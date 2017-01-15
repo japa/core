@@ -10,6 +10,7 @@
 */
 
 const Hook = require('./Hook')
+const Middleware = require('./Middleware')
 const $ = require('../lib/util')
 const emitter = require('../lib/emitter')
 
@@ -18,7 +19,6 @@ const eventsList = $.getEventsList()
 class Group {
   constructor (title, bail, isRoot) {
     this._title = title
-    this._bail = !!bail
     this._isRoot = !!isRoot
     this._timeout = $.getTimeout()
     this._hooks = {
@@ -28,7 +28,7 @@ class Group {
       after: []
     }
     this._tests = []
-    this._errorsStack = []
+    this.middleware = new Middleware(this, !!bail, this._wrapFn)
   }
 
   /**
@@ -122,45 +122,6 @@ class Group {
   }
 
   /**
-   * Composes the stack of tests and hooks as a middleare
-   * chain to be executed in sequence.
-   *
-   * @param   {Array} stack
-   * @return  {Function}
-   * @private
-   */
-  _composeAsMiddleware (stack) {
-    return (next) => {
-      if (stack.length === 0) {
-        return Promise.resolve()
-      }
-      return dispatch.bind(this)(0)
-      function dispatch (index) {
-        const elem = stack[index]
-
-        if (index === stack.length) {
-          return Promise.resolve()
-        }
-
-        return new Promise((resolve, reject) => {
-          this._wrapFn(elem, next => {
-            return dispatch.bind(this)(index + 1)
-          })
-          .then(resolve)
-          .catch((error) => {
-            if (this._bail) {
-              reject(error)
-            } else {
-              this._errorsStack.push(error)
-              resolve(dispatch.bind(this)(index + 1))
-            }
-          })
-        })
-      }
-    }
-  }
-
-  /**
    * Add a new closure to the before hook
    *
    * @param {Function} callback
@@ -224,17 +185,18 @@ class Group {
     const composedTests = this._composeStack()
 
     return new Promise((resolve, reject) => {
-      this._composeAsMiddleware(composedTests)()
+      this.middleware.compose(composedTests)()
       .then(() => {
-        this._end()
-        if (this._errorsStack.length) {
-          return reject(this._errorsStack)
+        if (this.middleware.errorsStack.length) {
+          throw this.middleware.errorsStack
         }
+        this._end()
         resolve()
       })
       .catch((error) => {
         this._end()
-        reject([error])
+        error = error instanceof Array === true ? error : [error]
+        reject(error)
       })
     })
   }

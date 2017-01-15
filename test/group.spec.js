@@ -97,7 +97,7 @@ test('compose tests as a middleware chain', function (assert) {
   group.addTest(testBar)
 
   group
-  ._composeAsMiddleware(group._composeStack())()
+  .middleware.compose(group._composeStack())()
   .then(() => {
     assert.deepEqual(testsStack, ['foo', 'bar'])
   })

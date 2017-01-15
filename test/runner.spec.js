@@ -12,75 +12,79 @@
 const test = require('tape')
 const Runner = require('../src/Runner')
 const Test = require('../src/Test')
+const emitter = require('../lib/emitter')
 
 const cleanup = function () {
-  Runner.clear()
-  Runner.eventNames().forEach((event) => {
-    Runner.removeAllListeners(event)
+  emitter.eventNames().forEach((event) => {
+    emitter.removeAllListeners(event)
   })
 }
 
 test('add a test to the default group', function (assert) {
+  const runner = new Runner()
   assert.plan(2)
-  const addedTest = Runner.test('this is test', function () {})
+  const addedTest = runner.test('this is test', function () {})
   assert.equal(addedTest instanceof Test, true)
-  assert.deepEqual(Runner.getGroups()[0]._tests[0], addedTest)
+  assert.deepEqual(runner.getGroups()[0]._tests[0], addedTest)
   cleanup()
 })
 
 test('add a test to the newly created group', function (assert) {
+  const runner = new Runner()
   assert.plan(2)
   let addedTest = null
-  Runner.group('Dummy group', () => {
-    addedTest = Runner.test('this is test', function () {})
+  runner.group('Dummy group', () => {
+    addedTest = runner.test('this is test', function () {})
   })
   assert.equal(addedTest instanceof Test, true)
-  assert.deepEqual(Runner.getGroups()[1]._tests[0], addedTest)
+  assert.deepEqual(runner.getGroups()[1]._tests[0], addedTest)
   cleanup()
 })
 
 test('add a test to the newly created default group after a named group', function (assert) {
+  const runner = new Runner()
   assert.plan(4)
   let groupTest = null
-  Runner.group('Dummy group', () => {
-    groupTest = Runner.test('this is test', function () {})
+  runner.group('Dummy group', () => {
+    groupTest = runner.test('this is test', function () {})
   })
 
-  const addedTest = Runner.test('Foo', function () {})
+  const addedTest = runner.test('Foo', function () {})
 
   assert.equal(addedTest instanceof Test, true)
-  assert.deepEqual(Runner.getGroups()[2]._tests[0], addedTest)
+  assert.deepEqual(runner.getGroups()[2]._tests[0], addedTest)
   assert.equal(groupTest instanceof Test, true)
-  assert.deepEqual(Runner.getGroups()[1]._tests[0], groupTest)
+  assert.deepEqual(runner.getGroups()[1]._tests[0], groupTest)
   cleanup()
 })
 
 test('run all tests in a group and in default group in sequence', function (assert) {
+  const runner = new Runner()
   assert.plan(1)
 
   const testsStack = []
 
-  Runner.on('group:start', function (stats) {
+  emitter.on('group:start', function (stats) {
     testsStack.push(stats.title)
   })
 
-  Runner.on('group:end', function (stats) {
+  emitter.on('group:end', function (stats) {
     testsStack.push(stats.title)
   })
 
-  Runner.on('test:end', function (stats) {
+  emitter.on('test:end', function (stats) {
     testsStack.push(stats.title)
   })
 
-  Runner.group('Foo', function () {
-    Runner.test('a foo foo', function () {})
-    Runner.test('a foo bar', function () {})
+  runner.group('Foo', function () {
+    runner.test('a foo foo', function () {})
+    runner.test('a foo bar', function () {})
   })
 
-  Runner.test('a foo', function () {})
-  Runner.test('a bar', function () {})
+  runner.test('a foo', function () {})
+  runner.test('a bar', function () {})
 
-  Runner
+  runner
   .run()
   .then(() => {
     assert.deepEqual(testsStack, ['Foo', 'a foo foo', 'a foo bar', 'Foo', 'a foo', 'a bar'])
@@ -89,48 +93,49 @@ test('run all tests in a group and in default group in sequence', function (asse
 })
 
 test('run all async tests in a group and in default group in sequence', function (assert) {
+  const runner = new Runner()
   assert.plan(1)
 
   const testsStack = []
 
-  Runner.on('group:start', function (stats) {
+  emitter.on('group:start', function (stats) {
     testsStack.push(stats.title)
   })
 
-  Runner.on('group:end', function (stats) {
+  emitter.on('group:end', function (stats) {
     testsStack.push(stats.title)
   })
 
-  Runner.on('test:end', function (stats) {
+  emitter.on('test:end', function (stats) {
     testsStack.push(stats.title)
   })
 
-  Runner.group('Foo', function () {
-    Runner.test('a foo foo', function () {
+  runner.group('Foo', function () {
+    runner.test('a foo foo', function () {
       return new Promise((resolve) => {
         resolve()
       })
     })
-    Runner.test('a foo bar', function () {
+    runner.test('a foo bar', function () {
       return new Promise((resolve) => {
         resolve()
       })
     })
   })
 
-  Runner.test('a foo', function () {
+  runner.test('a foo', function () {
     return new Promise((resolve) => {
       resolve()
     })
   })
 
-  Runner.test('a bar', function () {
+  runner.test('a bar', function () {
     return new Promise((resolve) => {
       resolve()
     })
   })
 
-  Runner
+  runner
   .run()
   .then(() => {
     assert.deepEqual(testsStack, ['Foo', 'a foo foo', 'a foo bar', 'Foo', 'a foo', 'a bar'])
@@ -139,141 +144,146 @@ test('run all async tests in a group and in default group in sequence', function
 })
 
 test('run a skippable test', function (assert) {
+  const runner = new Runner()
   assert.plan(2)
   const testsStack = []
-  Runner.on('test:end', function (stats) {
+  emitter.on('test:end', function (stats) {
     testsStack.push(stats)
   })
 
-  Runner.test.skip('Foo', function () {})
+  runner.skip('Foo', function () {})
 
-  Runner.run().then(() => {
+  runner.run().then(() => {
     assert.equal(testsStack[0].title, 'Foo')
     assert.equal(testsStack[0].status, 'skipped')
   })
 })
 
 test('do not emit hooks event when not defined', function (assert) {
+  const runner = new Runner()
   assert.plan(1)
   const eventsStack = []
 
-  Runner.on('hook:before:start', function () {
+  emitter.on('hook:before:start', function () {
     eventsStack.push('hook:before:start')
   })
 
-  Runner.on('hook:before:end', function () {
+  emitter.on('hook:before:end', function () {
     eventsStack.push('hook:before:end')
   })
 
-  Runner.on('hook:after:start', function () {
+  emitter.on('hook:after:start', function () {
     eventsStack.push('hook:after:start')
   })
 
-  Runner.on('hook:after:end', function () {
+  emitter.on('hook:after:end', function () {
     eventsStack.push('hook:after:end')
   })
 
-  Runner.run().then(() => {
+  runner.run().then(() => {
     assert.deepEqual(eventsStack, [])
     cleanup()
   })
 })
 
 test('do not emit hooks events when not defined but their is a test', function (assert) {
+  const runner = new Runner()
   assert.plan(1)
   const eventsStack = []
 
-  Runner.on('hook:before:start', function () {
+  emitter.on('hook:before:start', function () {
     eventsStack.push('hook:before:start')
   })
 
-  Runner.on('hook:before:end', function () {
+  emitter.on('hook:before:end', function () {
     eventsStack.push('hook:before:end')
   })
 
-  Runner.on('hook:after:start', function () {
+  emitter.on('hook:after:start', function () {
     eventsStack.push('hook:after:start')
   })
 
-  Runner.on('hook:after:end', function () {
+  emitter.on('hook:after:end', function () {
     eventsStack.push('hook:after:end')
   })
 
-  Runner.on('test:start', function () {
+  emitter.on('test:start', function () {
     eventsStack.push('test:start')
   })
 
-  Runner.on('test:end', function () {
+  emitter.on('test:end', function () {
     eventsStack.push('test:end')
   })
 
-  Runner.test('new test', function () {})
+  runner.test('new test', function () {})
 
-  Runner.run().then(() => {
+  runner.run().then(() => {
     assert.deepEqual(eventsStack, ['test:start', 'test:end'])
     cleanup()
   })
 })
 
 test('do emit group events when even a single test is defined', function (assert) {
+  const runner = new Runner()
   assert.plan(1)
   const eventsStack = []
 
-  Runner.on('group:start', function () {
+  emitter.on('group:start', function () {
     eventsStack.push('group:start')
   })
 
-  Runner.on('group:end', function () {
+  emitter.on('group:end', function () {
     eventsStack.push('group:end')
   })
 
-  Runner.on('test:start', function () {
+  emitter.on('test:start', function () {
     eventsStack.push('test:start')
   })
 
-  Runner.on('test:end', function () {
+  emitter.on('test:end', function () {
     eventsStack.push('test:end')
   })
 
-  Runner.group('Sample group', function () {
-    Runner.test('new test', function () {})
+  runner.group('Sample group', function () {
+    runner.test('new test', function () {})
   })
 
-  Runner.run().then(() => {
+  runner.run().then(() => {
     assert.deepEqual(eventsStack, ['group:start', 'test:start', 'test:end', 'group:end'])
     cleanup()
   })
 })
 
 test('do emit group hook events when they are defined', function (assert) {
+  const runner = new Runner()
   assert.plan(1)
   const eventsStack = []
 
-  Runner.on('group:start', function () {
+  emitter.on('group:start', function () {
     eventsStack.push('group:start')
   })
 
-  Runner.on('group:end', function () {
+  emitter.on('group:end', function () {
     eventsStack.push('group:end')
   })
 
-  Runner.on('hook:before:start', function () {
+  emitter.on('hook:before:start', function () {
     eventsStack.push('hook:before:start')
   })
 
-  Runner.on('hook:before:end', function () {
+  emitter.on('hook:before:end', function () {
     eventsStack.push('hook:before:end')
   })
 
-  Runner.on('test:start', function () {
+  emitter.on('test:start', function () {
     eventsStack.push('test:start')
   })
 
-  Runner.on('test:end', function () {
+  emitter.on('test:end', function () {
     eventsStack.push('test:end')
   })
 
-  Runner.group('Sample group', function (group) {
+  runner.group('Sample group', function (group) {
     group.before(function () {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -282,25 +292,76 @@ test('do emit group hook events when they are defined', function (assert) {
       })
     })
 
-    Runner.test('new test', function () {})
+    runner.test('new test', function () {})
   })
 
-  Runner.run().then(() => {
+  runner.run().then(() => {
     assert.deepEqual(eventsStack, ['group:start', 'hook:before:start', 'hook:before:end', 'test:start', 'test:end', 'group:end'])
     cleanup()
   })
 })
 
 test('set global timeout for all tests', function (assert) {
+  const runner = new Runner()
   assert.plan(2)
-  Runner.timeout(10)
+  runner.timeout(10)
   const start = new Date()
-  Runner.test('this is test', function (assert, done) {})
-  Runner
+  runner.test('this is test', function (assert, done) {})
+  runner
   .run()
   .catch((error) => {
     assert.equal(new Date() - start < 20, true)
     assert.equal(error[0].error.message, 'Test timeout, make sure to call done() or increase timeout')
     cleanup()
+  })
+})
+
+test('should run all tests even when the previous group fails', function (assert) {
+  const runner = new Runner()
+  assert.plan(2)
+  const testsStack = []
+
+  runner.group('group1', function () {
+    runner.test('this is test', function (assert, done) {})
+  })
+
+  runner.group('group2', function () {
+    runner.test('this is test 2', function (assert) {})
+  })
+
+  emitter.on('test:end', function (stats) {
+    testsStack.push(stats.title)
+  })
+
+  runner
+  .run()
+  .catch((error) => {
+    assert.deepEqual(testsStack, ['this is test', 'this is test 2'])
+    assert.equal(error[0].error.message, 'Test timeout, make sure to call done() or increase timeout')
+  })
+})
+
+test('should break when a group fails and bail is true', function (assert) {
+  const runner = new Runner(true)
+  assert.plan(2)
+  const testsStack = []
+
+  runner.group('group1', function () {
+    runner.test('this is test', function (assert, done) {})
+  })
+
+  runner.group('group2', function () {
+    runner.test('this is test 2', function (assert) {})
+  })
+
+  emitter.on('test:end', function (stats) {
+    testsStack.push(stats.title)
+  })
+
+  runner
+  .run()
+  .catch((error) => {
+    assert.deepEqual(testsStack, ['this is test'])
+    assert.equal(error[0].error.message, 'Test timeout, make sure to call done() or increase timeout')
   })
 })
