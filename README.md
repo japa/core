@@ -17,22 +17,18 @@ Japa is a batteries included minimal testing framework for Node.Js. Japa does no
    * [Skip Tests](#skip-tests)
    * [Failing/Regression Tests](#failingregression-tests)
    * [Grouping Tests](#grouping-tests)
-      * [before](#before)
-      * [beforeEach](#beforeeach)
-      * [after](#after)
-      * [afterEach](#aftereach)
 * [Globals](#globals)
-      * [bail](#bail)
-      * [timeout](#timeout)
-      * [use](#use)
+    * [bail](#bail)
+    * [timeout](#timeout)
+    * [use](#use)
 * [Assertion](#assertion)
 * [API](#api)
-      * [test(title, callback)](#testtitle-callback)
-      * [test.skip(title, callback)](#testskiptitle-callback)
-      * [test.failing(title, callback)](#testfailingtitle-callback)
-      * [timeout(milliseconds)](#timeoutmilliseconds)
-      * [retry(ops)](#retryops)
-      * [group(title, callback)](#grouptitle-callback)
+    * [test(title, callback)](#testtitle-callback)
+    * [test.skip(title, callback)](#testskiptitle-callback)
+    * [test.failing(title, callback)](#testfailingtitle-callback)
+    * [timeout(milliseconds)](#timeoutmilliseconds)
+    * [retry(ops)](#retryops)
+    * [group(title, callback)](#grouptitle-callback)
 * [Events](#events)
 
 ---
@@ -44,6 +40,11 @@ Japa is a batteries included minimal testing framework for Node.Js. Japa does no
 ```bash
 npm i --save japa
 ```
+
+---
+
+<br /><br />
+
 
 ## Why Japa?
 Below is the list of specific reasons to choose Japa over any other testing framework.
