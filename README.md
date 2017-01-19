@@ -2,6 +2,48 @@
 
 Japa is a batteries included minimal testing framework for Node.Js. Japa does not have any cli to run your tests, infact running the test file as a node script will execute the tests for you (quite similar to tape).
 
+* [Installation](#installation)
+* [Why Japa?](#why-japa)
+   * [Minimal Core](#minimal-core)
+   * [ES2015..2017 Friendly](#es20152017-friendly)
+   * [Embedable](#embedable)
+   * [Pretty Output](#pretty-output)
+   * [Human Readable Diff](#human-readable-diff)
+* [Batteries Included](#batteries-included)
+   * [Multiple Test Formats](#multiple-test-formats)
+   * [Assertions Planning](#assertions-planning)
+   * [Timeouts](#timeouts)
+   * [Retry Flaky Tests](#retry-flaky-tests)
+   * [Skip Tests](#skip-tests)
+   * [Failing/Regression Tests](#failingregression-tests)
+   * [Grouping Tests](#grouping-tests)
+      * [before](#before)
+      * [beforeEach](#beforeeach)
+      * [after](#after)
+      * [afterEach](#aftereach)
+* [Globals](#globals)
+      * [bail](#bail)
+      * [timeout](#timeout)
+      * [use](#use)
+* [Assertion](#assertion)
+* [API](#api)
+      * [test(title, callback)](#testtitle-callback)
+      * [test.skip(title, callback)](#testskiptitle-callback)
+      * [test.failing(title, callback)](#testfailingtitle-callback)
+      * [timeout(milliseconds)](#timeoutmilliseconds)
+      * [retry(ops)](#retryops)
+      * [group(title, callback)](#grouptitle-callback)
+* [Events](#events)
+
+---
+
+<br />
+
+## Installation
+
+```bash
+npm i --save japa
+```
 
 ## Why Japa?
 Below is the list of specific reasons to choose Japa over any other testing framework.
