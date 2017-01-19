@@ -311,7 +311,7 @@ test('set global timeout for all tests', function (assert) {
   .run()
   .catch((error) => {
     assert.equal(new Date() - start < 20, true)
-    assert.equal(error[0].error.message, 'Test timeout, make sure to call done() or increase timeout')
+    assert.equal(error[0].error.message, 'Test timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
     cleanup()
   })
 })
@@ -337,7 +337,7 @@ test('should run all tests even when the previous group fails', function (assert
   .run()
   .catch((error) => {
     assert.deepEqual(testsStack, ['this is test', 'this is test 2'])
-    assert.equal(error[0].error.message, 'Test timeout, make sure to call done() or increase timeout')
+    assert.equal(error[0].error.message, 'Test timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
   })
 })
 
@@ -362,6 +362,6 @@ test('should break when a group fails and bail is true', function (assert) {
   .run()
   .catch((error) => {
     assert.deepEqual(testsStack, ['this is test'])
-    assert.equal(error[0].error.message, 'Test timeout, make sure to call done() or increase timeout')
+    assert.equal(error[0].error.message, 'Test timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
   })
 })

@@ -67,7 +67,7 @@ class Assertion {
    * @throws {Error} If planned assertions mis-match the ran assertions
    */
   evaluate () {
-    if (this._planned < 0 || this._planned === this._ran) {
+    if (this._planned <= 0 || this._planned === this._ran) {
       return
     }
     assert.fail(this._ran, this._planned, `planned for ${this._planned} assertion${$.verb(this._planned)} but ran ${this._ran}`)

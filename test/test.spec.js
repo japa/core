@@ -88,6 +88,7 @@ test('emit test stats when test passes', function (assert) {
       title: 'dummy',
       error: null,
       status: 'passed',
+      regression: false,
       timeout: false
     })
     cleanup()
@@ -130,7 +131,7 @@ test('emit test stats when test timeouts', function (assert) {
   test
   .run()
   .catch(() => {
-    assert.equal(testStats.error.message, 'Test timeout, make sure to call done() or increase timeout')
+    assert.equal(testStats.error.message, 'Test timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
     assert.equal(testStats.status, 'failed')
     assert.equal(testStats.timeout, true)
     cleanup()
@@ -217,7 +218,7 @@ test('retry test for the retry times if test timeouts', function (assert) {
   test
   .run()
   .catch((error) => {
-    assert.equal(error.message, 'Test timeout, make sure to call done() or increase timeout')
+    assert.equal(error.message, 'Test timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
     assert.equal(testsCounts, 3)
     cleanup()
   })
@@ -296,6 +297,26 @@ test('report success when planned assertions are ran', function (t) {
   .then(() => {
     t.equal(testStats.error, null)
     t.equal(testStats.status, 'passed')
+    cleanup()
+  })
+})
+
+test('mark as passed when test is expected to fail and does fails', function (t) {
+  t.plan(2)
+  let testStats = null
+  const test = new Test('dummy', function () {
+    throw new Error('What the hell')
+  }, false, true)
+
+  emitter.on('test:end', (stats) => {
+    testStats = stats
+  })
+
+  test
+  .run()
+  .then(() => {
+    t.equal(testStats.status, 'passed')
+    t.equal(testStats.regression, true)
     cleanup()
   })
 })

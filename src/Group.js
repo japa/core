@@ -58,7 +58,7 @@ class Group {
     emitter.emit(eventsList['GROUP_END'], {
       title: this._title,
       status: error ? 'failed' : 'passed',
-      error: error || null
+      errors: error || null
     })
   }
 
@@ -194,8 +194,8 @@ class Group {
         resolve()
       })
       .catch((error) => {
-        this._end()
         error = error instanceof Array === true ? error : [error]
+        this._end(error)
         reject(error)
       })
     })

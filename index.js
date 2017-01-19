@@ -10,7 +10,6 @@
 */
 
 const runner = new (require('./src/Runner'))()
-const emitter = require('./lib/emitter')
 
 const nextTick = typeof (setImmediate) !== 'undefined' ? setImmediate : process.nextTick
 
@@ -27,14 +26,8 @@ nextTick(function () {
 
 exports = module.exports = runner.test.bind(runner)
 exports.skip = runner.skip.bind(runner)
+exports.failing = runner.failing.bind(runner)
 exports.group = runner.group.bind(runner)
-exports.run = runner.run.bind(runner)
 exports.timeout = runner.timeout.bind(runner)
 exports.use = runner.use.bind(runner)
-
-// EMITTER EVENTS
-exports.on = emitter.on.bind(emitter)
-exports.once = emitter.once.bind(emitter)
-exports.removeListener = emitter.removeListener.bind(emitter)
-exports.removeAllListeners = emitter.removeAllListeners.bind(emitter)
-exports.eventNames = emitter.eventNames.bind(emitter)
+exports.bail = runner.bail.bind(runner)

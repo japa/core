@@ -148,3 +148,16 @@ test('emit start event when hook starts', function (assert) {
     cleanup()
   })
 })
+
+test('throw exception when returning a promise and making use of done callback', function (assert) {
+  assert.plan(1)
+  const hook = new Hook('sample group', 'before', function (done) {
+    return new Promise(() => {})
+  })
+  hook
+  .run()
+  .catch((error) => {
+    assert.equal(error.message, 'Method overload, return a promise or make use of the done callback')
+    cleanup()
+  })
+})

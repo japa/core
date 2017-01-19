@@ -19,14 +19,15 @@ const emitter = require('../lib/emitter')
 const eventsList = $.getEventsList()
 
 class Test {
-  constructor (title, callback, skip) {
+  constructor (title, callback, skip, expectedToFail) {
     this._title = title
     this._skip = !!skip
     this._todo = typeof (callback) !== 'function'
     this._timeout = $.getTimeout()
     this._callback = callback
+    this._regression = !!expectedToFail
+    this._regressionMessage = null
     this._retry = 0
-    this.assert = new Assertion()
   }
 
   /**
@@ -38,7 +39,8 @@ class Test {
   get eventBody () {
     return {
       title: this._title,
-      status: this._todo ? 'todo' : (this._skip ? 'skipped' : 'pending')
+      status: this._todo ? 'todo' : (this._skip ? 'skipped' : 'pending'),
+      regression: this._regression
     }
   }
 
@@ -78,16 +80,16 @@ class Test {
 
     switch (error) {
       case 'TIMEOUT':
-        return new Error('Test timeout, make sure to call done() or increase timeout')
+        return new Error('Test timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
 
       case 'METHOD OVERLOAD:PROMISE':
-        return new Error('Method overload, return a promise or make use of the done callback')
+        return new Error('Method overload, returning promise and making use of "done()" is not allowed together')
 
       case 'METHOD OVERLOAD:ASYNC':
-        return new Error('Method overload, async functions should not make use of done callback')
+        return new Error('Method overload, async functions and making use of "done()" is not allowed together')
 
       case 'DONE CALLED TWICE':
-        return new Error('Make sure you are not calling done more than once')
+        return new Error('Make sure you are not calling "done()" more than once')
 
       default:
         return error
@@ -103,10 +105,19 @@ class Test {
   _end (error, start) {
     const eventBody = this.eventBody
 
-    eventBody.timeout = !!(error && error.message === 'Test timeout, make sure to call done() or increase timeout')
+    eventBody.timeout = !!(
+      error && error.message === 'Test timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.'
+    )
     eventBody.error = error || null
     eventBody.duration = new Date() - start
     eventBody.status = this._getTestStatus(error)
+
+    /**
+     * Attach the regression message if test is regression.
+     */
+    if (eventBody.regression) {
+      eventBody.regressionMessage = this._regressionMessage
+    }
 
     emitter.emit(eventsList['TEST_END'], eventBody)
   }
@@ -124,40 +135,26 @@ class Test {
    * @return {Promise}
    */
   _runTest () {
+    const assert = new Assertion()
     return new Promise((resolve, reject) => {
-      this._start()
-      const start = new Date()
-
-      /**
-       * If test is a todo, resolve it
-       * right away
-       */
-      if (this._todo) {
-        this._end(null, start)
-        resolve()
-      }
-
-      /**
-       * If test is marked as skipped, resolve
-       * it right away
-       */
-      if (this._skip) {
-        this._end(null, start)
-        resolve()
-      }
-
       new Callable(this._callback, this._timeout, 1)
-      .args([this.assert])
+      .args([assert])
       .run()
-      .then(() => this.assert.evaluate())
+      .then(() => assert.evaluate())
       .then(() => {
-        this._end(null, start)
+        if (this._regression) {
+          reject(new Error('Test was expected to fail'))
+          return
+        }
         resolve()
       })
       .catch((error) => {
-        error = this._parseError(error)
-        this._end(error, start)
-        reject(error)
+        if (this._regression) {
+          this._regressionMessage = error.message
+          resolve()
+          return
+        }
+        reject(this._parseError(error))
       })
     })
   }
@@ -170,18 +167,47 @@ class Test {
    */
   run () {
     const op = retry.operation({
-      retries: this._retry
+      retries: this._retry,
+      factor: 1
     })
 
+    const start = new Date()
+
     return new Promise((resolve, reject) => {
+      this._start()
+
+      /**
+       * If test is a todo, resolve it
+       * right away
+       */
+      if (this._todo) {
+        this._end(null, start)
+        resolve()
+        return
+      }
+
+      /**
+       * If test is marked as skipped, resolve
+       * it right away
+       */
+      if (this._skip) {
+        this._end(null, start)
+        resolve()
+        return
+      }
+
       op.attempt(() => {
         this
         ._runTest()
-        .then(resolve)
+        .then(() => {
+          this._end(null, start)
+          resolve()
+        })
         .catch((error) => {
           if (op.retry(error)) {
             return
           }
+          this._end(error, start)
           reject(op.mainError())
         })
       })

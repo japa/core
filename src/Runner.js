@@ -17,22 +17,34 @@ const $ = require('../lib/util')
 
 class Runner {
   constructor (bail) {
-    this._testReporter = require('../src/Reporters/json')
+    this._testReporter = require('../src/Reporters/min')
     this._testGroups = []
     this._pushDefaultGroup()
     this._bail = !!bail
-    this.middleware = new Middleware(this, this._bail, this._wrapFn)
   }
 
   /**
    * Emits the end event for all the tests.
    *
    * @param  {Object|Null}
+   *
+   * @private
    */
   _end (error) {
     emitter.emit('end', {
-      status: error ? 'failed' : 'passed'
+      status: error ? 'failed' : 'passed',
+      error: error || null
     })
+  }
+
+  /**
+   * Emits the start event when the tests suite
+   * starts.
+   *
+   * @private
+   */
+  _start () {
+    emitter.emit('start')
   }
 
   /**
@@ -40,6 +52,8 @@ class Runner {
    * This is required to make sure all tests
    * outside of explicit groups are executed
    * in order.
+   *
+   * @private
    */
   _pushDefaultGroup () {
     this._testGroups.push(new Group('default', this._bail, true))
@@ -50,6 +64,8 @@ class Runner {
    * stack.
    *
    * @return {Object}
+   *
+   * @private
    */
   _getLatestGroup () {
     return this._testGroups[this._testGroups.length - 1]
@@ -61,10 +77,11 @@ class Runner {
    * @param   {String}   title
    * @param   {Function} callback
    * @param   {Boolean}   skip
+   *
    * @private
    */
-  _addTest (title, callback, skip) {
-    const test = new Test(title, callback, skip)
+  _addTest (title, callback, skip, failing) {
+    const test = new Test(title, callback, skip, failing)
     const lastGroup = this._getLatestGroup()
     lastGroup.addTest(test)
     return test
@@ -76,6 +93,8 @@ class Runner {
    *
    * @param  {Array}
    * @return {Array}
+   *
+   * @private
    */
   _flatten (errorsStack) {
     let flatStack = []
@@ -95,6 +114,8 @@ class Runner {
    * @param  {Function}
    * @param  {Function}
    * @return {Promise}
+   *
+   * @private
    */
   _wrapFn (fn, next) {
     return new Promise((resolve, reject) => fn.run().then(next).then(resolve).catch(reject))
@@ -104,6 +125,8 @@ class Runner {
    * Returns the list of groups
    *
    * @return {Array}
+   *
+   * @private
    */
   getGroups () {
     return this._testGroups
@@ -116,7 +139,7 @@ class Runner {
    * @return {Object}
    */
   test (title, callback) {
-    return this._addTest(title, callback, false)
+    return this._addTest(title, callback, false, false)
   }
 
   /**
@@ -127,7 +150,30 @@ class Runner {
    * @return {Object}
    */
   skip (title, callback) {
-    return this._addTest(title, callback, true)
+    return this._addTest(title, callback, true, false)
+  }
+
+  /**
+   * Create a test that would fail but will be marked
+   * as passed.
+   *
+   * @param  {String}
+   * @param  {Function}
+   * @return {Object}
+   */
+  failing (title, callback) {
+    return this._addTest(title, callback, false, true)
+  }
+
+  /**
+   * Toggle the bail status of the runner. Also
+   * this needs to be done before calling
+   * the run method.
+   *
+   * @param  {Boolean} state
+   */
+  bail (state) {
+    this._bail = !!state
   }
 
   /**
@@ -159,10 +205,12 @@ class Runner {
     }
 
     return new Promise((resolve, reject) => {
-      this.middleware.compose(this._testGroups)()
+      const middleware = new Middleware(this, this._bail, this._wrapFn)
+      this._start()
+      middleware.compose(this._testGroups)()
       .then(() => {
-        if (this.middleware.errorsStack.length) {
-          throw this._flatten(this.middleware.errorsStack)
+        if (middleware.errorsStack.length) {
+          throw this._flatten(middleware.errorsStack)
         }
         this._end(null)
         resolve()

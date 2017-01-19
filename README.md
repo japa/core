@@ -52,6 +52,8 @@ Below is the list of specific reasons to choose Japa over any other testing fram
 ### Minimal Core
 Japa core is so minimal and only focuses on building your tests, not running them.
 
+---
+
 ### ES2015..2017 Friendly
 Japa harness the goodness of ES2105 and later. You can define your tests as **async** methods or **return a Promise** from your tests.
 
