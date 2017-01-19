@@ -36,6 +36,7 @@ Japa is a batteries included minimal testing framework for Node.Js. Japa does no
 <br />
 
 ## Installation
+Japa needs **Node.js >= 6.0.0**.
 
 ```bash
 npm i --save japa
