@@ -1,5 +1,5 @@
 {
-  "name": "micro-test",
+  "name": "japa",
   "version": "1.0.0",
   "description": "1. Simple and clean. 2. Options for running async tasks - via promises, async/await, generators and synchronous 3. Additional support for suites. 4. Runnable without CLI. 5. Stream result as JSON. 6. Reporters to pipe into stream and change the result output. 7. Test events every time a test completes. 8. Test tags - to run specific tests only. 9. Able to skip tests 10. Able to mark task as todo. Same is done without passing the closure. 11. Single test timeouts 12. Retry test. 13. Optionally bundle tests inside a module.",
   "main": "index.js",
