@@ -12,16 +12,27 @@ Japa core is so minimal and only focuses on building your tests, not running the
 ### ES2015..2017 Friendly
 Japa harness the goodness of ES2105 and later. You can define your tests as **async** methods or **return a Promise** from your tests.
 
+---
+
 ### Embedable
 It comes with fully-fledged API, which can be used to build your own test runners.
 
+---
+
 ### Pretty Output
 The default test reporter output is as pretty as Mocha spec reporter. Check below screenshot.
+
 ![](http://res.cloudinary.com/adonisjs/image/upload/v1484829443/Screenshot_2017-01-19_18.06.06_r1m0gq.png)
+
+---
 
 ### Human Readable Diff
 Majority of test runners outputs assertions diff quite similar to GIT. Which is great when diffing code, but not when reading failing test reports. Japa has a simple and clean **diff viewer**.
 ![](http://res.cloudinary.com/adonisjs/image/upload/v1484832296/Screen_Shot_2017-01-19_at_6.54.38_PM_yxaktv.png)
+
+<br />
+
+---
 
 ## Batteries Included
 
@@ -52,6 +63,8 @@ test('Traditional callbacks', (assert, done) => {
 })
 ```
 
+---
+
 ### Assertions Planning
 At times your test passes, since the failing code is not reachable by your test files. It is always a good idea
 to plan assertions to these kind of scanerios.
@@ -68,6 +81,8 @@ test('Planning assertions', (assert) => {
 })
 ```
 
+---
+
 ### Timeouts
 You can define timeout for each test when defining them.
 
@@ -78,6 +93,8 @@ test('This is the slow one', (assert) => {
   
 }).timeout(5000)
 ```
+
+---
 
 ### Retry Flaky Tests
 We all deal with flaky tests, which needs to be retried couple of times before they can pass.
@@ -92,6 +109,8 @@ test('I am so flaky', (assert) => {
 }).retry(3)
 ```
 
+---
+
 ### Skip Tests
 Got a bug that needs some love? Skip it's tests until it get's fixed.
 
@@ -102,6 +121,8 @@ test.skip('I will be skipped', (assert) => {
   
 })
 ```
+
+---
 
 ### Failing/Regression Tests
 When bugs spotted, your users can create a PR with failing test instead of creating issues. Tests started with `failing` will not break the test suite.
@@ -115,6 +136,8 @@ test.failing('Some regression here', (assert) => {
 ```
 
 ![](http://res.cloudinary.com/adonisjs/image/upload/v1484831298/Screen_Shot_2017-01-19_at_6.37.54_PM_i8dmrp.png)
+
+---
 
 ### Grouping Tests
 It is a good practice to keep your tests flat and not be depedented on any global state. But at times you may want to execute cleanup/setup methods before and after tests.
@@ -169,6 +192,11 @@ test.group('Some Module', (group) => {
 })
 ```
 
+<br />
+
+---
+
+
 ## Globals
 
 Below is the list of settings/options which can turn on/off globally.
@@ -211,8 +239,72 @@ test('title', () => {
 })
 ```
 
+<br />
+
+---
+
 ## Assertion
 Japa makes use of [ChaiJs Assertion Library](http://chaijs.com/api/assert/). Make sure to read their docs.
+
+<br />
+
+---
+
+
+## API
+Here is the list of all the testing methods
+
+#### test(title, callback)
+Write a new test
+
+```javascript
+test('title', (assert) => {})
+```
+
+#### test.skip(title, callback)
+Create a test to be skipped
+
+```javascript
+test.skip('title', (assert) => {})
+```
+
+#### test.failing(title, callback)
+Create a test which is expected to be failed
+
+```javascript
+test.failing('title', (assert) => {})
+```
+
+#### timeout(milliseconds)
+How long to wait for test to finish.
+
+```javascript
+test('title', (assert) => {
+  
+}).timeout(5000)
+```
+
+#### retry(ops)
+How many times to retry a test before marking it as fail. The `retry` only happens when test keeps on failing
+
+```javascript
+test('title', (assert) => {
+  
+}).retry(2)
+```
+
+#### group(title, callback)
+Create a new test group/suite. Nested groups are not allowed.
+
+```javascript
+test.group('Module name', (group) => {
+  
+  group.after(async () => >{
+    await Db.clear()
+  })
+
+})
+```
 
 ## Events
 
