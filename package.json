@@ -1,10 +1,11 @@
 {
   "name": "japa",
   "version": "1.0.0",
-  "description": "1. Simple and clean. 2. Options for running async tasks - via promises, async/await, generators and synchronous 3. Additional support for suites. 4. Runnable without CLI. 5. Stream result as JSON. 6. Reporters to pipe into stream and change the result output. 7. Test events every time a test completes. 8. Test tags - to run specific tests only. 9. Able to skip tests 10. Able to mark task as todo. Same is done without passing the closure. 11. Single test timeouts 12. Retry test. 13. Optionally bundle tests inside a module.",
+  "description": "Japa is a batteries included minimal testing framework for Node.Js. Japa does not have any cli to run your tests, infact running the test file as a node script will execute the tests for you (quite similar to tape)",
   "main": "index.js",
   "directories": {
-    "example": "examples"
+    "example": "examples",
+    "test": "test"
   },
   "dependencies": {
     "chai": "^3.5.0",
@@ -18,17 +19,28 @@
     "chai": "^3.5.0",
     "faucet": "0.0.1",
     "istanbul": "^0.4.5",
+    "require-all": "^2.1.0",
+    "semver": "^5.3.0",
+    "shelljs": "^0.7.6",
     "standard": "^8.6.0",
-    "tape": "^4.6.3"
+    "tape": "^4.6.3",
+    "ygor": "^4.0.1"
   },
   "scripts": {
     "pretest": "npm run lint",
-    "test": "node --harmony-async-await ./node_modules/.bin/tape test/*.spec.js",
-    "test:pretty": "npm run test | ./node_modules/.bin/faucet",
-    "coverage": "node --harmony-async-await ./node_modules/.bin/istanbul cover ./node_modules/.bin/tape test/*.spec.js",
+    "test": "node tasks test",
+    "coverage": "node tasks coverage",
     "lint": "standard"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "amanvirk",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thetutlage/japa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thetutlage/japa/issues"
+  },
+  "homepage": "https://github.com/thetutlage/japa#readme"
 }
