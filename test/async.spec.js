@@ -11,6 +11,8 @@
 
 const test = require('tape')
 const Callable = require('../src/Callable')
+const Hook = require('../src/Hook')
+const Test = require('../src/Test')
 
 test('resolve the function when it is async', function (assert) {
   assert.plan(1)
@@ -88,5 +90,27 @@ test('disable timeouts when timeout is zero', function (assert) {
   .run()
   .then(() => {
     assert.ok(new Date() - start > 2000)
+  })
+})
+
+test('throw exception when hook is an async function and making use of done', function (assert) {
+  assert.plan(1)
+  const hook = new Hook('sample group', 'before', async function (done) {
+  })
+  hook
+  .run()
+  .catch((error) => {
+    assert.equal(error.message, 'Method overload, async functions and making use of "done()" is not allowed together')
+  })
+})
+
+test('throw exception when test is an async function and making use of done', function (assert) {
+  assert.plan(1)
+  const test = new Test('dummy', async function (assert, done) {
+  })
+  test
+  .run()
+  .catch((error) => {
+    assert.equal(error.message, 'Method overload, async functions and making use of "done()" is not allowed together')
   })
 })

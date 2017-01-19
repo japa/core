@@ -30,6 +30,16 @@ test('throw exception when timeout is not a number', function (assert) {
   }
 })
 
+test('throw exception when callback is not a function', function (assert) {
+  assert.plan(1)
+  try {
+    /* eslint no-new: "off" */
+    new Callable()
+  } catch (error) {
+    assert.equal(error.message, 'Make sure to pass a function to the callable instance')
+  }
+})
+
 test('disable timeouts when timeout is 0', function (assert) {
   assert.plan(1)
   const fn = function (done) {}

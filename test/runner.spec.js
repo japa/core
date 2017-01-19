@@ -342,7 +342,8 @@ test('should run all tests even when the previous group fails', function (assert
 })
 
 test('should break when a group fails and bail is true', function (assert) {
-  const runner = new Runner(true)
+  const runner = new Runner()
+  runner.bail(true)
   assert.plan(2)
   const testsStack = []
 
@@ -363,5 +364,26 @@ test('should break when a group fails and bail is true', function (assert) {
   .catch((error) => {
     assert.deepEqual(testsStack, ['this is test'])
     assert.equal(error[0].error.message, 'Test timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
+  })
+})
+
+test('should pass when test is marked failing and does fails', function (assert) {
+  const runner = new Runner()
+  assert.plan(2)
+  const testsStack = []
+
+  emitter.on('test:end', (stats) => {
+    testsStack.push(stats)
+  })
+
+  runner.failing('this is test', function (assert) {
+    throw new Error('I failed but passed')
+  })
+
+  runner
+  .run()
+  .then(() => {
+    assert.equal(testsStack[0].regression, true)
+    assert.equal(testsStack[0].regressionMessage, 'I failed but passed')
   })
 })

@@ -36,16 +36,16 @@ class Hook {
 
     switch (error) {
       case 'TIMEOUT':
-        return new Error('Hook timeout, make sure to call done() or increase timeout')
+        return new Error('Hook timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
 
       case 'METHOD OVERLOAD:PROMISE':
-        return new Error('Method overload, return a promise or make use of the done callback')
+        return new Error('Method overload, returning promise and making use of "done()" is not allowed together')
 
       case 'METHOD OVERLOAD:ASYNC':
-        return new Error('Method overload, async functions should not make use of done callback')
+        return new Error('Method overload, async functions and making use of "done()" is not allowed together')
 
       case 'DONE CALLED TWICE':
-        return new Error('Make sure you are not calling done more than once')
+        return new Error('Make sure you are not calling "done()" more than once')
 
       default:
         return error

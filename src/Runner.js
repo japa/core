@@ -17,7 +17,7 @@ const $ = require('../lib/util')
 
 class Runner {
   constructor (bail) {
-    this._testReporter = require('../src/Reporters/min')
+    this._testReporter = require('../src/Reporters/list')
     this._testGroups = []
     this._pushDefaultGroup()
     this._bail = !!bail

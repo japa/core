@@ -320,3 +320,52 @@ test('mark as passed when test is expected to fail and does fails', function (t)
     cleanup()
   })
 })
+
+test('throw exception when test was expected to fail but passed', function (t) {
+  t.plan(1)
+  const test = new Test('dummy', function () {
+  }, false, true)
+
+  test
+  .run()
+  .catch((error) => {
+    t.equal(error.message, 'Test was expected to fail')
+  })
+})
+
+test('throw exception when done is called twice', function (assert) {
+  assert.plan(1)
+  const test = new Test('dummy', function (assert, done) {
+    done()
+    done()
+  })
+  test
+  .run()
+  .catch((error) => {
+    assert.equal(error.message, 'Make sure you are not calling "done()" more than once')
+  })
+})
+
+test('return error passed to done callback', function (assert) {
+  assert.plan(1)
+  const test = new Test('dummy', function (assert, done) {
+    done('Just a old plain string error')
+  })
+  test
+  .run()
+  .catch((error) => {
+    assert.equal(error, 'Just a old plain string error')
+  })
+})
+
+test('throw exception when promise and done used together', function (assert) {
+  assert.plan(1)
+  const test = new Test('dummy', function (assert, done) {
+    return new Promise(() => {})
+  })
+  test
+  .run()
+  .catch((error) => {
+    assert.equal(error.message, 'Method overload, returning promise and making use of "done()" is not allowed together')
+  })
+})

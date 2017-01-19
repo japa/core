@@ -220,7 +220,7 @@ test('throw timeout error when before test timeouts', function (assert) {
   .run()
   .catch((error) => {
     assert.equal(error[0].title, 'Sample')
-    assert.equal(error[0].error.message, 'Hook timeout, make sure to call done() or increase timeout')
+    assert.equal(error[0].error.message, 'Hook timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
     cleanup()
   })
 })
@@ -258,7 +258,7 @@ test('run all tests even when a hook fails', function (assert) {
   .run()
   .catch((error) => {
     assert.equal(error[0].title, 'Sample')
-    assert.equal(error[0].error.message, 'Hook timeout, make sure to call done() or increase timeout')
+    assert.equal(error[0].error.message, 'Hook timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
     assert.deepEqual(testsStack, [
       'beforeEach',
       'test foo',
@@ -305,7 +305,7 @@ test('stop after first error when bail is true', function (assert) {
   .run()
   .catch((error) => {
     assert.equal(error[0].title, 'A')
-    assert.equal(error[0].error.message, 'Hook timeout, make sure to call done() or increase timeout')
+    assert.equal(error[0].error.message, 'Hook timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
     assert.deepEqual(testsStack, [])
     cleanup()
   })

@@ -41,6 +41,7 @@ class Min {
       passed: 0,
       failed: 0,
       skipped: 0,
+      regression: 0,
       todo: 0
     }
 
@@ -71,7 +72,7 @@ class Min {
    * @return {Boolean}
    */
   _hasDiff (error) {
-    return typeof (error.actual) !== 'undefined' && typeof (error.expected) !== 'undefined'
+    return typeof (error.actual) !== 'undefined' || typeof (error.expected) !== 'undefined'
   }
 
   /**
@@ -79,7 +80,7 @@ class Min {
    * @param  {String} status
    * @return {Function}
    */
-  getStatusColor (status) {
+  _getStatusColor (status) {
     return chalk[this.colors[status]] || chalk.gray
   }
 
@@ -105,7 +106,7 @@ class Min {
    * @param  {String} status
    * @return {Function}
    */
-  getStatusIcon (status) {
+  _getStatusIcon (status) {
     return chalk[this.colors[status]](this.icons[status])
   }
 
@@ -146,9 +147,13 @@ class Min {
     this.finalStats[status]++
     this.finalStats.total++
 
-    const color = status === 'passed' ? chalk.gray : this.getStatusColor(status)
+    if (regression) {
+      this.finalStats.regression++
+    }
+
+    const color = status === 'passed' ? chalk.gray : this._getStatusColor(status)
     const pad = this.activeGroup ? '  ' : ''
-    this.log(`${pad}${this.getStatusIcon(status)} ${color(title)} ${chalk.gray(`(${ms(duration)})`)}`)
+    this.log(`${pad}${this._getStatusIcon(status)} ${color(title)} ${chalk.gray(`(${ms(duration)})`)}`)
 
     if (regressionMessage) {
       this.log(`${pad}${pad}${chalk.magenta(`MESSAGE: ${regressionMessage}`)} \n`)

@@ -40,6 +40,16 @@ test('pass when no tests were planned', function (t) {
   t.end()
 })
 
+test('throw exception when plan nums is not a number', function (t) {
+  t.plan(1)
+  const assertion = new Assertion()
+  try {
+    assertion.plan('foo')
+  } catch (error) {
+    t.equal(error.message, 'Planned assertions should be valid number')
+  }
+})
+
 test('fail when tests were planned but not asserted', function (t) {
   t.plan(1)
   const assertion = new Assertion()
@@ -61,5 +71,25 @@ test('fail when tests were more assertions are made than the planned assertions'
     assertion.evaluate()
   } catch (error) {
     t.equal(error.message, 'planned for 1 assertion but ran 2')
+  }
+})
+
+test('pass when assertion counts are 0 and ran 1', function (t) {
+  const assertion = new Assertion()
+  assertion.plan(0)
+  assertion.equal(2, 2)
+  assertion.evaluate()
+  t.end()
+})
+
+test('fail when ran assertions are less than planned assertions', function (t) {
+  t.plan(1)
+  const assertion = new Assertion()
+  assertion.plan(2)
+  assertion.equal(2, 2)
+  try {
+    assertion.evaluate()
+  } catch (error) {
+    t.equal(error.message, 'planned for 2 assertions but ran 1')
   }
 })

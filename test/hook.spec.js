@@ -127,7 +127,7 @@ test('emit hook stats when hook timeouts', function (assert) {
   hook
   .run()
   .catch(() => {
-    assert.equal(hookStats.error.message, 'Hook timeout, make sure to call done() or increase timeout')
+    assert.equal(hookStats.error.message, 'Hook timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
     assert.equal(hookStats.status, 'failed')
     cleanup()
   })
@@ -157,7 +157,46 @@ test('throw exception when returning a promise and making use of done callback',
   hook
   .run()
   .catch((error) => {
-    assert.equal(error.message, 'Method overload, return a promise or make use of the done callback')
+    assert.equal(error.message, 'Method overload, returning promise and making use of "done()" is not allowed together')
     cleanup()
   })
+})
+
+test('throw exception when done is called twice', function (assert) {
+  assert.plan(1)
+  const hook = new Hook('sample group', 'before', function (done) {
+    done()
+    done()
+  })
+  hook
+  .run()
+  .catch((error) => {
+    assert.equal(error.message, 'Make sure you are not calling "done()" more than once')
+    cleanup()
+  })
+})
+
+test('throw exception when hook throws exception', function (assert) {
+  assert.plan(1)
+  const hook = new Hook('sample group', 'before', function (done) {
+    done('This is an error')
+  })
+  hook
+  .run()
+  .catch((error) => {
+    assert.equal(error, 'This is an error')
+    cleanup()
+  })
+})
+
+test('throw exception when timeout is not a number', function (assert) {
+  assert.plan(1)
+  const hook = new Hook('sample group', 'before', function () {
+  })
+  try {
+    hook.timeout('foo')
+  } catch (error) {
+    assert.equal(error.message, 'Make sure timeout is in milliseconds as a number')
+    cleanup()
+  }
 })
