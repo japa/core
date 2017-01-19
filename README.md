@@ -1,4 +1,4 @@
-![](https://d13yacurqjgara.cloudfront.net/users/227263/screenshots/2365295/monk.png)
+![Japa](http://res.cloudinary.com/adonisjs/image/upload/v1484834197/monk_di16hz.png)
 
 Japa is a batteries included minimal testing framework for Node.Js. Japa does not have any cli to run your tests, infact running the test file as a node script will execute the tests for you (quite similar to tape).
 
@@ -6,32 +6,22 @@ Japa is a batteries included minimal testing framework for Node.Js. Japa does no
 ## Why Japa?
 Below is the list of specific reasons to choose Japa over any other testing framework.
 
-<details>
-    <summary> Minimal Core </summary>
-    Japa core is so minimal and only focuses on building your tests, not running them.
-</details>
+### Minimal Core
+Japa core is so minimal and only focuses on building your tests, not running them.
 
-<details>
-    <summary> ES2015..2017 Friendly </summary>
-    Japa harness the goodness of ES2105 and later. You can define your tests as **async** methods or **return a Promise** from your tests.
-</details>
+### ES2015..2017 Friendly
+Japa harness the goodness of ES2105 and later. You can define your tests as **async** methods or **return a Promise** from your tests.
 
-<details>
-    <summary> Embedable </summary>
-    It comes with fully-fledged API, which can be used to build your own test runners.
-</details>
+### Embedable
+It comes with fully-fledged API, which can be used to build your own test runners.
 
-<details>
-    <summary> Pretty Output </summary>
-    The default test reporter output is as pretty as Mocha spec reporter. Check below screenshot.
-    ![](http://res.cloudinary.com/adonisjs/image/upload/v1484829443/Screenshot_2017-01-19_18.06.06_r1m0gq.png)
-</details>
+### Pretty Output
+The default test reporter output is as pretty as Mocha spec reporter. Check below screenshot.
+![](http://res.cloudinary.com/adonisjs/image/upload/v1484829443/Screenshot_2017-01-19_18.06.06_r1m0gq.png)
 
-<details>
-    <summary> Human Readable Diff </summary>
-    Majority of test runners outputs assertions diff quite similar to GIT. Which is great when diffing code, but not when reading failing test reports. Japa has a simple and clean **diff viewer**.
-    ![](http://res.cloudinary.com/adonisjs/image/upload/v1484832296/Screen_Shot_2017-01-19_at_6.54.38_PM_yxaktv.png)
-</details>
+### Human Readable Diff
+Majority of test runners outputs assertions diff quite similar to GIT. Which is great when diffing code, but not when reading failing test reports. Japa has a simple and clean **diff viewer**.
+![](http://res.cloudinary.com/adonisjs/image/upload/v1484832296/Screen_Shot_2017-01-19_at_6.54.38_PM_yxaktv.png)
 
 ## Batteries Included
 
