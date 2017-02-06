@@ -118,7 +118,7 @@ to plan assertions to these kind of scanerios.
 ```javascript
 const test = require('japa')
 
-test('Planning assertions', (assert) => {
+test('Planning assertions', async (assert) => {
   assert.plan(2)
   const users = await User.all()
 
