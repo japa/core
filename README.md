@@ -352,6 +352,22 @@ test.group('Module name', (group) => {
 })
 ```
 
+#### grep(substring)
+Filter and only run tests that contains the given substring.
+
+```javascript
+test.grep('foo')
+
+test('bar', () => {
+  console.log('Not executed')
+})
+
+test('foo', () => {
+  console.log('Executed')
+})
+```
+
+
 ## Events
 
 Below is the list of events, you can listen for when writing for your reporters.
