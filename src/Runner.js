@@ -20,7 +20,9 @@ class Runner {
     this._testReporter = require('../src/Reporters/list')
     this._testGroups = []
     this._pushDefaultGroup()
+    this._grepOn = null
     this._bail = !!bail
+    this.emitter = emitter // refrence to emitter for listening events
   }
 
   /**
@@ -72,6 +74,25 @@ class Runner {
   }
 
   /**
+   * Returns whether string contains the substring
+   * or not.
+   *
+   * @method _passesGrep
+   *
+   * @param  {String}    title
+   *
+   * @return {Boolean}
+   *
+   * @private
+   */
+  _passesGrep (title) {
+    if (!this._grepOn) {
+      return true
+    }
+    return title.includes(this._grepOn)
+  }
+
+  /**
    * Adds a new test to the latest group
    *
    * @param   {String}   title
@@ -82,8 +103,20 @@ class Runner {
    */
   _addTest (title, callback, skip, failing) {
     const test = new Test(title, callback, skip, failing)
-    const lastGroup = this._getLatestGroup()
-    lastGroup.addTest(test)
+    /**
+     * Grep on the test title and make sure it passes the grep
+     * pattern if defined. If not we do not push it to the
+     * group but still instantiate the test since the
+     * end user will be chaining methods on it and
+     * it should not throw exception.
+     *
+     * In short: We create the test but do not execute it
+     */
+    if (this._passesGrep(title)) {
+      const lastGroup = this._getLatestGroup()
+      lastGroup.addTest(test)
+    }
+
     return test
   }
 
@@ -238,6 +271,17 @@ class Runner {
    */
   use (reporter) {
     this._testReporter = reporter
+  }
+
+  /**
+   * Grep on test title to run only specific tests
+   *
+   * @method grep
+   *
+   * @param  {String} pattern
+   */
+  grep (pattern) {
+    this._grepOn = pattern
   }
 }
 

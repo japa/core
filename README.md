@@ -118,7 +118,7 @@ to plan assertions to these kind of scanerios.
 ```javascript
 const test = require('japa')
 
-test('Planning assertions', (assert) => {
+test('Planning assertions', async (assert) => {
   assert.plan(2)
   const users = await User.all()
 
@@ -352,9 +352,33 @@ test.group('Module name', (group) => {
 })
 ```
 
+#### grep(substring)
+Filter and only run tests that contains the given substring.
+
+```javascript
+test.grep('foo')
+
+test('bar', () => {
+  console.log('Not executed')
+})
+
+test('foo', () => {
+  console.log('Executed')
+})
+```
+
+
 ## Events
 
 Below is the list of events, you can listen for when writing for your reporters.
+
+You can grab the instance of emitter by import the following file
+
+```
+const emitter = require('japa/lib/emitter')
+emitter.on('test:end', function (payload) {
+})
+```
 
 <details>
     <summary> group:start </summary>

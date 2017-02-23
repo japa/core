@@ -338,6 +338,7 @@ test('should run all tests even when the previous group fails', function (assert
   .catch((error) => {
     assert.deepEqual(testsStack, ['this is test', 'this is test 2'])
     assert.equal(error[0].error.message, 'Test timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
+    cleanup()
   })
 })
 
@@ -364,6 +365,7 @@ test('should break when a group fails and bail is true', function (assert) {
   .catch((error) => {
     assert.deepEqual(testsStack, ['this is test'])
     assert.equal(error[0].error.message, 'Test timeout, ensure "done()" is called; if returning a Promise, ensure it resolves.')
+    cleanup()
   })
 })
 
@@ -385,5 +387,57 @@ test('should pass when test is marked failing and does fails', function (assert)
   .then(() => {
     assert.equal(testsStack[0].regression, true)
     assert.equal(testsStack[0].regressionMessage, 'I failed but passed')
+    cleanup()
+  })
+})
+
+test('should be able to grep on tests and run only matching tests', function (assert) {
+  const runner = new Runner()
+  assert.plan(1)
+  const testsStack = []
+
+  emitter.on('test:end', (stats) => {
+    testsStack.push(stats.title)
+  })
+
+  runner.grep('foo')
+
+  runner.test('bar', function () {})
+  runner.test('foo', function () {})
+  runner.test('ohhh foo', function () {})
+
+  runner
+  .run()
+  .then(() => {
+    assert.deepEqual(testsStack, ['foo', 'ohhh foo'])
+    cleanup()
+  })
+})
+
+test('should be able to grep on tests inside groups and run only matching tests', function (assert) {
+  const runner = new Runner()
+  assert.plan(1)
+  const testsStack = []
+
+  emitter.on('test:end', (stats) => {
+    testsStack.push(stats.title)
+  })
+
+  runner.grep('foo')
+
+  runner.group('foo', function () {
+    runner.test('bar', function () {})
+    runner.test('ohhh foo', function () {})
+  })
+
+  runner.group('bar', function () {
+    runner.test('foo', function () {})
+  })
+
+  runner
+  .run()
+  .then(() => {
+    assert.deepEqual(testsStack, ['ohhh foo', 'foo'])
+    cleanup()
   })
 })
