@@ -356,6 +356,14 @@ test.group('Module name', (group) => {
 
 Below is the list of events, you can listen for when writing for your reporters.
 
+You can grab the instance of emitter by import the following file
+
+```
+const emitter = require('japa/lib/emitter')
+emitter.on('test:end', function (payload) {
+})
+```
+
 <details>
     <summary> group:start </summary>
 Emitted whenever a new group has been started. It includes the following payload.

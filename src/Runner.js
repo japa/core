@@ -21,6 +21,7 @@ class Runner {
     this._testGroups = []
     this._pushDefaultGroup()
     this._bail = !!bail
+    this.emitter = emitter // refrence to emitter for listening events
   }
 
   /**
