@@ -24,11 +24,6 @@ class JapaCli {
    * @private
    */
   _initiate () {
-    this._timeout = null
-    this._grep = null
-    this._bail = false
-
-    // public
     this.filterCallback = null
     this.ignorePattern = []
     this.testsGlob = 'test/*.spec.js'
@@ -61,51 +56,7 @@ class JapaCli {
       return this
     }
 
-    throw new Error('japaCli.filter only excepts a glob string, array or a callback function')
-  }
-
-  /**
-   * Set global timeout on each test
-   *
-   * @method timeout
-   *
-   * @param  {Number} timeout
-   *
-   * @chainable
-   */
-  timeout (timeout) {
-    this._timeout = Number(timeout)
-    return this
-  }
-
-  /**
-   * Whether or not to exist tests earlier. Passed
-   * to japa runner
-   *
-   * @method bail
-   *
-   * @param  {Boolean} status
-   *
-   * @chainable
-   */
-  bail (status) {
-    this._bail = !!status
-    return this
-  }
-
-  /**
-   * The pattern to be used for grepping over
-   * tests. Passed to japa runner
-   *
-   * @method grep
-   *
-   * @param  {String} pattern
-   *
-   * @chainable
-   */
-  grep (pattern) {
-    this._grep = pattern
-    return this
+    throw new Error('cli.filter only excepts a glob string, array or a callback function')
   }
 
   /**
@@ -124,7 +75,7 @@ class JapaCli {
     }
 
     if (typeof (glob) !== 'string') {
-      throw new Error(`japaCli.run excepts glob pattern to be a string. You passed ${typeof (glob)}`)
+      throw new Error(`cli.run excepts glob pattern to be a string. You passed ${typeof (glob)}`)
     }
 
     this.testsGlob = glob
