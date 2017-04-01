@@ -17,10 +17,9 @@ const emitter = require('../lib/emitter')
 const eventsList = $.getEventsList()
 
 class Group {
-  constructor (title, bail, isRoot) {
+  constructor (title, isRoot) {
     this._title = title
     this._isRoot = !!isRoot
-    this._timeout = $.getTimeout()
     this._hooks = {
       beforeEach: [],
       afterEach: [],
@@ -28,7 +27,7 @@ class Group {
       after: []
     }
     this._tests = []
-    this.middleware = new Middleware(this, !!bail, this._wrapFn)
+    this.middleware = new Middleware(this, this._wrapFn)
   }
 
   /**
@@ -66,13 +65,12 @@ class Group {
    * Wraps the test/hook as a middleware fn
    *
    * @param   {Object}   fn
-   * @param   {Promise} next
    * @return  {Promise}
    *
    * @private
    */
-  _wrapFn (fn, next) {
-    return new Promise((resolve, reject) => fn.run().then(next).then(resolve).catch((error) => {
+  _wrapFn (fn) {
+    return new Promise((resolve, reject) => fn.run().then(resolve).catch((error) => {
       reject({title: fn._title, error: error})
     }))
   }

@@ -9,11 +9,12 @@
  * file that was distributed with this source code.
 */
 
+const $ = require('../lib/util')
+
 class Middleware {
 
-  constructor (context, bail, fnWrapper) {
+  constructor (context, fnWrapper) {
     this._context = context
-    this._bail = !!bail
     this._fnWrapper = fnWrapper
     this._stack = []
     this.errorsStack = []
@@ -29,7 +30,7 @@ class Middleware {
    * @param  {Function}
    */
   _internalRejection (index, resolve, reject, error) {
-    if (this._bail) {
+    if ($.bail) {
       reject(error)
       return
     }
@@ -51,7 +52,8 @@ class Middleware {
 
     const fn = this._stack[index]
     return new Promise((resolve, reject) => {
-      this._fnWrapper(fn, next => this._dispatch(index + 1))
+      this._fnWrapper(fn)
+      .then(() => this._dispatch(index + 1))
       .then(resolve)
       .catch((error) => this._internalRejection.bind(this)(index, resolve, reject, error))
     })
@@ -82,7 +84,6 @@ class Middleware {
     this._stack = stack
     return this._middleware.bind(this)
   }
-
 }
 
 module.exports = Middleware

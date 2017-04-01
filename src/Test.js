@@ -23,7 +23,7 @@ class Test {
     this._title = title
     this._skip = !!skip
     this._todo = typeof (callback) !== 'function'
-    this._timeout = $.getTimeout()
+    this._timeout = $.timeout
     this._callback = callback
     this._regression = !!expectedToFail
     this._regressionMessage = null

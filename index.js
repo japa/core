@@ -10,7 +10,6 @@
 */
 
 const runner = new (require('./src/Runner'))()
-const cli = require('./cli')
 
 const nextTick = typeof (setImmediate) !== 'undefined' ? setImmediate : process.nextTick
 
@@ -33,4 +32,3 @@ exports.timeout = runner.timeout.bind(runner)
 exports.use = runner.use.bind(runner)
 exports.bail = runner.bail.bind(runner)
 exports.grep = runner.grep.bind(runner)
-exports.cli = cli

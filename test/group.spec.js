@@ -274,7 +274,8 @@ test('run all tests even when a hook fails', function (assert) {
 
 test('stop after first error when bail is true', function (assert) {
   assert.plan(3)
-  const group = new Group('A', true)
+  const group = new Group('A')
+  group.middleware._bail = true
   const testsStack = []
 
   group.before(function (done) {})
@@ -313,7 +314,7 @@ test('stop after first error when bail is true', function (assert) {
 
 test('do not emit events for a root level group', function (assert) {
   assert.plan(1)
-  const group = new Group('Default group', false, true)
+  const group = new Group('Default group', true)
   const groupEvents = []
 
   emitter.on('group:start', function () {
