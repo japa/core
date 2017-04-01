@@ -235,6 +235,21 @@ class Min {
     const end = new Date() - this.start
     this.blankLine()
 
+    /**
+     * Show a small message with Zero tests ran when
+     * total count of tests is zero
+     *
+     * @method if
+     *
+     * @param  {[type]} this.finalStats.total [description]
+     *
+     * @return {[type]}                       [description]
+     */
+    if (this.finalStats.total === 0) {
+      this.log(chalk.bgMagenta.white(' 0 TESTS RAN '))
+      return
+    }
+
     this.printStack(error)
 
     if (status === 'passed') {
