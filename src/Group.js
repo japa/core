@@ -17,7 +17,7 @@ const emitter = require('../lib/emitter')
 const eventsList = $.getEventsList()
 
 class Group {
-  constructor (title, bail, isRoot) {
+  constructor (title, isRoot) {
     this._title = title
     this._isRoot = !!isRoot
     this._timeout = $.getTimeout()
@@ -28,7 +28,7 @@ class Group {
       after: []
     }
     this._tests = []
-    this.middleware = new Middleware(this, !!bail, this._wrapFn)
+    this.middleware = new Middleware(this, $.getBail(), this._wrapFn)
   }
 
   /**

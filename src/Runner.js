@@ -16,12 +16,11 @@ const emitter = require('../lib/emitter')
 const $ = require('../lib/util')
 
 class Runner {
-  constructor (bail) {
+  constructor () {
     this._testReporter = require('../src/Reporters/list')
     this._testGroups = []
     this._pushDefaultGroup()
     this._grepOn = null
-    this._bail = !!bail
     this.emitter = emitter // refrence to emitter for listening events
   }
 
@@ -58,7 +57,7 @@ class Runner {
    * @private
    */
   _pushDefaultGroup () {
-    this._testGroups.push(new Group('default', this._bail, true))
+    this._testGroups.push(new Group('default', true))
   }
 
   /**
@@ -198,24 +197,13 @@ class Runner {
   }
 
   /**
-   * Toggle the bail status of the runner. Also
-   * this needs to be done before calling
-   * the run method.
-   *
-   * @param  {Boolean} state
-   */
-  bail (state) {
-    this._bail = !!state
-  }
-
-  /**
    * Add a new group to have nested tests.
    * @param  {String}   title
    * @param  {Function} callback
    * @return {Object}
    */
   group (title, callback) {
-    const group = new Group(title, this._bail)
+    const group = new Group(title)
     this._testGroups.push(group)
     callback(group)
 
@@ -237,7 +225,7 @@ class Runner {
     }
 
     return new Promise((resolve, reject) => {
-      const middleware = new Middleware(this, this._bail, this._wrapFn)
+      const middleware = new Middleware(this, $.getBail(), this._wrapFn)
       this._start()
       middleware.compose(this._testGroups)()
       .then(() => {
@@ -252,6 +240,17 @@ class Runner {
         reject(error)
       })
     })
+  }
+
+  /**
+   * Toggle the bail status of the runner. Also
+   * this needs to be done before calling
+   * the run method.
+   *
+   * @param  {Boolean} state
+   */
+  bail (state) {
+    $.setBail(state)
   }
 
   /**

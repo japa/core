@@ -83,7 +83,6 @@ class Middleware {
     this._stack = stack
     return this._middleware.bind(this)
   }
-
 }
 
 module.exports = Middleware
