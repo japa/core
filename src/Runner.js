@@ -145,13 +145,12 @@ class Runner {
    * Wraps the group.run as a middleware function.
    *
    * @param  {Function}
-   * @param  {Function}
    * @return {Promise}
    *
    * @private
    */
-  _wrapFn (fn, next) {
-    return new Promise((resolve, reject) => fn.run().then(next).then(resolve).catch(reject))
+  _wrapFn (fn) {
+    return new Promise((resolve, reject) => fn.run().then(resolve).catch(reject))
   }
 
   /**

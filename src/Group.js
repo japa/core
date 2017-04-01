@@ -66,13 +66,12 @@ class Group {
    * Wraps the test/hook as a middleware fn
    *
    * @param   {Object}   fn
-   * @param   {Promise} next
    * @return  {Promise}
    *
    * @private
    */
-  _wrapFn (fn, next) {
-    return new Promise((resolve, reject) => fn.run().then(next).then(resolve).catch((error) => {
+  _wrapFn (fn) {
+    return new Promise((resolve, reject) => fn.run().then(resolve).catch((error) => {
       reject({title: fn._title, error: error})
     }))
   }

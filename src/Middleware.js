@@ -51,7 +51,8 @@ class Middleware {
 
     const fn = this._stack[index]
     return new Promise((resolve, reject) => {
-      this._fnWrapper(fn, next => this._dispatch(index + 1))
+      this._fnWrapper(fn)
+      .then(() => this._dispatch(index + 1))
       .then(resolve)
       .catch((error) => this._internalRejection.bind(this)(index, resolve, reject, error))
     })
