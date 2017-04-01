@@ -225,7 +225,7 @@ class Runner {
     }
 
     return new Promise((resolve, reject) => {
-      const middleware = new Middleware(this, $.getBail(), this._wrapFn)
+      const middleware = new Middleware(this, this._wrapFn)
       this._start()
       middleware.compose(this._testGroups)()
       .then(() => {

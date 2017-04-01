@@ -9,11 +9,13 @@
  * file that was distributed with this source code.
 */
 
+const $ = require('../lib/util')
+
 class Middleware {
 
-  constructor (context, bail, fnWrapper) {
+  constructor (context, fnWrapper) {
     this._context = context
-    this._bail = !!bail
+    this._bail = $.getBail()
     this._fnWrapper = fnWrapper
     this._stack = []
     this.errorsStack = []

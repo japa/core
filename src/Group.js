@@ -20,7 +20,6 @@ class Group {
   constructor (title, isRoot) {
     this._title = title
     this._isRoot = !!isRoot
-    this._timeout = $.getTimeout()
     this._hooks = {
       beforeEach: [],
       afterEach: [],
@@ -28,7 +27,7 @@ class Group {
       after: []
     }
     this._tests = []
-    this.middleware = new Middleware(this, $.getBail(), this._wrapFn)
+    this.middleware = new Middleware(this, this._wrapFn)
   }
 
   /**
