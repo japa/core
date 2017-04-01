@@ -15,7 +15,6 @@ class Middleware {
 
   constructor (context, fnWrapper) {
     this._context = context
-    this._bail = $.bail
     this._fnWrapper = fnWrapper
     this._stack = []
     this.errorsStack = []
@@ -31,7 +30,7 @@ class Middleware {
    * @param  {Function}
    */
   _internalRejection (index, resolve, reject, error) {
-    if (this._bail) {
+    if ($.bail) {
       reject(error)
       return
     }
