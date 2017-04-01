@@ -250,7 +250,7 @@ class Runner {
    * @param  {Boolean} state
    */
   bail (state) {
-    $.setBail(state)
+    $.bail = state
   }
 
   /**
@@ -259,7 +259,7 @@ class Runner {
    * @param  {Number} time
    */
   timeout (time) {
-    $.setTimeout(time)
+    $.timeout = time
   }
 
   /**

@@ -15,7 +15,7 @@ class Middleware {
 
   constructor (context, fnWrapper) {
     this._context = context
-    this._bail = $.getBail()
+    this._bail = $.bail
     this._fnWrapper = fnWrapper
     this._stack = []
     this.errorsStack = []

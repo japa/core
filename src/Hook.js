@@ -19,7 +19,7 @@ class Hook {
     this._title = groupTitle
     this._hookFor = hookFor
     this._callback = callback
-    this._timeout = $.getTimeout()
+    this._timeout = $.timeout
   }
 
   /**
