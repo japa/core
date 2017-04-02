@@ -10,6 +10,7 @@
 */
 
 const test = require('tape')
+const $ = require('../lib/util')
 const Group = require('../src/Group')
 const Hook = require('../src/Hook')
 const Test = require('../src/Test')
@@ -18,6 +19,7 @@ const emitter = require('../lib/emitter')
 const cleanup = function () {
   emitter.eventNames().forEach((event) => {
     emitter.removeAllListeners(event)
+    $.bail = false
   })
 }
 
@@ -275,7 +277,7 @@ test('run all tests even when a hook fails', function (assert) {
 test('stop after first error when bail is true', function (assert) {
   assert.plan(3)
   const group = new Group('A')
-  group.middleware._bail = true
+  $.bail = true
   const testsStack = []
 
   group.before(function (done) {})
