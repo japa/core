@@ -369,3 +369,21 @@ test('throw exception when promise and done used together', function (assert) {
     assert.equal(error.message, 'Method overload, returning promise and making use of "done()" is not allowed together')
   })
 })
+
+test('pass custom 1st arg to the test', function (tapeAssert) {
+  tapeAssert.plan(1)
+  let called = false
+
+  const test = new Test('dummy', function ({ assert }) {
+    assert.equal(1 + 1, 2)
+    called = true
+  })
+
+  test.resolveArg(function (assert) {
+    return { assert }
+  })
+
+  test.run().then(() => {
+    tapeAssert.equal(called, true)
+  })
+})

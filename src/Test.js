@@ -28,6 +28,7 @@ class Test {
     this._regression = !!expectedToFail
     this._regressionMessage = null
     this._retry = 0
+    this._resolveArgFn = null
   }
 
   /**
@@ -42,6 +43,23 @@ class Test {
       status: this._todo ? 'todo' : (this._skip ? 'skipped' : 'pending'),
       regression: this._regression
     }
+  }
+
+  /**
+   * Returns the 1st argument to be passed to the
+   * each test.
+   *
+   * @method _getArg
+   *
+   * @param  {String} assert
+   *
+   * @return {Object}
+   */
+  _getArg (assert) {
+    if (typeof (this._resolveArgFn) === 'function') {
+      return this._resolveArgFn(assert)
+    }
+    return assert
   }
 
   /**
@@ -138,7 +156,7 @@ class Test {
     const assert = new Assertion()
     return new Promise((resolve, reject) => {
       new Callable(this._callback, this._timeout, 1)
-      .args([assert])
+      .args([this._getArg(assert)])
       .run()
       .then(() => assert.evaluate())
       .then(() => {
@@ -212,6 +230,24 @@ class Test {
         })
       })
     })
+  }
+
+  /**
+   * Attach a callback to customize the 1st argument
+   * to be passed to the test callback function.
+   *
+   * For multiple values, pass an object, which can be
+   * destrctured within the callback.
+   *
+   * @method resolveArg
+   *
+   * @param  {Function} callback
+   *
+   * @chainable
+   */
+  resolveArg (callback) {
+    this._resolveArgFn = callback
+    return this
   }
 
   /**
