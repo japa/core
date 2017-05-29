@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
 */
 
-const runner = new (require('./src/Runner'))()
+const slimRunner = new (require('./src/SlimRunner'))(require('./lib/props'))
 
 const nextTick = typeof (setImmediate) !== 'undefined' ? setImmediate : process.nextTick
 
 nextTick(function () {
-  runner
+  slimRunner
   .run()
   .then(() => {
     process.exit(0)
@@ -24,11 +24,11 @@ nextTick(function () {
   })
 })
 
-exports = module.exports = runner.test.bind(runner)
-exports.skip = runner.skip.bind(runner)
-exports.failing = runner.failing.bind(runner)
-exports.group = runner.group.bind(runner)
-exports.timeout = runner.timeout.bind(runner)
-exports.use = runner.use.bind(runner)
-exports.bail = runner.bail.bind(runner)
-exports.grep = runner.grep.bind(runner)
+exports = module.exports = slimRunner.test.bind(slimRunner)
+exports.skip = slimRunner.skip.bind(slimRunner)
+exports.failing = slimRunner.failing.bind(slimRunner)
+exports.group = slimRunner.group.bind(slimRunner)
+exports.timeout = slimRunner.timeout.bind(slimRunner)
+exports.use = slimRunner.use.bind(slimRunner)
+exports.bail = slimRunner.bail.bind(slimRunner)
+exports.grep = slimRunner.grep.bind(slimRunner)

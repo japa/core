@@ -13,6 +13,7 @@ const test = require('tape')
 const Callable = require('../src/Callable')
 const Hook = require('../src/Hook')
 const Test = require('../src/Test')
+const $ = require('../lib/props')
 
 test('resolve the function when it is async', function (assert) {
   assert.plan(1)
@@ -96,7 +97,7 @@ test('disable timeouts when timeout is zero', function (assert) {
 test('throw exception when hook is an async function and making use of done', function (assert) {
   assert.plan(1)
   const hook = new Hook('sample group', 'before', async function (done) {
-  })
+  }, $)
   hook
   .run()
   .catch((error) => {
@@ -107,7 +108,7 @@ test('throw exception when hook is an async function and making use of done', fu
 test('throw exception when test is an async function and making use of done', function (assert) {
   assert.plan(1)
   const test = new Test('dummy', async function (assert, done) {
-  })
+  }, $)
   test
   .run()
   .catch((error) => {

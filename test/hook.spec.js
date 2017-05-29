@@ -11,11 +11,11 @@
 
 const test = require('tape')
 const Hook = require('../src/Hook')
-const emitter = require('../lib/emitter')
+const $ = require('../lib/props')
 
 const cleanup = function () {
-  emitter.eventNames().forEach((event) => {
-    emitter.removeAllListeners(event)
+  $.emitter.eventNames().forEach((event) => {
+    $.emitter.removeAllListeners(event)
   })
 }
 
@@ -24,7 +24,7 @@ test('run a hook by executing the callback', function (assert) {
   let hookCbCalled = false
   const hook = new Hook('sample group', 'beforeEach', function () {
     hookCbCalled = true
-  })
+  }, $)
   hook
   .run()
   .then(() => {
@@ -36,9 +36,9 @@ test('emit the end event when hook succeeds', function (assert) {
   assert.plan(1)
   let eventCalled = false
   const hook = new Hook('sample group', 'before', function () {
-  })
+  }, $)
 
-  emitter.on('hook:before:end', function () {
+  $.emitter.on('hook:before:end', function () {
     eventCalled = true
   })
 
@@ -55,9 +55,9 @@ test('emit the end event when hook fails', function (assert) {
   let eventCalled = false
   const hook = new Hook('sample group', 'before', function () {
     throw new Error('foo')
-  })
+  }, $)
 
-  emitter.on('hook:before:end', function () {
+  $.emitter.on('hook:before:end', function () {
     eventCalled = true
   })
 
@@ -73,9 +73,9 @@ test('emit hook stats when hook passes', function (assert) {
   assert.plan(1)
   let hookStats = null
   const hook = new Hook('sample group', 'before', function () {
-  })
+  }, $)
 
-  emitter.on('hook:before:end', function (stats) {
+  $.emitter.on('hook:before:end', function (stats) {
     hookStats = stats
   })
 
@@ -98,9 +98,9 @@ test('emit hook stats when hook fails', function (assert) {
   const error = new Error('foo')
   const hook = new Hook('sample group', 'before', function () {
     throw error
-  })
+  }, $)
 
-  emitter.on('hook:before:end', function (stats) {
+  $.emitter.on('hook:before:end', function (stats) {
     hookStats = stats
   })
 
@@ -117,10 +117,10 @@ test('emit hook stats when hook timeouts', function (assert) {
   assert.plan(2)
   let hookStats = null
   const hook = new Hook('sample group', 'before', function (done) {
-  })
+  }, $)
   hook.timeout(50)
 
-  emitter.on('hook:before:end', function (stats) {
+  $.emitter.on('hook:before:end', function (stats) {
     hookStats = stats
   })
 
@@ -136,8 +136,8 @@ test('emit hook stats when hook timeouts', function (assert) {
 test('emit start event when hook starts', function (assert) {
   assert.plan(2)
   let hookStats = null
-  const hook = new Hook('sample group', 'before', function () {})
-  emitter.on('hook:before:start', function (stats) {
+  const hook = new Hook('sample group', 'before', function () {}, $)
+  $.emitter.on('hook:before:start', function (stats) {
     hookStats = stats
   })
   hook
@@ -153,7 +153,7 @@ test('throw exception when returning a promise and making use of done callback',
   assert.plan(1)
   const hook = new Hook('sample group', 'before', function (done) {
     return new Promise(() => {})
-  })
+  }, $)
   hook
   .run()
   .catch((error) => {
@@ -167,7 +167,7 @@ test('throw exception when done is called twice', function (assert) {
   const hook = new Hook('sample group', 'before', function (done) {
     done()
     done()
-  })
+  }, $)
   hook
   .run()
   .catch((error) => {
@@ -180,7 +180,7 @@ test('throw exception when hook throws exception', function (assert) {
   assert.plan(1)
   const hook = new Hook('sample group', 'before', function (done) {
     done('This is an error')
-  })
+  }, $)
   hook
   .run()
   .catch((error) => {
@@ -192,7 +192,7 @@ test('throw exception when hook throws exception', function (assert) {
 test('throw exception when timeout is not a number', function (assert) {
   assert.plan(1)
   const hook = new Hook('sample group', 'before', function () {
-  })
+  }, $)
   try {
     hook.timeout('foo')
   } catch (error) {

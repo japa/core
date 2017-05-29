@@ -29,8 +29,12 @@ class Callable {
   /**
    * Validates the function to be wrapped as a callable.
    *
+   * @method _validateFn
+   *
    * @param {Function} fn
    * @throws {Error} if fn is not a function
+   *
+   * @private
    */
   _validateFn (fn) {
     if (typeof (fn) !== 'function') {
@@ -41,8 +45,12 @@ class Callable {
   /**
    * Validate the timeout to be used for timing out the function.
    *
+   * @method _validateTimeout
+   *
    * @param {Number} timeout
    * @throws {Error} if timeout is not a number
+   *
+   * @private
    */
   _validateTimeout (timeout) {
     if (typeof (timeout) !== 'number') {
@@ -53,6 +61,10 @@ class Callable {
   /**
    * Clears the timer if there is
    * any running timer.
+   *
+   * @method _clearTimer
+   *
+   * @private
    */
   _clearTimer () {
     if (this._timer) {
@@ -63,8 +75,12 @@ class Callable {
   /**
    * Calls the fn by passing args.
    *
+   * @method _callFn
+   *
    * @param {Function} [done]
    * @return {Function}
+   *
+   * @private
    */
   _callFn (done) {
     return this._fn(...this._args, done)
@@ -73,8 +89,12 @@ class Callable {
   /**
    * Resolves the promise and clears the timer
    *
+   * @method _internalResolve
+   *
    * @param {Function} resolve
    * @return {Function}
+   *
+   * @private
    */
   _internalResolve (resolve) {
     return () => {
@@ -87,8 +107,12 @@ class Callable {
   /**
    * Rejects the promise and clears the timer
    *
+   * @method _internalReject
+   *
    * @param {Function} reject
    * @return {Function}
+   *
+   * @private
    */
   _internalReject (reject) {
     return (error) => {
@@ -101,6 +125,8 @@ class Callable {
   /**
    * Pass custom arguments to {this._fn}
    *
+   * @method args
+   *
    * @param {Array} args
    * @chainable
    */
@@ -112,6 +138,8 @@ class Callable {
   /**
    * Run the given function and handle all the hard stuff. Lot's
    * of comments inside the method body.
+   *
+   * @method run
    *
    * @return {Promise}
    */

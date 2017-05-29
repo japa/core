@@ -11,50 +11,67 @@
 
 const Hook = require('./Hook')
 const Middleware = require('./Middleware')
-const $ = require('../lib/util')
-const emitter = require('../lib/emitter')
-
-const eventsList = $.getEventsList()
+const util = require('../lib/util')
 
 class Group {
-  constructor (title, isRoot) {
+  constructor (title, globals, isRoot) {
     this._title = title
+    this._globals = globals
+
+    /**
+     * A root group where tests are not nested intentionally
+     * by the user but group was created by the runner for
+     * the sake of simplicity.
+     */
     this._isRoot = !!isRoot
+
+    /**
+     * Hooks to be executed
+     */
     this._hooks = {
       beforeEach: [],
       afterEach: [],
       before: [],
       after: []
     }
+
     this._tests = []
-    this.middleware = new Middleware(this, this._wrapFn)
+    this.middleware = new Middleware(this, this._wrapFn, this._globals.bail)
   }
 
   /**
    * Emits the start event for the group
+   *
+   * @method _start
+   *
+   * @private
    */
   _start () {
     if (this._isRoot) {
       return
     }
 
-    emitter.emit(eventsList['GROUP_START'], {
+    this._globals.emitter.emit(util.eventsList['GROUP_START'], {
       title: this._title,
       status: 'pending'
     })
   }
 
   /**
-   * Emits the end event for the group
+   * Emits the end event for the group.
+   *
+   * @method _end
    *
    * @param {Object|Null} error
+   *
+   * @private
    */
   _end (error) {
     if (this._isRoot) {
       return
     }
 
-    emitter.emit(eventsList['GROUP_END'], {
+    this._globals.emitter.emit(util.eventsList['GROUP_END'], {
       title: this._title,
       status: error ? 'failed' : 'passed',
       errors: error || null
@@ -78,6 +95,8 @@ class Group {
   /**
    * Composing tests in an order they should be executed. It
    * also includes the lifecycle hooks.
+   *
+   * @method _composeStack
    *
    * @return  {Array}
    *
@@ -120,45 +139,61 @@ class Group {
   }
 
   /**
-   * Add a new closure to the before hook
+   * Add a new closure to the before hooks stack.
+   *
+   * @method before
    *
    * @param {Function} callback
+   *
+   * @return {Hook} Instance of hook
    */
   before (callback) {
-    const hook = new Hook(this._title, 'before', callback)
+    const hook = new Hook(this._title, 'before', callback, this._globals)
     this._hooks.before.push(hook)
     return hook
   }
 
   /**
-   * Add a new closure to the beforeEach hook
+   * Add a new closure to the beforeEach hooks stack.
+   *
+   * @method beforeEach
    *
    * @param {Function} callback
+   *
+   * @return {Hook} Instance of hook
    */
   beforeEach (callback) {
-    const hook = new Hook(this._title, 'beforeEach', callback)
+    const hook = new Hook(this._title, 'beforeEach', callback, this._globals)
     this._hooks.beforeEach.push(hook)
     return hook
   }
 
   /**
-   * Add a new closure to the after hook
+   * Add a new closure to the after hooks stack.
+   *
+   * @method after
    *
    * @param {Function} callback
+   *
+   * @return {Hook} Instance of hook
    */
   after (callback) {
-    const hook = new Hook(this._title, 'after', callback)
+    const hook = new Hook(this._title, 'after', callback, this._globals)
     this._hooks.after.push(hook)
     return hook
   }
 
   /**
-   * Add a new closure to the afterEach hook
+   * Add a new closure to the afterEach hooks stack.
+   *
+   * @method afterEach
    *
    * @param {Function} callback
+   *
+   * @return {Hook} Instance of hook
    */
   afterEach (callback) {
-    const hook = new Hook(this._title, 'afterEach', callback)
+    const hook = new Hook(this._title, 'afterEach', callback, this._globals)
     this._hooks.afterEach.push(hook)
     return hook
   }
@@ -167,6 +202,8 @@ class Group {
    * Add a test to be added to the groups
    * stack.
    *
+   * @method addTest
+   *
    * @param {Object} test callerInstance
    */
   addTest (test) {
@@ -174,7 +211,10 @@ class Group {
   }
 
   /**
-   * Run tests with their hooks
+   * Run tests with their hooks. All errors will be stacked
+   * and returned as nested arrays.
+   *
+   * @method run
    *
    * @return {Promise}
    */

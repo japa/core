@@ -11,8 +11,9 @@
 
 const chai = require('chai')
 const assert = chai.assert
-const $ = require('../lib/util')
 chai.config.showDiff = true
+
+const util = require('../lib/util')
 
 class Assertion {
   constructor () {
@@ -50,6 +51,8 @@ class Assertion {
   /**
    * Define the number of planned assertions
    *
+   * @method plan
+   *
    * @param {Function} num
    */
   plan (num) {
@@ -64,13 +67,20 @@ class Assertion {
    * an exception if planned assertions mis-matches
    * the ran assertions
    *
+   * @method evaluate
+   *
    * @throws {Error} If planned assertions mis-match the ran assertions
    */
   evaluate () {
     if (this._planned <= 0 || this._planned === this._ran) {
       return
     }
-    assert.fail(this._ran, this._planned, `planned for ${this._planned} assertion${$.verb(this._planned)} but ran ${this._ran}`)
+
+    assert.fail(
+      this._ran,
+      this._planned,
+      `planned for ${this._planned} assertion${util.verb(this._planned)} but ran ${this._ran}`
+    )
   }
 }
 

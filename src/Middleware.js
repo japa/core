@@ -9,28 +9,30 @@
  * file that was distributed with this source code.
 */
 
-const $ = require('../lib/util')
-
 class Middleware {
-
-  constructor (context, fnWrapper) {
+  constructor (context, fnWrapper, bail) {
     this._context = context
     this._fnWrapper = fnWrapper
     this._stack = []
+    this._bail = bail
     this.errorsStack = []
   }
 
   /**
    * Rejects the error by making sure bail is true.
-   * Otherwise stacks error for later rejection
+   * Otherwise stacks error for later rejection.
+   *
+   * @method _internalRejection
    *
    * @param  {Number}
    * @param  {Object}
    * @param  {Function}
    * @param  {Function}
+   *
+   * @private
    */
   _internalRejection (index, resolve, reject, error) {
-    if ($.bail) {
+    if (this._bail) {
       reject(error)
       return
     }
@@ -42,8 +44,12 @@ class Middleware {
    * Dispatches each layer of the stack one
    * by one.
    *
+   * @method _dispatch
+   *
    * @param  {Number}
    * @return {Promise}
+   *
+   * @private
    */
   _dispatch (index) {
     if (index === this._stack.length) {
@@ -60,29 +66,22 @@ class Middleware {
   }
 
   /**
-   * Returns the first promise from the stack
-   * or a blank promise if stack is empty.
-   *
-   * @param  {Function}
-   * @return {Promise}
-   */
-  _middleware (next) {
-    if (this._stack.length === 0) {
-      return Promise.resolve()
-    }
-    return this._dispatch(0)
-  }
-
-  /**
    * Composes a middleware layer to be executed
    * in sequence.
+   *
+   * @method stack
    *
    * @param  {Array} stack
    * @return {Fuction}
    */
   compose (stack) {
     this._stack = stack
-    return this._middleware.bind(this)
+    return function () {
+      if (this._stack.length === 0) {
+        return Promise.resolve()
+      }
+      return this._dispatch(0)
+    }.bind(this)
   }
 }
 

@@ -11,11 +11,11 @@
 
 const test = require('tape')
 const Test = require('../src/Test')
-const emitter = require('../lib/emitter')
+const $ = require('../lib/props')
 
 const cleanup = function () {
-  emitter.eventNames().forEach((event) => {
-    emitter.removeAllListeners(event)
+  $.emitter.eventNames().forEach((event) => {
+    $.emitter.removeAllListeners(event)
   })
 }
 
@@ -24,7 +24,7 @@ test('run a test by executing the callback', function (assert) {
   let testCbCalled = false
   const test = new Test('dummy', function () {
     testCbCalled = true
-  })
+  }, $)
   test
   .run()
   .then(() => {
@@ -37,9 +37,9 @@ test('emit the end event when test succeeds', function (assert) {
   assert.plan(1)
   let eventCalled = false
   const test = new Test('dummy', function () {
-  })
+  }, $)
 
-  emitter.on('test:end', function () {
+  $.emitter.on('test:end', function () {
     eventCalled = true
   })
 
@@ -56,9 +56,9 @@ test('emit the end event when test fails', function (assert) {
   let eventCalled = false
   const test = new Test('dummy', function () {
     throw new Error('foo')
-  })
+  }, $)
 
-  emitter.on('test:end', function () {
+  $.emitter.on('test:end', function () {
     eventCalled = true
   })
 
@@ -74,9 +74,9 @@ test('emit test stats when test passes', function (assert) {
   assert.plan(1)
   let testStats = null
   const test = new Test('dummy', function () {
-  })
+  }, $)
 
-  emitter.on('test:end', function (stats) {
+  $.emitter.on('test:end', function (stats) {
     testStats = stats
   })
 
@@ -101,9 +101,9 @@ test('emit test stats when test fails', function (assert) {
   const error = new Error('foo')
   const test = new Test('dummy', function () {
     throw error
-  })
+  }, $)
 
-  emitter.on('test:end', function (stats) {
+  $.emitter.on('test:end', function (stats) {
     testStats = stats
   })
 
@@ -121,10 +121,10 @@ test('emit test stats when test timeouts', function (assert) {
   assert.plan(3)
   let testStats = null
   const test = new Test('dummy', function (assert, done) {
-  })
+  }, $)
   test.timeout(50)
 
-  emitter.on('test:end', function (stats) {
+  $.emitter.on('test:end', function (stats) {
     testStats = stats
   })
 
@@ -142,8 +142,8 @@ test('emit test stats when test is skipped', function (assert) {
   assert.plan(2)
   let testStats = null
   const test = new Test('dummy', function (assert) {
-  }, true)
-  emitter.on('test:end', function (stats) {
+  }, $, true)
+  $.emitter.on('test:end', function (stats) {
     testStats = stats
   })
   test
@@ -158,8 +158,8 @@ test('emit test stats when test is skipped', function (assert) {
 test('emit test stats when test is a todo', function (assert) {
   assert.plan(2)
   let testStats = null
-  const test = new Test('dummy')
-  emitter.on('test:end', function (stats) {
+  const test = new Test('dummy', null, $)
+  $.emitter.on('test:end', function (stats) {
     testStats = stats
   })
   test
@@ -174,8 +174,8 @@ test('emit test stats when test is a todo', function (assert) {
 test('emit start event when test starts', function (assert) {
   assert.plan(3)
   let testStats = null
-  const test = new Test('dummy')
-  emitter.on('test:start', function (stats) {
+  const test = new Test('dummy', null, $)
+  $.emitter.on('test:start', function (stats) {
     testStats = stats
   })
   test
@@ -194,7 +194,7 @@ test('retry test for the retry times if test fails', function (assert) {
   const test = new Test('dummy', function () {
     testsCounts++
     throw Error('foo')
-  })
+  }, $)
   test.retry(2)
   test
   .run()
@@ -210,7 +210,7 @@ test('retry test for the retry times if test timeouts', function (assert) {
   let testsCounts = 0
   const test = new Test('dummy', function (assert, done) {
     testsCounts++
-  })
+  }, $)
 
   test.retry(2)
   test.timeout(10)
@@ -229,7 +229,7 @@ test('throw exception when assertion planned counts are not satisfied', function
   const test = new Test('dummy', function (assert, done) {
     assert.plan(1)
     done()
-  })
+  }, $)
 
   test
   .run()
@@ -246,7 +246,7 @@ test('throw exception when assertion ran exceeds the planned count', function (t
     assert.equal(true, true)
     assert.equal(true, true)
     done()
-  })
+  }, $)
 
   test
   .run()
@@ -264,9 +264,9 @@ test('report error in the end event when assertions mis-matches', function (t) {
     assert.equal(true, true)
     assert.equal(true, true)
     done()
-  })
+  }, $)
 
-  emitter.on('test:end', (stats) => {
+  $.emitter.on('test:end', (stats) => {
     testStats = stats
   })
 
@@ -286,9 +286,9 @@ test('report success when planned assertions are ran', function (t) {
     assert.plan(1)
     assert.equal(true, true)
     done()
-  })
+  }, $)
 
-  emitter.on('test:end', (stats) => {
+  $.emitter.on('test:end', (stats) => {
     testStats = stats
   })
 
@@ -306,9 +306,9 @@ test('mark as passed when test is expected to fail and does fails', function (t)
   let testStats = null
   const test = new Test('dummy', function () {
     throw new Error('What the hell')
-  }, false, true)
+  }, $, false, true)
 
-  emitter.on('test:end', (stats) => {
+  $.emitter.on('test:end', (stats) => {
     testStats = stats
   })
 
@@ -324,7 +324,7 @@ test('mark as passed when test is expected to fail and does fails', function (t)
 test('throw exception when test was expected to fail but passed', function (t) {
   t.plan(1)
   const test = new Test('dummy', function () {
-  }, false, true)
+  }, $, false, true)
 
   test
   .run()
@@ -338,7 +338,7 @@ test('throw exception when done is called twice', function (assert) {
   const test = new Test('dummy', function (assert, done) {
     done()
     done()
-  })
+  }, $)
   test
   .run()
   .catch((error) => {
@@ -350,7 +350,7 @@ test('return error passed to done callback', function (assert) {
   assert.plan(1)
   const test = new Test('dummy', function (assert, done) {
     done('Just a old plain string error')
-  })
+  }, $)
   test
   .run()
   .catch((error) => {
@@ -362,7 +362,7 @@ test('throw exception when promise and done used together', function (assert) {
   assert.plan(1)
   const test = new Test('dummy', function (assert, done) {
     return new Promise(() => {})
-  })
+  }, $)
   test
   .run()
   .catch((error) => {
@@ -377,7 +377,7 @@ test('pass custom 1st arg to the test', function (tapeAssert) {
   const test = new Test('dummy', function ({ assert }) {
     assert.equal(1 + 1, 2)
     called = true
-  })
+  }, $)
 
   test.resolveArg(function (assert) {
     return { assert }

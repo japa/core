@@ -10,24 +10,27 @@
 */
 
 const Callable = require('./Callable')
-const $ = require('../lib/util')
-const emitter = require('../lib/emitter')
-const eventsList = $.getEventsList()
+const util = require('../lib/util')
 
 class Hook {
-  constructor (groupTitle, hookFor, callback) {
+  constructor (groupTitle, hookFor, callback, globals) {
     this._title = groupTitle
     this._hookFor = hookFor
     this._callback = callback
-    this._timeout = $.timeout
+    this._globals = globals
+    this._timeout = globals.timeout
   }
 
   /**
    * Parses the error. If error is a string, it will
    * get converted to a valid error object.
    *
+   * @method _parseError
+   *
    * @param {String|Object|Null} error
    * @return {Object}
+   *
+   * @private
    */
   _parseError (error) {
     if (error && error.message) {
@@ -55,11 +58,15 @@ class Hook {
   /**
    * Emits the {end} event for a given hook.
    *
+   * @method _end
+   *
    * @param {String|Object|Null} error
    * @param {Number} start
+   *
+   * @private
    */
   _end (error, start) {
-    emitter.emit(eventsList['GROUP_HOOK_END'][this._hookFor], {
+    this._globals.emitter.emit(util.eventsList['GROUP_HOOK_END'][this._hookFor], {
       title: this._title,
       status: error ? 'failed' : 'passed',
       error: error || null,
@@ -69,9 +76,13 @@ class Hook {
 
   /**
    * Emits the {start} event for a given hook.
+   *
+   * @method _start
+   *
+   * @private
    */
   _start () {
-    emitter.emit(eventsList['GROUP_HOOK_START'][this._hookFor], {
+    this._globals.emitter.emit(util.eventsList['GROUP_HOOK_START'][this._hookFor], {
       title: this._title,
       status: 'pending'
     })
@@ -79,6 +90,8 @@ class Hook {
 
   /**
    * Runs the hook as a promise
+   *
+   * @method run
    *
    * @return {Promise}
    */
@@ -103,6 +116,8 @@ class Hook {
 
   /**
    * Modify hook timeout
+   *
+   * @method timeout
    *
    * @param {Number} time
    */
