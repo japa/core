@@ -10,29 +10,25 @@
 */
 
 const Middleware = require('./Middleware')
-const Test = require('./Test')
-const Group = require('./Group')
-const emitter = require('../lib/emitter')
-const $ = require('../lib/util')
 
 class Runner {
-  constructor () {
-    this._testReporter = require('../src/Reporters/list')
-    this._testGroups = []
-    this._pushDefaultGroup()
-    this._grepOn = null
-    this.emitter = emitter // refrence to emitter for listening events
+  constructor (stack, reporter, globals) {
+    this._reporter = reporter
+    this._stack = stack
+    this._globals = globals
   }
 
   /**
    * Emits the end event for all the tests.
+   *
+   * @method _end
    *
    * @param  {Object|Null}
    *
    * @private
    */
   _end (error) {
-    emitter.emit('end', {
+    this._globals.emitter.emit('end', {
       status: error ? 'failed' : 'passed',
       error: error || null
     })
@@ -42,81 +38,12 @@ class Runner {
    * Emits the start event when the tests suite
    * starts.
    *
+   * @method _start
+   *
    * @private
    */
   _start () {
-    emitter.emit('start')
-  }
-
-  /**
-   * Pushes a default group to the tests groups.
-   * This is required to make sure all tests
-   * outside of explicit groups are executed
-   * in order.
-   *
-   * @private
-   */
-  _pushDefaultGroup () {
-    this._testGroups.push(new Group('default', true))
-  }
-
-  /**
-   * Returns the latest group from the groups
-   * stack.
-   *
-   * @return {Object}
-   *
-   * @private
-   */
-  _getLatestGroup () {
-    return this._testGroups[this._testGroups.length - 1]
-  }
-
-  /**
-   * Returns whether string contains the substring
-   * or not.
-   *
-   * @method _passesGrep
-   *
-   * @param  {String}    title
-   *
-   * @return {Boolean}
-   *
-   * @private
-   */
-  _passesGrep (title) {
-    if (!this._grepOn) {
-      return true
-    }
-    return title.includes(this._grepOn)
-  }
-
-  /**
-   * Adds a new test to the latest group
-   *
-   * @param   {String}   title
-   * @param   {Function} callback
-   * @param   {Boolean}   skip
-   *
-   * @private
-   */
-  _addTest (title, callback, skip, failing) {
-    const test = new Test(title, callback, skip, failing)
-    /**
-     * Grep on the test title and make sure it passes the grep
-     * pattern if defined. If not we do not push it to the
-     * group but still instantiate the test since the
-     * end user will be chaining methods on it and
-     * it should not throw exception.
-     *
-     * In short: We create the test but do not execute it
-     */
-    if (this._passesGrep(title)) {
-      const lastGroup = this._getLatestGroup()
-      lastGroup.addTest(test)
-    }
-
-    return test
+    this._globals.emitter.emit('start')
   }
 
   /**
@@ -153,81 +80,25 @@ class Runner {
   }
 
   /**
-   * Returns the list of groups
-   *
-   * @return {Array}
-   *
-   * @private
-   */
-  getGroups () {
-    return this._testGroups
-  }
-
-  /**
-   * Adds a new test to the relevant test group
-   * @param  {String}   title
-   * @param  {Function} callback
-   * @return {Object}
-   */
-  test (title, callback) {
-    return this._addTest(title, callback, false, false)
-  }
-
-  /**
-   * Add a skipable test.
-   *
-   * @param  {String}   title
-   * @param  {Function} callback
-   * @return {Object}
-   */
-  skip (title, callback) {
-    return this._addTest(title, callback, true, false)
-  }
-
-  /**
-   * Create a test that would fail but will be marked
-   * as passed.
-   *
-   * @param  {String}
-   * @param  {Function}
-   * @return {Object}
-   */
-  failing (title, callback) {
-    return this._addTest(title, callback, false, true)
-  }
-
-  /**
-   * Add a new group to have nested tests.
-   * @param  {String}   title
-   * @param  {Function} callback
-   * @return {Object}
-   */
-  group (title, callback) {
-    const group = new Group(title)
-    this._testGroups.push(group)
-    callback(group)
-
-    // Push default group after each test
-    this._pushDefaultGroup()
-  }
-
-  /**
    * The lord who runs the entire tests stack in sequence
    * by respecting the bail feature and also makes sure
-   * to pass the emitter instance to the reporter. So
+   * to pass the props.emitter instance to the reporter. So
    * that reporter can generate nice output.
+   *
+   * @method run
    *
    * @return {Promise}
    */
   run () {
-    if (typeof (this._testReporter) === 'function') {
-      this._testReporter(emitter)
+    if (typeof (this._reporter) === 'function') {
+      this._reporter(this._globals.emitter)
     }
 
     return new Promise((resolve, reject) => {
-      const middleware = new Middleware(this, this._wrapFn)
+      const middleware = new Middleware(this, this._wrapFn, this._globals.bail)
       this._start()
-      middleware.compose(this._testGroups)()
+
+      middleware.compose(this._stack)()
       .then(() => {
         if (middleware.errorsStack.length) {
           throw this._flatten(middleware.errorsStack)
@@ -240,46 +111,6 @@ class Runner {
         reject(error)
       })
     })
-  }
-
-  /**
-   * Toggle the bail status of the runner. Also
-   * this needs to be done before calling
-   * the run method.
-   *
-   * @param  {Boolean} state
-   */
-  bail (state) {
-    $.bail = state
-  }
-
-  /**
-   * Sets global timeout to be used for all tests.
-   *
-   * @param  {Number} time
-   */
-  timeout (time) {
-    $.timeout = time
-  }
-
-  /**
-   * Use a third part reporter.
-   *
-   * @param  {Function} reporter
-   */
-  use (reporter) {
-    this._testReporter = reporter
-  }
-
-  /**
-   * Grep on test title to run only specific tests
-   *
-   * @method grep
-   *
-   * @param  {String} pattern
-   */
-  grep (pattern) {
-    this._grepOn = pattern
   }
 }
 

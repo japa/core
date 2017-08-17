@@ -10,51 +10,53 @@
 */
 
 const test = require('tape')
+const _ = require('lodash')
+const $ = require('../lib/props')
 const Group = require('../src/Group')
 const Hook = require('../src/Hook')
 const Test = require('../src/Test')
-const emitter = require('../lib/emitter')
 
 const cleanup = function () {
-  emitter.eventNames().forEach((event) => {
-    emitter.removeAllListeners(event)
+  $.emitter.eventNames().forEach((event) => {
+    $.emitter.removeAllListeners(event)
+    $.bail = false
   })
 }
 
 test('add before hook to the module', function (assert) {
   assert.plan(1)
-  const group = new Group()
+  const group = new Group(null, $)
   group.before(function () {})
   assert.equal(group._hooks.before[0] instanceof Hook, true)
 })
 
 test('add beforeEach hook to the module', function (assert) {
   assert.plan(1)
-  const group = new Group()
+  const group = new Group(null, $)
   group.beforeEach(function () {})
   assert.equal(group._hooks.beforeEach[0] instanceof Hook, true)
 })
 
 test('add after hook to the module', function (assert) {
   assert.plan(1)
-  const group = new Group()
+  const group = new Group(null, $)
   group.after(function () {})
   assert.equal(group._hooks.after[0] instanceof Hook, true)
 })
 
 test('add afterEach hook to the module', function (assert) {
   assert.plan(1)
-  const group = new Group()
+  const group = new Group(null, $)
   group.afterEach(function () {})
   assert.equal(group._hooks.afterEach[0] instanceof Hook, true)
 })
 
 test('compose tests by placing beforeEach hook before each test', function (assert) {
   assert.plan(1)
-  const group = new Group()
+  const group = new Group(null, $)
 
   group.beforeEach(function () {})
-  const test = new Test('test foo', function () {})
+  const test = new Test('test foo', function () {}, $)
   group.addTest(test)
   const composedTests = group._composeStack()
   assert.equal(composedTests.length, 2)
@@ -62,14 +64,14 @@ test('compose tests by placing beforeEach hook before each test', function (asse
 
 test('compose tests by placing all hooks in order', function (assert) {
   assert.plan(1)
-  const group = new Group()
+  const group = new Group(null, $)
 
   group.before(function () {})
   group.after(function () {})
   group.afterEach(function () {})
   group.beforeEach(function () {})
-  const test = new Test('test foo', function () {})
-  const test1 = new Test('test foo', function () {})
+  const test = new Test('test foo', function () {}, $)
+  const test1 = new Test('test foo', function () {}, $)
   group.addTest(test)
   group.addTest(test1)
   const composedTests = group._composeStack()
@@ -86,13 +88,13 @@ test('compose tests as a middleware chain', function (assert) {
         resolve()
       }, 10)
     })
-  })
+  }, $)
 
   const testBar = new Test('bar', function () {
     testsStack.push('bar')
-  })
+  }, $)
 
-  const group = new Group()
+  const group = new Group(null, $)
   group.addTest(testFoo)
   group.addTest(testBar)
 
@@ -105,7 +107,7 @@ test('compose tests as a middleware chain', function (assert) {
 
 test('run tests by executing hooks in order', (assert) => {
   assert.plan(1)
-  const group = new Group()
+  const group = new Group(null, $)
   const testsStack = []
 
   group.before(function () {
@@ -126,11 +128,11 @@ test('run tests by executing hooks in order', (assert) => {
 
   const test = new Test('test foo', function () {
     testsStack.push('test1')
-  })
+  }, $)
 
   const test1 = new Test('test foo', function () {
     testsStack.push('test2')
-  })
+  }, $)
 
   group.addTest(test)
   group.addTest(test1)
@@ -153,36 +155,36 @@ test('run tests by executing hooks in order', (assert) => {
 
 test('emit event for each hook and corresponding test title', (assert) => {
   assert.plan(1)
-  const group = new Group('Module A')
+  const group = new Group('Module A', $)
   const eventsStack = []
 
   group.before(function () {})
   group.after(function () {})
   group.afterEach(function () {})
   group.beforeEach(function () {})
-  const test = new Test('test foo', function () {})
-  const test1 = new Test('test bar', function () {})
+  const test = new Test('test foo', function () {}, $)
+  const test1 = new Test('test bar', function () {}, $)
 
   group.addTest(test)
   group.addTest(test1)
 
-  emitter.on('hook:before:end', function (stats) {
+  $.emitter.on('hook:before:end', function (stats) {
     eventsStack.push('hook:before:end')
   })
 
-  emitter.on('test:end', function (stats) {
+  $.emitter.on('test:end', function (stats) {
     eventsStack.push(stats.title)
   })
 
-  emitter.on('hook:after:end', function (stats) {
+  $.emitter.on('hook:after:end', function (stats) {
     eventsStack.push('hook:after:end')
   })
 
-  emitter.on('hook:beforeEach:end', function (stats) {
+  $.emitter.on('hook:beforeEach:end', function (stats) {
     eventsStack.push('hook:beforeEach:end')
   })
 
-  emitter.on('hook:afterEach:end', function (stats) {
+  $.emitter.on('hook:afterEach:end', function (stats) {
     eventsStack.push('hook:afterEach:end')
   })
 
@@ -205,14 +207,14 @@ test('emit event for each hook and corresponding test title', (assert) => {
 
 test('throw timeout error when before test timeouts', function (assert) {
   assert.plan(2)
-  const group = new Group('Sample')
+  const group = new Group('Sample', $)
 
   group.before(function (done) {}).timeout(10)
   group.after(function () {})
   group.afterEach(function () {})
   group.beforeEach(function () {})
-  const test = new Test('test foo', function () {})
-  const test1 = new Test('test foo', function () {})
+  const test = new Test('test foo', function () {}, $)
+  const test1 = new Test('test foo', function () {}, $)
   group.addTest(test)
   group.addTest(test1)
 
@@ -227,7 +229,7 @@ test('throw timeout error when before test timeouts', function (assert) {
 
 test('run all tests even when a hook fails', function (assert) {
   assert.plan(3)
-  const group = new Group('Sample')
+  const group = new Group('Sample', $)
   const testsStack = []
 
   group.before(function (done) {}).timeout(10)
@@ -245,11 +247,11 @@ test('run all tests even when a hook fails', function (assert) {
 
   const test = new Test('test foo', function () {
     testsStack.push('test foo')
-  })
+  }, $)
 
   const test1 = new Test('test bar', function () {
     testsStack.push('test bar')
-  })
+  }, $)
 
   group.addTest(test)
   group.addTest(test1)
@@ -274,8 +276,9 @@ test('run all tests even when a hook fails', function (assert) {
 
 test('stop after first error when bail is true', function (assert) {
   assert.plan(3)
-  const group = new Group('A')
-  group.middleware._bail = true
+  const props = _.clone($)
+  props.bail = true
+  const group = new Group('A', props)
   const testsStack = []
 
   group.before(function (done) {})
@@ -293,11 +296,11 @@ test('stop after first error when bail is true', function (assert) {
 
   const test = new Test('test foo', function () {
     testsStack.push('test foo')
-  })
+  }, $)
 
   const test1 = new Test('test bar', function () {
     testsStack.push('test bar')
-  })
+  }, $)
 
   group.addTest(test)
   group.addTest(test1)
@@ -314,34 +317,34 @@ test('stop after first error when bail is true', function (assert) {
 
 test('do not emit events for a root level group', function (assert) {
   assert.plan(1)
-  const group = new Group('Default group', true)
+  const group = new Group('Default group', $, true)
   const groupEvents = []
 
-  emitter.on('group:start', function () {
+  $.emitter.on('group:start', function () {
     groupEvents.push('group:start')
   })
 
-  emitter.on('group:end', function () {
+  $.emitter.on('group:end', function () {
     groupEvents.push('group:end')
   })
 
-  emitter.on('hook:before:start', function () {
+  $.emitter.on('hook:before:start', function () {
     groupEvents.push('hook:before:start')
   })
 
-  emitter.on('hook:before:end', function () {
+  $.emitter.on('hook:before:end', function () {
     groupEvents.push('hook:before:end')
   })
 
-  emitter.on('test:start', function () {
+  $.emitter.on('test:start', function () {
     groupEvents.push('test:start')
   })
 
-  emitter.on('test:end', function () {
+  $.emitter.on('test:end', function () {
     groupEvents.push('test:end')
   })
 
-  const test = new Test('test foo', function () {})
+  const test = new Test('test foo', function () {}, $)
   group.addTest(test)
 
   group

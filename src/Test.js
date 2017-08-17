@@ -10,24 +10,23 @@
 */
 
 const retry = require('retry')
-
 const Callable = require('./Callable')
 const Assertion = require('./Assertion')
-const $ = require('../lib/util')
-const emitter = require('../lib/emitter')
-
-const eventsList = $.getEventsList()
+const util = require('../lib/util')
 
 class Test {
-  constructor (title, callback, skip, expectedToFail) {
+  constructor (title, callback, globals, skip, regression) {
     this._title = title
     this._skip = !!skip
     this._todo = typeof (callback) !== 'function'
-    this._timeout = $.timeout
     this._callback = callback
-    this._regression = !!expectedToFail
+    this._regression = !!regression
     this._regressionMessage = null
+
+    this._globals = globals
+    this._timeout = globals.timeout
     this._retry = 0
+    this._resolveArgFn = null
   }
 
   /**
@@ -45,12 +44,35 @@ class Test {
   }
 
   /**
+   * Returns the 1st argument to be passed to the
+   * each test.
+   *
+   * @method _getArg
+   *
+   * @param  {String} assert
+   *
+   * @return {Object}
+   *
+   * @private
+   */
+  _getArg (assert) {
+    if (typeof (this._resolveArgFn) === 'function') {
+      return this._resolveArgFn(assert)
+    }
+    return assert
+  }
+
+  /**
    * Returns the test status
+   *
+   * @method _getPostRunStatus
    *
    * @param {String|Object} error
    * @return {String}
+   *
+   * @private
    */
-  _getTestStatus (error) {
+  _getPostRunStatus (error) {
     if (error) {
       return 'failed'
     }
@@ -70,8 +92,12 @@ class Test {
    * Parses the error. If error is a string, it will
    * get converted to a valid error object.
    *
+   * @method _parseError
+   *
    * @param {String|Object|Null} error
    * @return {Object}
+   *
+   * @private
    */
   _parseError (error) {
     if (error && error.message) {
@@ -99,8 +125,12 @@ class Test {
   /**
    * Emits the {end} event for a given test.
    *
+   * @method _end
+   *
    * @param {String|Object|Null} error
    * @param {Number} start
+   *
+   * @private
    */
   _end (error, start) {
     const eventBody = this.eventBody
@@ -110,7 +140,7 @@ class Test {
     )
     eventBody.error = error || null
     eventBody.duration = new Date() - start
-    eventBody.status = this._getTestStatus(error)
+    eventBody.status = this._getPostRunStatus(error)
 
     /**
      * Attach the regression message if test is regression.
@@ -119,26 +149,34 @@ class Test {
       eventBody.regressionMessage = this._regressionMessage
     }
 
-    emitter.emit(eventsList['TEST_END'], eventBody)
+    this._globals.emitter.emit(util.eventsList['TEST_END'], eventBody)
   }
 
   /**
    * Emits the {start} event for a given test.
+   *
+   * @method _start
+   *
+   * @private
    */
   _start () {
-    emitter.emit(eventsList['TEST_START'], this.eventBody)
+    this._globals.emitter.emit(util.eventsList['TEST_START'], this.eventBody)
   }
 
   /**
    * Runs the test as a promise
    *
+   * @method _runTest
+   *
    * @return {Promise}
+   *
+   * @private
    */
   _runTest () {
     const assert = new Assertion()
     return new Promise((resolve, reject) => {
       new Callable(this._callback, this._timeout, 1)
-      .args([assert])
+      .args([this._getArg(assert)])
       .run()
       .then(() => assert.evaluate())
       .then(() => {
@@ -162,6 +200,8 @@ class Test {
   /**
    * Public interface to run tests with the
    * the beauty of retries.
+   *
+   * @method run
    *
    * @return {Promise}
    */
@@ -215,7 +255,27 @@ class Test {
   }
 
   /**
+   * Attach a callback to customize the 1st argument
+   * to be passed to the test callback function.
+   *
+   * For multiple values, pass an object, which can be
+   * destrctured within the callback.
+   *
+   * @method resolveArg
+   *
+   * @param  {Function} callback
+   *
+   * @chainable
+   */
+  resolveArg (callback) {
+    this._resolveArgFn = callback
+    return this
+  }
+
+  /**
    * Modify test timeout
+   *
+   * @method timeout
    *
    * @param {Number} time
    */
@@ -228,6 +288,8 @@ class Test {
 
   /**
    * Updates the retry property of a test.
+   *
+   * @method retry
    *
    * @param {Number} ops
    */
