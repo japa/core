@@ -1,3 +1,15 @@
+<a name="1.0.4"></a>
+## [1.0.4](https://github.com/thetutlage/japa/compare/v1.0.3...v1.0.4) (2017-08-17)
+
+
+### Features
+
+* out of the box support for embed api ([6a9ed2e](https://github.com/thetutlage/japa/commit/6a9ed2e))
+* **assertion:** expose api to extend chai ([66e09a7](https://github.com/thetutlage/japa/commit/66e09a7))
+* **test:** add support for custom arg to test callback ([f92c8cb](https://github.com/thetutlage/japa/commit/f92c8cb))
+
+
+
 <a name="1.0.3"></a>
 ## [1.0.3](https://github.com/thetutlage/japa/compare/v1.0.2...v1.0.3) (2017-04-01)
 
