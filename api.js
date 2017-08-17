@@ -12,6 +12,7 @@
 const Test = require('./src/Test')
 const Group = require('./src/Group')
 const Runner = require('./src/Runner')
+const Assertion = require('./src/Assertion')
 const list = require('./src/Reporters/list')
 const { eventsList } = require('./lib/util')
 
@@ -19,6 +20,7 @@ module.exports = {
   Test,
   Group,
   Runner,
+  Assertion,
   eventsList,
   reporters: {
     list

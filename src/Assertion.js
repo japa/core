@@ -82,6 +82,20 @@ class Assertion {
       `planned for ${this._planned} assertion${util.verb(this._planned)} but ran ${this._ran}`
     )
   }
+
+  /**
+   * Apply plugin on the chai instance
+   *
+   * @method use
+   *
+   * @param  {Function} chaiPlugin
+   *
+   * @chainable
+   */
+  static use (chaiPlugin) {
+    chai.use(chaiPlugin)
+    return this
+  }
 }
 
 module.exports = Assertion

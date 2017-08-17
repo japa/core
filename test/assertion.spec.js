@@ -93,3 +93,10 @@ test('fail when ran assertions are less than planned assertions', function (t) {
     t.equal(error.message, 'planned for 2 assertions but ran 1')
   }
 })
+
+test('attach plugin to chai', function (t) {
+  t.plan(1)
+  Assertion.use(function (chai) {
+    t.deepEqual(chai, require('chai'))
+  })
+})
