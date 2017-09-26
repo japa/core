@@ -185,6 +185,7 @@ test('throw exception when promise rejects', function (assert) {
   assert.plan(1)
   const fn = function () {
     return new Promise((resolve, reject) => {
+      /* eslint prefer-promise-reject-errors: "off" */
       reject('custom rejection')
     })
   }

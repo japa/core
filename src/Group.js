@@ -88,6 +88,7 @@ class Group {
    */
   _wrapFn (fn) {
     return new Promise((resolve, reject) => fn.run().then(resolve).catch((error) => {
+      /* eslint prefer-promise-reject-errors: "off" */
       reject({title: fn._title, error: error})
     }))
   }

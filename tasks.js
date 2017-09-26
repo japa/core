@@ -6,7 +6,7 @@ const semver = require('semver')
 const exec = require('shelljs').exec
 const path = require('path')
 
-const satisfies = semver.satisfies(process.version, '>=7.0.0')
+const satisfies = semver.satisfies(process.version, '>=7.0.0') && semver.satisfies(process.version, '<8.0.0')
 let filesToIgnore = []
 let harmonyFlags = []
 if (!satisfies) {

@@ -1,7 +1,6 @@
 'use strict'
 
 class StringCalcuator {
-
   add (expression) {
     if (!expression) {
       return 0
@@ -16,7 +15,6 @@ class StringCalcuator {
     })
     return total
   }
-
 }
 
 module.exports = StringCalcuator

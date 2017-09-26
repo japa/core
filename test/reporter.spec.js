@@ -54,13 +54,15 @@ test('return true if actual is null and expected is undefined', (assert) => {
 test('return color fn for test status', (assert) => {
   assert.plan(1)
   const list = List(fakeEmitter)
-  assert.deepEqual(list._getStatusColor('passed')._styles, ['green'])
+  console.log(list._getStatusColor('passed'))
+  assert.deepEqual(list._getStatusColor('passed')._styles[0].open, '\u001b[32m')
 })
 
 test('return gray color when status is not defined', (assert) => {
   assert.plan(1)
   const list = List(fakeEmitter)
-  assert.deepEqual(list._getStatusColor('foo')._styles, ['gray'])
+  console.log(list._getStatusColor('foo'))
+  assert.equal(list._getStatusColor('foo').hasGrey, true)
 })
 
 test('do not entertain test with invalid status', (assert) => {
