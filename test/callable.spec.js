@@ -280,3 +280,37 @@ test('pass custom args to the function', function (assert) {
     assert.deepEqual(args, ['virk', 22])
   })
 })
+
+test('call function passed to done to find errors', function (assert) {
+  assert.plan(1)
+  const fn = function (done) {
+    setTimeout(function () {
+      done(function () {
+        throw new Error('internal error')
+      })
+    }, 20)
+  }
+
+  const callable = new Callable(fn, 100, 0)
+  callable
+  .run()
+  .catch(({ message }) => {
+    assert.equal(message, 'internal error')
+  })
+})
+
+test('resolve when done callback doesn\'t throws an exception', function (assert) {
+  assert.plan(1)
+  const fn = function (done) {
+    setTimeout(function () {
+      done(function () {})
+    }, 20)
+  }
+
+  const callable = new Callable(fn, 100, 0)
+  callable
+  .run()
+  .then(() => {
+    assert.equal(true, true)
+  })
+})
