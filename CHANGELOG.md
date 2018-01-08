@@ -1,3 +1,13 @@
+<a name="1.0.6"></a>
+## [1.0.6](https://github.com/thetutlage/japa/compare/v1.0.5...v1.0.6) (2018-01-08)
+
+
+### Features
+
+* **callable:** allow closure inside done ([4d2adca](https://github.com/thetutlage/japa/commit/4d2adca))
+
+
+
 <a name="1.0.5"></a>
 ## [1.0.5](https://github.com/thetutlage/japa/compare/v1.0.4...v1.0.5) (2017-09-26)
 
