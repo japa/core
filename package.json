@@ -1,6 +1,6 @@
 {
   "name": "japa",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Japa is a batteries included minimal testing framework for Node.Js. Japa does not have any cli to run your tests, infact running the test file as a node script will execute the tests for you (quite similar to tape)",
   "main": "index.js",
   "directories": {
@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "chai": "^4.1.2",
-    "chalk": "^2.1.0",
-    "ms": "^2.0.0",
+    "chalk": "^2.3.0",
+    "ms": "^2.1.1",
     "retry": "^0.10.1",
     "right-pad": "^1.0.1",
     "variable-diff": "^1.1.0"
@@ -25,7 +25,7 @@
     "shelljs": "^0.7.8",
     "standard": "^10.0.3",
     "tape": "^4.8.0",
-    "ygor": "^4.0.4"
+    "ygor": "^5.1.4"
   },
   "scripts": {
     "pretest": "npm run lint",

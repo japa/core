@@ -15,7 +15,7 @@ if (!satisfies) {
   harmonyFlags.push('--harmony-async-await')
 }
 
-ygor.task('test:safe', () => {
+ygor.tasks.add('test:safe', () => {
   require('require-all')({
     dirname: path.join(__dirname, './test'),
     filter: (fileName) => {
@@ -24,7 +24,7 @@ ygor.task('test:safe', () => {
   })
 })
 
-ygor.task('test', () => {
+ygor.tasks.add('test', () => {
   const command = `FORCE_COLOR=true node ${harmonyFlags.join(' ')} tasks.js test:safe`
   exec(command, (code, stdout, stderr) => {
     process.stderr.write(stderr)
@@ -33,7 +33,7 @@ ygor.task('test', () => {
   })
 })
 
-ygor.task('coverage', () => {
+ygor.tasks.add('coverage', () => {
   const command = `FORCE_COLOR=true node ${harmonyFlags.join(' ')} ./node_modules/.bin/istanbul cover -x tasks.js tasks.js test`
   exec(command, (code, stdout, stderr) => {
     process.stderr.write(stderr)

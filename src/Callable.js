@@ -224,7 +224,23 @@ class Callable {
             this._doneCalled = true
 
             /**
-             * When {done} is called with an error
+             * When {done} is called with an error and it
+             * is function, then we call the function
+             * and catch for errors.
+             */
+            if (typeof (error) === 'function') {
+              try {
+                error()
+                this._internalResolve(resolve)()
+              } catch (doneError) {
+                this._internalReject(reject)(doneError)
+              }
+              return
+            }
+
+            /**
+             * Otherwise use the error value to reject
+             * the promise
              */
             if (error) {
               this._internalReject(reject)(error)
