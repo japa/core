@@ -11,6 +11,7 @@ export enum IEvents {
 
 export type IOptions = {
   bail: boolean,
+  timeout: number,
 }
 
 export type ITestOptions = {

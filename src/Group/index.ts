@@ -36,14 +36,10 @@ export class Group <T extends any[]> {
   }
 
   /**
-   * Options to be passed as a reference to the test. Keeping
-   * them on the group makes it easier to set them for all
-   * test.
+   * Timeout defined on group will be applied to
+   * all the tests by default.
    */
-  private _testOptions: ITestOptions = {
-    timeout: 2000,
-    regression: false,
-  }
+  private _timeout: number
 
   /**
    * The test error (if any)
@@ -165,17 +161,31 @@ export class Group <T extends any[]> {
       throw new Error('group.timeout must be called before defining the tests')
     }
 
-    this._testOptions.timeout = duration
+    this._timeout = duration
     return this
   }
 
   /**
    * Create a new test as part of this group.
    */
-  public test (title: string, callback: ICallback<T>): Test<T> {
+  public test (title: string, callback: ICallback<T>, testOptions?: ITestOptions): Test<T> {
     ow(title, ow.string.label('title').nonEmpty)
 
-    const test = new Test(title, this._resolveFn, callback, this._testOptions)
+    testOptions = Object.assign({
+      skip: false,
+      skipInCI: false,
+      runInCI: false,
+    }, testOptions)
+
+    /**
+     * Give priority to the group timeout vs the one defined
+     * using runner properties
+     */
+    if (this._timeout) {
+      testOptions.timeout = this._timeout
+    }
+
+    const test = new Test(title, this._resolveFn, callback, testOptions)
 
     this._tests.push(test)
     return test

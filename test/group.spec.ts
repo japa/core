@@ -375,6 +375,5 @@ describe('Group', () => {
 
     const fn = () => group.timeout(300)
     assert.throw(fn, 'group.timeout must be called before defining the tests')
-
   })
 })
