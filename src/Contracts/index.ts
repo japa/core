@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 export enum IEvents {
   TESTSTARTED = 'test:started',
   TESTCOMPLETED = 'test:completed',

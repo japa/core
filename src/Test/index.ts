@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 /*
  * japa
  *
@@ -24,6 +28,14 @@ import {
   IResolver,
 } from '../Contracts'
 
+/**
+ * Test class is used for running and defining a test. It supports following
+ * top level config properties.
+ *
+ * - skip     : Skip the test
+ * - skipInCI : Skip the test on CI
+ * - runInCI  : Run only in CI
+ */
 export class Test <T extends any[]> {
   /**
    * When the callback for the function is not defined, then we mark
@@ -153,12 +165,9 @@ export class Test <T extends any[]> {
   }
 
   /**
-   * Runs the test along with it's before and after hooks
-   * stack.
-   *
-   * If retries are defined, then the test will be retried for the
-   * given number of times before marked as failed. When retrying
-   * hooks are not executed again.
+   * Runs the test. If retries are defined, then the test will be retried for the
+   * given number of times before marked as failed. When retrying hooks are not
+   * executed again.
    *
    * ```js
    * // stack

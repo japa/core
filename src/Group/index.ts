@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 /*
  * japa
  *
@@ -13,6 +17,11 @@ import { Test } from '../Test'
 import { emitter } from '../Emitter'
 import { ICallback, IResolver, IGroupReport, IGroupStatus, IEvents, ITestOptions } from '../Contracts'
 
+/**
+ * Group holds `n` number of tests to be executed. Groups also allows
+ * defining hooks to be called before and after each test and the
+ * group itself.
+ */
 export class Group <T extends any[]> {
   private _hooks: {
     before: Hook<T>[],
@@ -126,7 +135,8 @@ export class Group <T extends any[]> {
   }
 
   /**
-   * Returns the JSON report for the group
+   * Returns the JSON report for the group. The output of this
+   * method is emitted as an event.
    */
   public toJSON (): IGroupReport {
     let status = IGroupStatus.PENDING
@@ -145,7 +155,8 @@ export class Group <T extends any[]> {
   }
 
   /**
-   * Define timeout for all the tests inside the group
+   * Define timeout for all the tests inside the group. Still
+   * each test can override it's own timeout.
    */
   public timeout (duration: number): this {
     ow(duration, ow.number.label('duration').integer)
@@ -159,7 +170,7 @@ export class Group <T extends any[]> {
   }
 
   /**
-   * Create a new test
+   * Create a new test as part of this group.
    */
   public test (title: string, callback: ICallback<T>): Test<T> {
     ow(title, ow.string.label('title').nonEmpty)

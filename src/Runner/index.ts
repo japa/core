@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 /*
  * japa
  *
@@ -12,6 +16,10 @@ import { Group } from '../Group'
 import { emitter } from '../Emitter'
 import listReporter from '../Reporter/list'
 
+/**
+ * Runner class is used for defining global properties
+ * and run all the tests inside the group.
+ */
 export class Runner <T extends any[]> {
   private _reporterFn: ((emitter, options) => void) | null
 

@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 /*
  * japa
  *
@@ -7,5 +11,9 @@
  * file that was distributed with this source code.
 */
 
+/**
+ * List reporter to show the tests progress on stdout in
+ * a list format
+ */
 export default function listReporter () {
 }

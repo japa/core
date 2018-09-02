@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 /*
  * japa
  *
@@ -10,10 +14,15 @@
 import { TimeoutException } from '../Exceptions'
 import { IResolver, ICallback } from '../Contracts'
 import * as Debug from 'debug'
+
+/**
+ * @ignore
+ */
 const debug = Debug('japa')
 
 /**
  * Executes the function as promise
+ * @ignore
  */
 async function asPromise (fn, args) {
   return await fn(...args)

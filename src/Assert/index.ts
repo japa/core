@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 /*
  * japa
  *
@@ -10,9 +14,9 @@
 import { assert as chaiAssert, use } from 'chai'
 
 /**
- * The assert interface to run assertions using ChaiJs.
- *
- * @class Assert
+ * The assert interface to run assertions using chaijs.
+ * This class is a thin wrapper over [chaijs#assert](http://www.chaijs.com/api/assert/) allowing
+ * assertion planning and all existing methods from chaijs are supported.
  */
 export class Assert {
   private _counts: number = 0
@@ -50,7 +54,8 @@ export class Assert {
   }
 
   /**
-   * Run all assertions
+   * Evaluate whether assertions count matches the
+   * planned counts or not.
    */
   public evaluate () {
     if (this._plannedCounts && this._plannedCounts !== this._counts) {

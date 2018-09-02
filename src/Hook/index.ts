@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 /*
  * japa
  *
@@ -11,12 +15,7 @@ import { Callable } from '../Callable'
 import { IResolver, ICallback } from '../Contracts'
 
 /**
- * Hooks are executed before or after the test/groups. Super helpful
- * to make the setup/teardown for tests easier.
- *
- * 1. A hook never times out.
- * 2. You cannot run assertions inside hooks.
- * 3. If a hook fails, it will stop the test suite.
+ * Hook class is used for running the group hooks.
  */
 export class Hook <T extends any[]> {
   constructor (
