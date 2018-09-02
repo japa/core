@@ -1,47 +1,69 @@
 {
   "name": "japa",
-  "version": "1.0.6",
-  "description": "Japa is a batteries included minimal testing framework for Node.Js. Japa does not have any cli to run your tests, infact running the test file as a node script will execute the tests for you (quite similar to tape)",
+  "version": "1.0.0",
+  "description": "",
   "main": "index.js",
-  "directories": {
-    "example": "examples",
-    "test": "test"
-  },
-  "dependencies": {
-    "chai": "^4.1.2",
-    "chalk": "^2.3.0",
-    "ms": "^2.1.1",
-    "retry": "^0.10.1",
-    "right-pad": "^1.0.1",
-    "variable-diff": "^1.1.0"
-  },
-  "devDependencies": {
-    "chai": "^4.1.2",
-    "faucet": "0.0.1",
-    "istanbul": "^0.4.5",
-    "lodash": "^4.17.4",
-    "require-all": "^2.2.0",
-    "semver": "^5.4.1",
-    "shelljs": "^0.7.8",
-    "standard": "^10.0.3",
-    "tape": "^4.8.0",
-    "ygor": "^5.1.4"
-  },
   "scripts": {
+    "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
-    "test": "node tasks test",
-    "coverage": "node tasks coverage",
-    "lint": "standard"
+    "test": "nyc mocha -r ts-node/register test/*.spec.ts",
+    "posttest": "npm run coverage",
+    "commit": "git-cz",
+    "prepublishOnly": "npm run build",
+    "test:win": "node ./node_modules/japa-cli/index.js",
+    "clean": "del build",
+    "compile": "npm run lint && npm run clean && tsc",
+    "build": "npm run compile",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "lint": "tslint --project tsconfig.json"
   },
-  "keywords": [],
-  "author": "amanvirk",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thetutlage/japa.git"
   },
+  "author": "virk",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/thetutlage/japa/issues"
   },
-  "homepage": "https://github.com/thetutlage/japa#readme"
+  "homepage": "https://github.com/thetutlage/japa#readme",
+  "dependencies": {
+    "debug": "^3.1.0",
+    "ow": "^0.6.0",
+    "retry": "^0.12.0",
+    "time-span": "^2.0.0"
+  },
+  "devDependencies": {
+    "@adonisjs/mrm-preset": "^1.0.11",
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.7.1",
+    "chai": "^4.1.2",
+    "commitizen": "^2.10.1",
+    "coveralls": "^3.0.2",
+    "cz-conventional-changelog": "^2.1.0",
+    "del-cli": "^1.1.0",
+    "mocha": "^5.2.0",
+    "mrm": "^1.2.1",
+    "nyc": "^12.0.2",
+    "pkg-ok": "^2.2.0",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.0.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "nyc": {
+    "exclude": [
+      "test",
+      "japaFile.js"
+    ],
+    "extension": [
+      ".ts"
+    ]
+  }
 }
