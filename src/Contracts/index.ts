@@ -16,6 +16,9 @@ export type IOptions = {
 export type ITestOptions = {
   timeout: number,
   regression: boolean,
+  skip?: boolean,
+  skipInCI?: boolean,
+  runInCI?: boolean,
 }
 
 export enum IGroupStatus {

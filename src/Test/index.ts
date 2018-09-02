@@ -14,6 +14,7 @@
 import ow from 'ow'
 import * as timeSpan from 'time-span'
 import * as retry from 'retry'
+import * as isCI from 'is-ci'
 
 import { Callable } from '../Callable'
 import { emitter } from '../Emitter'
@@ -76,6 +77,13 @@ export class Test <T extends any[]> {
   private _error: Error | null = null
 
   /**
+   * Whether or not to skip the test
+   *
+   * @type {boolean}
+   */
+  private _skip: boolean
+
+  /**
    * Has test been executed
    */
   private _completed: boolean = false
@@ -89,6 +97,14 @@ export class Test <T extends any[]> {
     this._todo = typeof (_callback) !== 'function'
     this._timeout = options.timeout
     this._regression = options.regression
+
+    if (options.skip) {
+      this._skip = true
+    } else if (options.skipInCI && isCI) {
+      this._skip = true
+    } else if (options.runInCI && !isCI) {
+      this._skip = true
+    }
   }
 
   /**
@@ -128,6 +144,8 @@ export class Test <T extends any[]> {
 
     if (this._todo) {
       status = ITestStatus.TODO
+    } else if (this._skip) {
+      status = ITestStatus.SKIPPED
     } else if (this._completed && this._error) {
       status = (this._regression && !this._isHardException) ? ITestStatus.PASSED : ITestStatus.FAILED
     } else if (this._completed && !this._error) {
@@ -187,7 +205,7 @@ export class Test <T extends any[]> {
     const start = timeSpan()
 
     /* istanbul ignore else */
-    if (!this._todo) {
+    if (!this._todo && !this._skip) {
       /**
        * Run the actual test
        */
