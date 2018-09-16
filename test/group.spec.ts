@@ -15,7 +15,7 @@ import { getFn, sleep } from './helpers'
 
 describe('Group', () => {
   it('should register the tests to be invoked later', async () => {
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
     group.test('sample test', function cb () {})
 
     assert.lengthOf(group['_tests'], 1)
@@ -24,7 +24,7 @@ describe('Group', () => {
 
   it('should run the test when running the group', async () => {
     let invoked = false
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.test('sample test', function cb () {
       invoked = true
@@ -36,7 +36,7 @@ describe('Group', () => {
 
   it('should run the before hooks when running the group', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.test('sample test', function cb () {
       stack.push('test')
@@ -52,7 +52,7 @@ describe('Group', () => {
 
   it('should run the after hooks when running the group', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.test('sample test', function cb () {
       stack.push('test')
@@ -72,7 +72,7 @@ describe('Group', () => {
 
   it('should not run the test and after hook, when before hook fails', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.test('sample test', function cb () {
       stack.push('test')
@@ -95,7 +95,7 @@ describe('Group', () => {
 
   it('should not run the upcoming before hooks, when before hook fails', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.test('sample test', function cb () {
       stack.push('test')
@@ -122,7 +122,7 @@ describe('Group', () => {
 
   it('run beforeEach hooks before each test', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.before(function cb () {
       stack.push('before')
@@ -148,7 +148,7 @@ describe('Group', () => {
 
   it('run afterEach hooks after each test', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.before(function cb () {
       stack.push('before')
@@ -178,7 +178,7 @@ describe('Group', () => {
 
   it('do not run test when beforeEach fails', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.beforeEach(function cb () {
       stack.push('beforeEach')
@@ -197,7 +197,7 @@ describe('Group', () => {
 
   it('do not run other beforeEach hooks when beforeEach fails', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.beforeEach(function cb () {
       stack.push('beforeEach')
@@ -220,7 +220,7 @@ describe('Group', () => {
 
   it('do not run other afterEach hooks when beforeEach fails', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.beforeEach(function cb () {
       stack.push('beforeEach')
@@ -243,7 +243,7 @@ describe('Group', () => {
 
   it('do not run other tests when beforeEach fails', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.beforeEach(function cb () {
       stack.push('beforeEach')
@@ -266,7 +266,7 @@ describe('Group', () => {
 
   it('do not run other tests when afterEach fails', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.beforeEach(function cb () {
       stack.push('beforeEach')
@@ -293,7 +293,7 @@ describe('Group', () => {
 
   it('fail group when after hook fails', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.beforeEach(function cb () {
       stack.push('beforeEach')
@@ -323,7 +323,7 @@ describe('Group', () => {
 
   it('do not run other afterEach hooks when one fails', async () => {
     const stack: string[] = []
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.beforeEach(function cb () {
       stack.push('beforeEach')
@@ -354,7 +354,7 @@ describe('Group', () => {
   })
 
   it('define timeout for the test via group', async () => {
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.timeout(300)
     const test = group.test('sample test', async function cb () {
@@ -367,7 +367,7 @@ describe('Group', () => {
   })
 
   it('raise error when user try to give timeout to the group after adding tests', async () => {
-    const group = new Group('sample', getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]))
 
     group.test('sample test', async function cb () {
       await sleep(500)

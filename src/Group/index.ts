@@ -15,19 +15,27 @@ import ow from 'ow'
 import { Hook } from '../Hook'
 import { Test } from '../Test'
 import { emitter } from '../Emitter'
-import { ICallback, IResolver, IGroupReport, IGroupStatus, IEvents, ITestOptions } from '../Contracts'
+import {
+  ICallback,
+  IResolver,
+  IGroupReport,
+  IGroupStatus,
+  IEvents,
+  ITestStatus,
+  ITestOptions,
+ } from '../Contracts'
 
 /**
  * Group holds `n` number of tests to be executed. Groups also allows
  * defining hooks to be called before and after each test and the
  * group itself.
  */
-export class Group <T extends any[]> {
+export class Group <T extends any[], H extends any[]> {
   private _hooks: {
-    before: Hook<T>[],
-    after: Hook<T>[],
-    beforeEach: Hook<T>[],
-    afterEach: Hook<T>[],
+    before: Hook<H>[],
+    after: Hook<H>[],
+    beforeEach: Hook<H>[],
+    afterEach: Hook<H>[],
   } = {
     before: [],
     after: [],
@@ -56,7 +64,21 @@ export class Group <T extends any[]> {
    */
   private _tests: Test<T>[] = []
 
-  constructor (private _title: string, private _resolveFn: IResolver<T>) {
+  /**
+   * Storing whether the group has any failing tests or
+   * not.
+   */
+  private _hasFailingTests = false
+
+  constructor (private _title: string, private _resolveTestFn: IResolver<T>, private _resolveHookFn: IResolver<H>) {
+  }
+
+  /**
+   * Returns a boolean telling if group or any of the tests inside
+   * the group has errors.
+   */
+  public get hasErrors (): boolean {
+    return this._hasFailingTests || !!this._error
   }
 
   /**
@@ -64,7 +86,7 @@ export class Group <T extends any[]> {
    * set the completed flag to true, along with the
    * error.
    */
-  private async _runHook (fn: Hook<T>) {
+  private async _runHook (fn: Hook<H>) {
     try {
       await fn.run()
     } catch (error) {
@@ -101,6 +123,14 @@ export class Group <T extends any[]> {
     await test.run()
 
     /**
+     * Setting flag to true when any one test has failed. This helps
+     * in telling runner to exit process with the correct status.
+     */
+    if (!this._hasFailingTests && test.toJSON().status === ITestStatus.FAILED) {
+      this._hasFailingTests = true
+    }
+
+    /**
      * Run all after each hooks
      */
     for (let hook of this._hooks.afterEach) {
@@ -118,8 +148,10 @@ export class Group <T extends any[]> {
    */
   private async _runTests () {
     /**
-     * Run all the tests in sequence, if any test sets the status
-     * to completed, we will break the loop
+     * Run all the tests in sequence. If any hook beforeEach or afterEach
+     * hook fails, it will set `complete = true` and then we break out
+     * of the loop, since if hooks are failing, then there is no
+     * point is running tests.
      */
     for (let test of this._tests) {
       if (this._completed) {
@@ -168,10 +200,11 @@ export class Group <T extends any[]> {
   /**
    * Create a new test as part of this group.
    */
-  public test (title: string, callback: ICallback<T>, testOptions?: ITestOptions): Test<T> {
+  public test (title: string, callback: ICallback<T>, testOptions?: Partial<ITestOptions>): Test<T> {
     ow(title, ow.string.label('title').nonEmpty)
 
     testOptions = Object.assign({
+      regression: false,
       skip: false,
       skipInCI: false,
       runInCI: false,
@@ -185,7 +218,7 @@ export class Group <T extends any[]> {
       testOptions.timeout = this._timeout
     }
 
-    const test = new Test(title, this._resolveFn, callback, testOptions)
+    const test = new Test(title, this._resolveTestFn, callback, testOptions as ITestOptions)
 
     this._tests.push(test)
     return test
@@ -195,10 +228,10 @@ export class Group <T extends any[]> {
    * Add before hook to be executed before the group starts
    * executing tests.
    */
-  public before (cb: ICallback<T>): this {
+  public before (cb: ICallback<H>): this {
     ow(cb, ow.function.label('cb'))
 
-    this._hooks.before.push(new Hook(this._resolveFn, cb))
+    this._hooks.before.push(new Hook(this._resolveHookFn, cb))
     return this
   }
 
@@ -206,30 +239,30 @@ export class Group <T extends any[]> {
    * Add after hook to be executed after the group has executed
    * all the tests.
    */
-  public after (cb: ICallback<T>): this {
+  public after (cb: ICallback<H>): this {
     ow(cb, ow.function.label('cb'))
 
-    this._hooks.after.push(new Hook(this._resolveFn, cb))
+    this._hooks.after.push(new Hook(this._resolveHookFn, cb))
     return this
   }
 
   /**
    * Add before each hook to be execute before each test
    */
-  public beforeEach (cb: ICallback<T>): this {
+  public beforeEach (cb: ICallback<H>): this {
     ow(cb, ow.function.label('cb'))
 
-    this._hooks.beforeEach.push(new Hook(this._resolveFn, cb))
+    this._hooks.beforeEach.push(new Hook(this._resolveHookFn, cb))
     return this
   }
 
   /**
    * Add after each hook to be execute before each test
    */
-  public afterEach (cb: ICallback<T>): this {
+  public afterEach (cb: ICallback<H>): this {
     ow(cb, ow.function.label('cb'))
 
-    this._hooks.afterEach.push(new Hook(this._resolveFn, cb))
+    this._hooks.afterEach.push(new Hook(this._resolveHookFn, cb))
     return this
   }
 

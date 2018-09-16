@@ -45,12 +45,13 @@ export class Test <T extends any[]> {
   private _todo: boolean
 
   /**
-   * Regression message is the one that passes, when it fails
+   * Mark failed tests as passed
    */
   private _regression: boolean
 
   /**
-   * Regression message is the error message
+   * Regression message is set when the passes, but it was meant
+   * to fail
    */
   private _regressionMessage: string = ''
 
@@ -60,7 +61,7 @@ export class Test <T extends any[]> {
   private _timeout: number
 
   /**
-   * How many times, we should re-try the function before marking
+   * How many times, we should retry the function before marking
    * it as failed
    */
   private _retries: number = 0
@@ -78,8 +79,6 @@ export class Test <T extends any[]> {
 
   /**
    * Whether or not to skip the test
-   *
-   * @type {boolean}
    */
   private _skip: boolean
 
@@ -94,7 +93,7 @@ export class Test <T extends any[]> {
     private _callback: ICallback<T> | undefined,
     options: ITestOptions,
   ) {
-    this._todo = typeof (_callback) !== 'function'
+    this._todo = typeof (this._callback) !== 'function'
     this._timeout = options.timeout
     this._regression = options.regression
 
@@ -155,6 +154,7 @@ export class Test <T extends any[]> {
     return {
       title: this._title,
       status: status,
+      regression: this._regression,
       regressionMessage: this._regressionMessage,
       duration: this._duration,
       error: this._error,
@@ -226,7 +226,7 @@ export class Test <T extends any[]> {
       }
     }
 
-    this._duration = start()
+    this._duration = start.rounded()
     this._completed = true
     emitter.emit(IEvents.TESTCOMPLETED, this.toJSON())
   }
