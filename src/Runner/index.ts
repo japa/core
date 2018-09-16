@@ -14,7 +14,6 @@
 import { IOptions, IEvents } from '../Contracts'
 import { Group } from '../Group'
 import { emitter } from '../Emitter'
-import listReporter from '../Reporter/list'
 
 /**
  * Runner class is used for defining global properties
@@ -46,15 +45,30 @@ export class Runner <T extends any[], H extends any[]> {
    * Run all the tests inside the registered groups
    */
   public async run () {
-    const reporterFn = typeof (this._reporterFn) === 'function' ? this._reporterFn : listReporter
-    reporterFn(emitter, this._options)
+    if (typeof (this._reporterFn) !== 'function') {
+      throw new Error('Make sure to define tests reporter as a function')
+    }
 
+    /**
+     * Give emitter instance to the reporter
+     */
+    this._reporterFn(emitter, this._options)
+
+    /**
+     * Emit the started event
+     */
     emitter.emit(IEvents.STARTED)
 
+    /**
+     * Run all the tests
+     */
     for (let group of this._groups) {
       await group.run()
     }
 
+    /**
+     * Emit completed event
+     */
     emitter.emit(IEvents.COMPLETED)
   }
 }

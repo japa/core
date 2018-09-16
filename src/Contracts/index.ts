@@ -53,14 +53,15 @@ export type IGroupReport = {
   error: Error | null,
 }
 
-export type ITestRecord = {
+export type IReport = {
   regressionCount: number,
   passedCount: number,
   skippedCount: number,
   failedCount: number,
   total: number,
   todoCount: number,
-  tests: { group: string, title: string, error: Error }[],
+  groups: { title: string, failedTests: { title: string, error: Error }[] }[],
+  duration: number,
 }
 
 export type ICallback <T extends any[]> = (...args: T) => Promise<void> | void
