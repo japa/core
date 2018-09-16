@@ -25,3 +25,31 @@ export function testOptions (options?): ITestOptions {
     timeout: 2000,
   }, options)
 }
+
+export function getTestReporter () {
+  const obj: {
+    events: any[],
+    fn: (emitter) => void,
+  } = {
+    events: [],
+    fn (emitter) {
+      emitter.on('test:started', (data) => {
+        this.events.push({ event: 'test:started', data })
+      })
+
+      emitter.on('test:completed', (data) => {
+        this.events.push({ event: 'test:completed', data })
+      })
+
+      emitter.on('group:started', (data) => {
+        this.events.push({ event: 'group:started', data })
+      })
+
+      emitter.on('group:completed', (data) => {
+        this.events.push({ event: 'group:completed', data })
+      })
+    },
+  }
+
+  return obj
+}

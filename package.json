@@ -28,11 +28,15 @@
   },
   "homepage": "https://github.com/thetutlage/japa#readme",
   "dependencies": {
+    "chalk": "^2.4.1",
     "debug": "^3.1.0",
     "is-ci": "^1.2.0",
+    "ms": "^2.1.1",
     "ow": "^0.6.0",
     "retry": "^0.12.0",
-    "time-span": "^2.0.0"
+    "right-pad": "^1.0.1",
+    "time-span": "^2.0.0",
+    "variable-diff": "^1.1.0"
   },
   "devDependencies": {
     "@adonisjs/mrm-preset": "^1.0.11",

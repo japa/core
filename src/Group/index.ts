@@ -214,7 +214,7 @@ export class Group <T extends any[], H extends any[]> {
      * Give priority to the group timeout vs the one defined
      * using runner properties
      */
-    if (this._timeout) {
+    if (this._timeout !== undefined) {
       testOptions.timeout = this._timeout
     }
 

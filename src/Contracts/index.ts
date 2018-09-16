@@ -14,7 +14,6 @@ export enum IEvents {
 export type IOptions = {
   bail: boolean,
   timeout: number,
-  grep: string | null,
 }
 
 export type ITestOptions = {
