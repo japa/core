@@ -10,6 +10,7 @@
 import { Runner } from '../Runner'
 import { Group } from '../Group'
 import { Assert } from '../Assert'
+import listReporter from '../Reporter/list'
 import { ICallback, IOptions, ITestOptions } from '../Contracts'
 
 /**
@@ -61,7 +62,7 @@ let runnerOptions: IOptions = {
 /**
  * Custom reporter function
  */
-let reporterFn: ((emitter) => void) | null = null
+let reporterFn: ((emitter) => void) = listReporter
 
 /**
  * Adds the test to the active group. If there isn't any active
@@ -88,10 +89,7 @@ export function test (title: string, callback: ICallback<testArgs>) {
  */
 export async function run () {
   const runner = new Runner(groups, runnerOptions)
-
-  if (reporterFn) {
-    runner.reporter(reporterFn)
-  }
+  runner.reporter(reporterFn)
 
   await runner.run()
 
@@ -101,13 +99,13 @@ export async function run () {
     bail: false,
     timeout: 2000,
   }
-  reporterFn = null
+  reporterFn = listReporter
 }
 
 /**
  * Configure test runner
  */
-export function configure (options: { reporterFn?, bail: boolean, timeout: number }) {
+export function configure (options: Partial<{ reporterFn?, bail: boolean, timeout: number }>) {
   if (options.reporterFn) {
     reporterFn = options.reporterFn
   }
