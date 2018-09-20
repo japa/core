@@ -29,7 +29,10 @@ type hookArgs = [Function]
  * Returns arguments to be passed to the callback
  * of a test
  */
-function testArgsFn (done: Function): testArgs {
+function testArgsFn (done: Function, postRun: Function): testArgs {
+  postRun(function postRunFn (assert) {
+    assert.evaluate()
+  })
   return [new Assert(), done]
 }
 

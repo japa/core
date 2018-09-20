@@ -18,7 +18,8 @@ import * as isCI from 'is-ci'
 
 import { Callable } from '../Callable'
 import { emitter } from '../Emitter'
-import { TimeoutException, RegressionException } from '../Exceptions'
+import { RegressionException } from '../Exceptions'
+import { isCoreException } from '../utils'
 
 import {
   ITestOptions,
@@ -111,7 +112,7 @@ export class Test <T extends any[]> {
    * fails the regression tests too
    */
   private get _isHardException () {
-    return this._error instanceof TimeoutException || this._error instanceof RegressionException
+    return isCoreException(this._error)
   }
 
   /**

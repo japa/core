@@ -11,7 +11,8 @@
  * file that was distributed with this source code.
 */
 
-export class TimeoutException extends Error {
-}
+export class TimeoutException extends Error {}
 
 export class RegressionException extends Error {}
+
+export class InvalidAssertionsCount extends Error {}

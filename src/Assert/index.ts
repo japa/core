@@ -12,6 +12,7 @@
 */
 
 import { assert as chaiAssert, use } from 'chai'
+import { InvalidAssertionsCount } from '../Exceptions'
 
 /**
  * The assert interface to run assertions using chaijs.
@@ -60,11 +61,8 @@ export class Assert {
   public evaluate () {
     if (this._plannedCounts && this._plannedCounts !== this._counts) {
       const suffix = this._plannedCounts === 1 ? '' : 's'
-      chaiAssert.equal(
-         this._plannedCounts,
-         this._counts,
-         `Planned for ${this._plannedCounts} assertion${suffix}, but ran ${this._counts}`,
-      )
+      const message = `Planned for ${this._plannedCounts} assertion${suffix}, but ran ${this._counts}`
+      throw new InvalidAssertionsCount(message)
     }
   }
 }

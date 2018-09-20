@@ -16,7 +16,7 @@ import * as ms from 'ms'
 import * as variableDiff from 'variable-diff'
 import * as rightPad from 'right-pad'
 
-import { TestsStore } from '../utils'
+import { TestsStore, isCoreException } from '../utils'
 import { IEvents, IGroupReport, ITestReport } from '../Contracts'
 
 /**
@@ -105,17 +105,21 @@ class ListReporter {
    * there is no need to print the stack.
    */
   private _printTestError (error: any) {
-    if (error.actual && error.expected) {
-      console.log(chalk.red(`    Assertion Error: ${error.message}`))
-      variableDiff(error.actual, error.expected)
-        .text
-        .split('\n')
-        .forEach((line) => {
-          console.log(`    ${line}`)
-        })
-    } else {
-      console.log(`    ${this._getStack(error.stack)}`)
+    if (isCoreException(error)) {
+      console.log(chalk.red(`    ${error.message}`))
+      return
     }
+
+    const { actual, expected } = error
+    if (actual && expected) {
+      console.log(chalk.red(`    Assertion Error: ${error.message}`))
+      variableDiff(actual, expected).text.split('\n').forEach((line) => {
+        console.log(`    ${line}`)
+      })
+      return
+    }
+
+    console.log(`    ${this._getStack(error.stack)}`)
   }
 
   /**
@@ -221,6 +225,7 @@ class ListReporter {
 
       if (failedTests.length) {
         failedTests.forEach(({ title, error }) => {
+          console.log('')
           console.log(`  ${this._getFailingTitle(title)}`)
           this._printTestError(error)
         })

@@ -9,6 +9,7 @@
 
 import * as timeSpan from 'time-span'
 import { IReport, IGroupReport, ITestReport, ITestStatus, IGroupStatus } from '../Contracts'
+import * as exceptions from '../Exceptions'
 
 export class TestsStore {
   private _store: IReport = {
@@ -119,4 +120,12 @@ export class TestsStore {
     this.close()
     return this._store
   }
+}
+
+/**
+ * Returns a boolean telling if exception is part of core exceptions or
+ * not.
+ */
+export function isCoreException (error) : boolean {
+  return !!Object.keys(exceptions).find((e) => error instanceof exceptions[e])
 }

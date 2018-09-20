@@ -117,7 +117,7 @@ export function Callable <T extends any[]> (resolveFn: IResolver<T>, callback: I
 
         /* istanbul ignore else */
         if (!completed) {
-          finish(new TimeoutException('timeout'))
+          finish(new TimeoutException(`Test timeout after ${timeout} milliseconds`))
         }
       }, timeout)
     }
