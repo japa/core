@@ -6,7 +6,7 @@
   "scripts": {
     "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
-    "test": "nyc mocha -r ts-node/register test/*.spec.ts",
+    "test": "nyc mocha -r ts-node/register test/callable.spec.ts",
     "posttest": "npm run coverage",
     "commit": "git-cz",
     "prepublishOnly": "npm run build",

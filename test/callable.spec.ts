@@ -96,4 +96,100 @@ describe('Callable', () => {
       assert.equal(message, 'failed')
     }
   })
+
+  it('should mark test as failed, when post run ends with error', async () => {
+    const args: any[string] = ['virk']
+    const resolver = getFn<[string, Function]>(args, function cb () {
+      throw new Error('Failed in post run')
+    })
+
+    try {
+      await Callable(resolver, () => {
+      }, 2000)
+      assert.isTrue(false)
+    } catch ({ message }) {
+      assert.equal(message, 'Failed in post run')
+    }
+  })
+
+  it('should mark test as failed, when post run ends with error and using done', async () => {
+    const args: any[string] = ['virk']
+    const resolver = getFn<[string, Function]>(args, function cb () {
+      throw new Error('Failed in post run')
+    })
+
+    try {
+      await Callable(resolver, (_username, done) => {
+        done()
+      }, 2000)
+      assert.isTrue(false)
+    } catch ({ message }) {
+      assert.equal(message, 'Failed in post run')
+    }
+  })
+
+  it('do not run post run when actual test ends with error', async () => {
+    let invoked = false
+    const args: any[string] = ['virk']
+    const resolver = getFn<[string, Function]>(args, function cb () {
+      invoked = true
+    })
+
+    try {
+      await Callable(resolver, (_username, done) => {
+        done(new Error('Failed in test'))
+      }, 2000)
+      assert.isTrue(false)
+    } catch ({ message }) {
+      assert.equal(message, 'Failed in test')
+      assert.isFalse(invoked)
+    }
+  })
+
+  it('do not run post run when actual test throws error', async () => {
+    let invoked = false
+    const args: any[string] = ['virk']
+    const resolver = getFn<[string, Function]>(args, function cb () {
+      invoked = true
+    })
+
+    try {
+      await Callable(resolver, (_username) => {
+        throw new Error('Failed in test')
+      }, 2000)
+      assert.isTrue(false)
+    } catch ({ message }) {
+      assert.equal(message, 'Failed in test')
+      assert.isFalse(invoked)
+    }
+  })
+
+  it('do not run post run when test times out', async () => {
+    let invoked = false
+    const args: any[string] = ['virk']
+    const resolver = getFn<[string, Function]>(args, function cb () {
+      invoked = true
+    })
+
+    try {
+      await Callable(resolver, async () => {
+        await sleep(100)
+      }, 10)
+      assert.isTrue(false)
+    } catch (error) {
+      assert.instanceOf(error, TimeoutException)
+      assert.isFalse(invoked)
+    }
+  })
+
+  it('pass args to the post run callback', async () => {
+    let name: null | string = null
+    const args: any[string] = ['virk']
+    const resolver = getFn<[string, Function]>(args, function cb (username) {
+      name = username
+    })
+
+    await Callable(resolver, async () => {}, 10)
+    assert.equal(name, 'virk')
+  })
 })

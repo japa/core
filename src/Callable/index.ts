@@ -35,7 +35,10 @@ async function asPromise (fn, args) {
  */
 export function Callable <T extends any[]> (resolveFn: IResolver<T>, callback: ICallback<T>, timeout: number) {
   return new Promise((resolve, reject) => {
-    const args: T = resolveFn(done)
+    let postCallable: null | Function = null
+    const args: T = resolveFn(done, function postRun (fn) {
+      postCallable = fn
+    })
 
     /**
      * Finding if we need to wait for done to be called
@@ -67,6 +70,14 @@ export function Callable <T extends any[]> (resolveFn: IResolver<T>, callback: I
      * Finish the callable
      */
     function finish (error?) {
+      if (typeof (postCallable) === 'function' && !error) {
+        try {
+          postCallable(...args)
+        } catch (postCallableError) {
+          error = postCallableError
+        }
+      }
+
       debug(error ? 'finishing callable as error' : 'finishing callable')
 
       completed = true

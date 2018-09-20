@@ -9,8 +9,11 @@
 
 import { IResolver, ITestOptions } from '../src/Contracts'
 
-export function getFn <T extends any[]> (args: T): IResolver<T> {
-  return function resolveFn (done: Function): T & Function {
+export function getFn <T extends any[]> (args: T, postRunCb?: Function): IResolver<T> {
+  return function resolveFn (done: Function, postRun: Function): T & Function {
+    if (typeof (postRunCb) === 'function') {
+      postRun(postRunCb)
+    }
     return <T & Function> args.concat(done)
   }
 }

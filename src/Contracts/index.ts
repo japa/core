@@ -69,4 +69,4 @@ export type IReport = {
 }
 
 export type ICallback <T extends any[]> = (...args: T) => Promise<void> | void
-export type IResolver <T> = (done: Function) => T
+export type IResolver <T> = (done: Function, postRun?: Function) => T
