@@ -21,6 +21,7 @@ export class Hook <T extends any[]> {
   constructor (
     private _resolveFn: IResolver<T>,
     private _fn: ICallback<T>,
+    private _hookLifecycle: string,
   ) {}
 
   /**
@@ -28,6 +29,12 @@ export class Hook <T extends any[]> {
    * group should emit required events for them.
    */
   public async run () {
-    await Callable(this._resolveFn, this._fn, 0)
+    try {
+      await Callable(this._resolveFn, this._fn, 0)
+    } catch (error) {
+      error.lifecycle = this._hookLifecycle
+      error.fnName = this._fn.name
+      throw error
+    }
   }
 }

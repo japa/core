@@ -231,7 +231,7 @@ export class Group <T extends any[], H extends any[]> {
   public before (cb: ICallback<H>): this {
     ow(cb, ow.function.label('cb'))
 
-    this._hooks.before.push(new Hook(this._resolveHookFn, cb))
+    this._hooks.before.push(new Hook(this._resolveHookFn, cb, 'before'))
     return this
   }
 
@@ -242,7 +242,7 @@ export class Group <T extends any[], H extends any[]> {
   public after (cb: ICallback<H>): this {
     ow(cb, ow.function.label('cb'))
 
-    this._hooks.after.push(new Hook(this._resolveHookFn, cb))
+    this._hooks.after.push(new Hook(this._resolveHookFn, cb, 'after'))
     return this
   }
 
@@ -252,7 +252,7 @@ export class Group <T extends any[], H extends any[]> {
   public beforeEach (cb: ICallback<H>): this {
     ow(cb, ow.function.label('cb'))
 
-    this._hooks.beforeEach.push(new Hook(this._resolveHookFn, cb))
+    this._hooks.beforeEach.push(new Hook(this._resolveHookFn, cb, 'beforeEach'))
     return this
   }
 
@@ -262,7 +262,7 @@ export class Group <T extends any[], H extends any[]> {
   public afterEach (cb: ICallback<H>): this {
     ow(cb, ow.function.label('cb'))
 
-    this._hooks.afterEach.push(new Hook(this._resolveHookFn, cb))
+    this._hooks.afterEach.push(new Hook(this._resolveHookFn, cb, 'afterEach'))
     return this
   }
 
