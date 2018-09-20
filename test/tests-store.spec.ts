@@ -50,6 +50,7 @@ describe('Tests store', () => {
         title: 'hello',
         error: error,
       }],
+      failedHooks: [],
     }])
   })
 
