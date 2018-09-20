@@ -60,7 +60,11 @@ export type IReport = {
   failedCount: number,
   total: number,
   todoCount: number,
-  groups: { title: string, failedTests: { title: string, error: Error }[] }[],
+  groups: {
+    title: string,
+    failedTests: { title: string, error: Error }[],
+    failedHooks: { title: string, error: Error }[],
+  }[],
   duration: number,
 }
 

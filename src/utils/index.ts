@@ -8,7 +8,7 @@
 */
 
 import * as timeSpan from 'time-span'
-import { IReport, IGroupReport, ITestReport, ITestStatus } from '../Contracts'
+import { IReport, IGroupReport, ITestReport, ITestStatus, IGroupStatus } from '../Contracts'
 
 export class TestsStore {
   private _store: IReport = {
@@ -22,14 +22,31 @@ export class TestsStore {
     duration: 0,
   }
 
-  private _processStart: Function
+  private _processStart: { rounded: Function }
+
+  /**
+   * Returns the currently active group
+   */
+  public get activeGroup () {
+    return this._store.groups[this._store.groups.length - 1]
+  }
 
   /**
    * Record the group
    */
   public recordGroup (group: IGroupReport) {
     this.open()
-    this._store.groups.push({ title: group.title, failedTests: [] })
+    this._store.groups.push({ title: group.title, failedTests: [], failedHooks: [] })
+  }
+
+  /**
+   * End the group and record failed hooks
+   */
+  public endGroup (group: IGroupReport) {
+    if (group.status === IGroupStatus.FAILED && this.activeGroup.title === group.title) {
+      const error = group.error as any
+      this.activeGroup.failedHooks.push({ title: error.fnName || error.lifecycle, error })
+    }
   }
 
   /**
@@ -43,8 +60,7 @@ export class TestsStore {
      * failed
      */
     if (test.status === ITestStatus.FAILED) {
-      const currentGroup = this._store.groups[this._store.groups.length - 1]
-      currentGroup.failedTests.push({ title: test.title, error: test.error! })
+      this.activeGroup.failedTests.push({ title: test.title, error: test.error! })
     }
 
     /**
@@ -92,7 +108,7 @@ export class TestsStore {
    */
   public close () {
     if (!this._store.duration) {
-      this._store.duration = this._processStart()
+      this._store.duration = this._processStart.rounded()
     }
   }
 
