@@ -173,14 +173,4 @@ describe('Test', () => {
 
     assert.equal(test.toJSON().status, 'skipped')
   })
-
-  it('should skip test when runinCi is true', async () => {
-    const test = new Test('sample test', getFn([]), function cb () {
-      throw new Error('Never expected to be called')
-    }, testOptions({ runInCI: true }))
-
-    await test.run()
-
-    assert.equal(test.toJSON().status, 'skipped')
-  })
 })

@@ -267,60 +267,6 @@ describe('SlimRunner', () => {
     ])
   })
 
-  it('create skippable function using runInCI', async () => {
-    const reporter = getTestReporter()
-    test.configure({ reporterFn: reporter.fn.bind(reporter) })
-
-    let executed = false
-    test.runInCI('hello', () => {
-      executed = true
-    })
-
-    await run()
-    assert.isFalse(executed)
-
-    assert.deepEqual(reporter.events, [
-      {
-        event: 'group:started',
-        data: {
-          error: null,
-          status: 'pending',
-          title: 'root',
-        },
-      },
-      {
-        event: 'test:started',
-        data: {
-          duration: 0,
-          error: null,
-          regression: false,
-          regressionMessage: '',
-          status: 'skipped',
-          title: 'hello',
-        },
-      },
-      {
-        event: 'test:completed',
-        data: {
-          duration: reporter.events[2].data.duration,
-          error: null,
-          regression: false,
-          regressionMessage: '',
-          status: 'skipped',
-          title: 'hello',
-        },
-      },
-      {
-        event: 'group:completed',
-        data: {
-          error: null,
-          status: 'passed',
-          title: 'root',
-        },
-      },
-    ])
-  })
-
   it('create regression function using runInCI', async () => {
     const reporter = getTestReporter()
     test.configure({ reporterFn: reporter.fn.bind(reporter) })
