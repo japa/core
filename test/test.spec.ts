@@ -115,7 +115,7 @@ describe('Test', () => {
     const test = new Test('sample test', getFn([]), callback, testOptions({ regression: true, timeout: 100 }))
     await test.run()
 
-    assert.equal(test.toJSON().error!.message, 'timeout')
+    assert.equal(test.toJSON().error!.message, 'Test timeout after 100 milliseconds')
     assert.equal(test.toJSON().status, 'failed')
     assert.equal(test.toJSON().regressionMessage, '')
   })

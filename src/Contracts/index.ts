@@ -68,5 +68,13 @@ export type IReport = {
   duration: number,
 }
 
+export type IConfigureOptions = {
+  bail: boolean,
+  timeout: number,
+  files: string[] | string,
+  reporterFn: (emitter) => void,
+  filter: (file: string) => void,
+}
+
 export type ICallback <T extends any[]> = (...args: T) => Promise<void> | void
 export type IResolver <T> = (done: Function, postRun?: Function) => T

@@ -8,13 +8,13 @@
 */
 
 import { assert } from 'chai'
-import { test, run, configure } from '../src/SlimRunner'
+import { test, run } from '../src/SlimRunner'
 import { getTestReporter } from './helpers'
 
 describe('SlimRunner', () => {
   it('create test using exported function', async () => {
     const reporter = getTestReporter()
-    configure({ reporterFn: reporter.fn.bind(reporter) })
+    test.configure({ reporterFn: reporter.fn.bind(reporter) })
 
     let executed = false
     test('hello', () => {
@@ -67,7 +67,7 @@ describe('SlimRunner', () => {
 
   it('create test inside a group', async () => {
     const reporter = getTestReporter()
-    configure({ reporterFn: reporter.fn.bind(reporter) })
+    test.configure({ reporterFn: reporter.fn.bind(reporter) })
 
     let executed = false
     test.group('foo', () => {
@@ -122,7 +122,7 @@ describe('SlimRunner', () => {
 
   it('tests created outside of the group must be part of root group', async () => {
     const reporter = getTestReporter()
-    configure({ reporterFn: reporter.fn.bind(reporter) })
+    test.configure({ reporterFn: reporter.fn.bind(reporter) })
 
     test.group('foo', () => {
       test('hello', () => {
@@ -215,7 +215,7 @@ describe('SlimRunner', () => {
 
   it('create skippable function', async () => {
     const reporter = getTestReporter()
-    configure({ reporterFn: reporter.fn.bind(reporter) })
+    test.configure({ reporterFn: reporter.fn.bind(reporter) })
 
     let executed = false
     test.skip('hello', () => {
@@ -269,7 +269,7 @@ describe('SlimRunner', () => {
 
   it('create skippable function using runInCI', async () => {
     const reporter = getTestReporter()
-    configure({ reporterFn: reporter.fn.bind(reporter) })
+    test.configure({ reporterFn: reporter.fn.bind(reporter) })
 
     let executed = false
     test.runInCI('hello', () => {
@@ -323,7 +323,7 @@ describe('SlimRunner', () => {
 
   it('create regression function using runInCI', async () => {
     const reporter = getTestReporter()
-    configure({ reporterFn: reporter.fn.bind(reporter) })
+    test.configure({ reporterFn: reporter.fn.bind(reporter) })
 
     test.failing('hello', () => {
       throw new Error('See it fails')

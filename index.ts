@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 /*
  * japa
  *
@@ -21,4 +25,4 @@ nextTick(function cb () {
   })
 })
 
-export default test
+export = test

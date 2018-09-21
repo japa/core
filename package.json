@@ -2,11 +2,16 @@
   "name": "japa",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
+  "files": [
+    "build/src",
+    "build/index.js",
+    "build/index.d.js"
+  ],
   "scripts": {
     "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
-    "test": "nyc mocha -r ts-node/register test/callable.spec.ts",
+    "test": "nyc mocha -r ts-node/register test/*.spec.ts",
     "posttest": "npm run coverage",
     "commit": "git-cz",
     "prepublishOnly": "npm run build",
@@ -30,6 +35,7 @@
   "dependencies": {
     "chalk": "^2.4.1",
     "debug": "^3.1.0",
+    "fast-glob": "^2.2.2",
     "is-ci": "^1.2.0",
     "ms": "^2.1.1",
     "ow": "^0.6.0",

@@ -27,7 +27,7 @@ describe('Assert', () => {
       assert.evaluate()
       chaiAssert.isTrue(false)
     } catch (error) {
-      chaiAssert.equal(error.message, 'Planned for 2 assertions, but ran 1: expected 2 to equal 1')
+      chaiAssert.equal(error.message, 'Planned for 2 assertions, but ran 1')
     }
   })
 

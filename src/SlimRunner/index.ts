@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 /*
  * japa
  *
@@ -11,7 +15,10 @@ import { Runner } from '../Runner'
 import { Group } from '../Group'
 import { Assert } from '../Assert'
 import listReporter from '../Reporter/list'
-import { ICallback, IOptions, ITestOptions } from '../Contracts'
+import { ICallback, IOptions, ITestOptions, IConfigureOptions } from '../Contracts'
+import { Loader } from './Loader'
+
+const loader = new Loader()
 
 /**
  * The type for the arguments to be passed to a
@@ -94,6 +101,16 @@ export async function run () {
   const runner = new Runner(groups, runnerOptions)
   runner.reporter(reporterFn)
 
+  const loaderFiles = await loader.loadFiles()
+  if (loaderFiles.length && groups.length) {
+    throw new Error('Calling test.configure inside test file is not allowed. Create a master file for same')
+  }
+
+  /**
+   * Load all files from the loader
+   */
+  loaderFiles.forEach((file) => require(file))
+
   await runner.run()
 
   groups = []
@@ -103,23 +120,6 @@ export async function run () {
     timeout: 2000,
   }
   reporterFn = listReporter
-}
-
-/**
- * Configure test runner
- */
-export function configure (options: Partial<{ reporterFn?, bail: boolean, timeout: number }>) {
-  if (options.reporterFn) {
-    reporterFn = options.reporterFn
-  }
-
-  if (options.bail !== undefined) {
-    runnerOptions.bail = options.bail
-  }
-
-  if (options.timeout !== undefined) {
-    runnerOptions.timeout = options.timeout
-  }
 }
 
 export namespace test {
@@ -170,5 +170,30 @@ export namespace test {
    */
   export function failing (title: string, callback: ICallback<testArgs>) {
     return addTest(title, callback, { regression: true })
+  }
+
+  /**
+   * Configure test runner
+   */
+  export function configure (options: Partial<IConfigureOptions>) {
+    if (options.reporterFn) {
+      reporterFn = options.reporterFn
+    }
+
+    if (options.bail !== undefined) {
+      runnerOptions.bail = options.bail
+    }
+
+    if (typeof (options.timeout) === 'number') {
+      runnerOptions.timeout = options.timeout
+    }
+
+    if (options.files !== undefined) {
+      loader.files(options.files)
+    }
+
+    if (typeof (options.filter) === 'function') {
+      loader.filter(options.filter)
+    }
   }
 }
