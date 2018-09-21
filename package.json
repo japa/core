@@ -15,7 +15,7 @@
     "posttest": "npm run coverage",
     "commit": "git-cz",
     "prepublishOnly": "npm run build",
-    "test:win": "node ./node_modules/japa-cli/index.js",
+    "test:win": "npm run test",
     "clean": "del build",
     "compile": "npm run lint && npm run clean && tsc",
     "build": "npm run compile && typedoc",
