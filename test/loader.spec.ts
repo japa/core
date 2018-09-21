@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
 */
 
-import { join } from 'path'
+import { posix } from 'path'
 import { assert } from 'chai'
 import { Loader } from '../src/SlimRunner/Loader'
 
@@ -27,7 +27,7 @@ describe('Loader', () => {
       'test/slim-runner.spec.ts',
       'test/test.spec.ts',
       'test/tests-store.spec.ts',
-    ].map((file) => join(__dirname, '..', file)))
+    ].map((file) => posix.join(__dirname, '..', file)))
   })
 
   it('allow negate globs', async () => {
@@ -44,7 +44,7 @@ describe('Loader', () => {
       'test/slim-runner.spec.ts',
       'test/test.spec.ts',
       'test/tests-store.spec.ts',
-    ].map((file) => join(__dirname, '..', file)))
+    ].map((file) => posix.join(__dirname, '..', file)))
   })
 
   it('filter files using filterFn', async () => {
@@ -62,6 +62,6 @@ describe('Loader', () => {
       'test/slim-runner.spec.ts',
       'test/test.spec.ts',
       'test/tests-store.spec.ts',
-    ].map((file) => join(__dirname, '..', file)))
+    ].map((file) => posix.join(__dirname, '..', file)))
   })
 })
