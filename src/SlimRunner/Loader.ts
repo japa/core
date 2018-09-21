@@ -11,8 +11,6 @@
  * file that was distributed with this source code.
 */
 
-import * as fg from 'fast-glob'
-
 export class Loader {
   private _glob: string[] | string
   private _filterFn: (file: string) => void
@@ -40,7 +38,8 @@ export class Loader {
       return []
     }
 
-    let filesPaths = await fg(this._glob, {
+    const fg = await import('fast-glob')
+    let filesPaths = await fg.default(this._glob, {
       absolute: true,
       onlyFiles: false,
     }) as string[]
