@@ -4,6 +4,15 @@ export declare class Assert {
   private _assertionStack;
 
   /**
+   * Use chai plugins
+   */
+  static use(fn: (chai: any, utils: any) => void): Chai.ChaiStatic;
+  /**
+   * Plan for assertions
+   */
+  plan(count: number): void;
+
+  /**
    * Throws a failure.
    *
    * @type T   Type of the objects.

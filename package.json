@@ -18,7 +18,7 @@
     "test:win": "npm run test",
     "clean": "del build",
     "compile": "npm run lint && npm run clean && tsc",
-    "build": "npm run compile && typedoc",
+    "build": "npm run compile && typedoc && node bin/postBuild.js",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "lint": "tslint --project tsconfig.json"
   },
