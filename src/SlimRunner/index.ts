@@ -13,6 +13,7 @@
 
 import { Runner } from '../Runner'
 import { Group } from '../Group'
+import { Test } from '../Test'
 import { Assert } from '../Assert'
 import listReporter from '../Reporter/list'
 import { ICallback, IOptions, ITestOptions, IConfigureOptions } from '../Contracts'
@@ -31,6 +32,16 @@ type testArgs = [Assert, Function]
  * hook
  */
 type hookArgs = [Function]
+
+/**
+ * Group instance exposed by slim runner
+ */
+type runnerGroup = Pick<Group<testArgs, hookArgs>, Exclude<keyof Group<testArgs, hookArgs>, 'run' | 'toJSON' | 'test'>>
+
+/**
+ * Test instance exposed by slim runner
+ */
+type runnerTest = Pick<Test<testArgs>, Exclude<keyof Test<testArgs>, 'run' | 'toJSON'>>
 
 /**
  * Returns arguments to be passed to the callback
@@ -78,7 +89,7 @@ let reporterFn: ((emitter) => void) = listReporter
  * Adds the test to the active group. If there isn't any active
  * group, it will be created.
  */
-function addTest (title: string, callback: ICallback<testArgs>, options?: Partial<ITestOptions>) {
+function addTest (title: string, callback: ICallback<testArgs>, options?: Partial<ITestOptions>): runnerTest {
   if (!activeGroup) {
     activeGroup = new Group('root', testArgsFn, hookArgsFn)
     groups.push(activeGroup)
@@ -126,7 +137,7 @@ export namespace test {
   /**
    * Create a new test to group all test together
    */
-  export function group (title: string, callback: (group: Group<testArgs, hookArgs>) => void) {
+  export function group (title: string, callback: (group: runnerGroup) => void) {
     activeGroup = new Group(title, testArgsFn, hookArgsFn)
     groups.push(activeGroup)
 
