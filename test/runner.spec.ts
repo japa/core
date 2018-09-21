@@ -18,7 +18,7 @@ describe('Runner', () => {
     const reporter = getTestReporter()
     let invoked = false
 
-    const group = new Group('sample', getFn([]), getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]), { bail: false, timeout: 2000 })
     group.test('sample test', function cb () {
       invoked = true
     })
@@ -36,7 +36,7 @@ describe('Runner', () => {
   it('find first error in group tests', async () => {
     const reporter = getTestReporter()
 
-    const group = new Group('sample', getFn([]), getFn([]))
+    const group = new Group('sample', getFn([]), getFn([]), { bail: false, timeout: 2000 })
     group.test('sample test', function cb () {
       throw new Error('failed')
     })
@@ -49,5 +49,53 @@ describe('Runner', () => {
 
     await runner.run()
     assert.isTrue(runner.hasErrors)
+  })
+
+  it('stop on first test failure when bail is true', async () => {
+    const reporter = getTestReporter()
+    let invoked = false
+
+    const group = new Group('sample', getFn([]), getFn([]), { bail: true, timeout: 2000 })
+    group.test('sample test', function cb () {
+      throw new Error('failed')
+    })
+
+    group.test('sample test 2', function cb () {
+      invoked = true
+    })
+
+    const runner = new Runner([group], {
+      bail: true,
+      timeout: 2000,
+    })
+    runner.reporter(reporter.fn.bind(reporter))
+
+    await runner.run()
+    assert.isFalse(invoked)
+  })
+
+  it('stop on first test failure across multiple groups when bail is true', async () => {
+    const reporter = getTestReporter()
+    let invoked = false
+
+    const group = new Group('sample', getFn([]), getFn([]), { bail: true, timeout: 2000 })
+    const group1 = new Group('sample', getFn([]), getFn([]), { bail: true, timeout: 2000 })
+
+    group.test('sample test', function cb () {
+      throw new Error('failed')
+    })
+
+    group1.test('sample test 2', function cb () {
+      invoked = true
+    })
+
+    const runner = new Runner([group, group1], {
+      bail: true,
+      timeout: 2000,
+    })
+    runner.reporter(reporter.fn.bind(reporter))
+
+    await runner.run()
+    assert.isFalse(invoked)
   })
 })

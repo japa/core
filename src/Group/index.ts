@@ -23,6 +23,7 @@ import {
   IEvents,
   ITestStatus,
   ITestOptions,
+  IOptions,
  } from '../Contracts'
 
 /**
@@ -70,7 +71,11 @@ export class Group <T extends any[], H extends any[]> {
    */
   private _hasFailingTests = false
 
-  constructor (private _title: string, private _resolveTestFn: IResolver<T>, private _resolveHookFn: IResolver<H>) {
+  constructor (
+    private _title: string,
+    private _resolveTestFn: IResolver<T>,
+    private _resolveHookFn: IResolver<H>,
+    private _options: IOptions) {
   }
 
   /**
@@ -126,8 +131,18 @@ export class Group <T extends any[], H extends any[]> {
      * Setting flag to true when any one test has failed. This helps
      * in telling runner to exit process with the correct status.
      */
-    if (!this._hasFailingTests && test.toJSON().status === ITestStatus.FAILED) {
+    const testFailed = test.toJSON().status === ITestStatus.FAILED
+    if (!this._hasFailingTests && testFailed) {
       this._hasFailingTests = true
+    }
+
+    /**
+     * Mark group as completed when bail is set to true and
+     * test has failed
+     */
+    if (this._options.bail && testFailed) {
+      this._completed = true
+      return
     }
 
     /**
@@ -211,12 +226,9 @@ export class Group <T extends any[], H extends any[]> {
     }, testOptions)
 
     /**
-     * Give priority to the group timeout vs the one defined
-     * using runner properties
+     * Using group timeout as a priority over runner timeout
      */
-    if (this._timeout !== undefined) {
-      testOptions.timeout = this._timeout
-    }
+    testOptions.timeout = this._timeout !== undefined ? this._timeout : this._options.timeout
 
     const test = new Test(title, this._resolveTestFn, callback, testOptions as ITestOptions)
 

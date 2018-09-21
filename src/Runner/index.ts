@@ -64,6 +64,13 @@ export class Runner <T extends any[], H extends any[]> {
      */
     for (let group of this._groups) {
       await group.run()
+
+      /**
+       * Break when bail is true and group has errors
+       */
+      if (this._options.bail && group.hasErrors) {
+        break
+      }
     }
 
     /**

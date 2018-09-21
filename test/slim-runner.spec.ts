@@ -318,4 +318,65 @@ describe('SlimRunner', () => {
       },
     ])
   })
+
+  it('stop tests after failing test when bail is true', async () => {
+    const reporter = getTestReporter()
+    test.configure({ reporterFn: reporter.fn.bind(reporter), bail: true })
+
+    let executed = false
+    const error = new Error('failed')
+
+    test.group('foo', () => {
+      test('hi', () => {
+        throw error
+      })
+
+      test('hello', () => {
+        executed = true
+      })
+    })
+
+    await run()
+    assert.isFalse(executed)
+    assert.deepEqual(reporter.events, [
+      {
+        event: 'group:started',
+        data: {
+          error: null,
+          status: 'pending',
+          title: 'foo',
+        },
+      },
+      {
+        event: 'test:started',
+        data: {
+          duration: 0,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'pending',
+          title: 'hi',
+        },
+      },
+      {
+        event: 'test:completed',
+        data: {
+          duration: reporter.events[2].data.duration,
+          error: error,
+          regression: false,
+          regressionMessage: '',
+          status: 'failed',
+          title: 'hi',
+        },
+      },
+      {
+        event: 'group:completed',
+        data: {
+          error: null,
+          status: 'passed',
+          title: 'foo',
+        },
+      },
+    ])
+  })
 })

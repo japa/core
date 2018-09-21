@@ -91,11 +91,11 @@ let reporterFn: ((emitter) => void) = listReporter
  */
 function addTest (title: string, callback: ICallback<testArgs>, options?: Partial<ITestOptions>): runnerTest {
   if (!activeGroup) {
-    activeGroup = new Group('root', testArgsFn, hookArgsFn)
+    activeGroup = new Group('root', testArgsFn, hookArgsFn, runnerOptions)
     groups.push(activeGroup)
   }
 
-  return activeGroup.test(title, callback, Object.assign({ timeout: runnerOptions.bail }, options))
+  return activeGroup.test(title, callback, options)
 }
 
 /**
@@ -138,7 +138,7 @@ export namespace test {
    * Create a new test to group all test together
    */
   export function group (title: string, callback: (group: runnerGroup) => void) {
-    activeGroup = new Group(title, testArgsFn, hookArgsFn)
+    activeGroup = new Group(title, testArgsFn, hookArgsFn, runnerOptions)
     groups.push(activeGroup)
 
     /**
