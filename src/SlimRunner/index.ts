@@ -126,11 +126,6 @@ export async function run () {
 
   groups = []
   activeGroup = null
-  runnerOptions = {
-    bail: false,
-    timeout: 2000,
-  }
-  reporterFn = listReporter
 }
 
 export namespace test {
@@ -187,22 +182,41 @@ export namespace test {
    * Configure test runner
    */
   export function configure (options: Partial<IConfigureOptions>) {
+    if (groups.length) {
+      throw new Error('test.configure must be called before creating any tests')
+    }
+
+    /**
+     * Hold repoter fn to be passed to the runner
+     */
     if (options.reporterFn) {
       reporterFn = options.reporterFn
     }
 
+    /**
+     * Use bail option if defined by the end user
+     */
     if (options.bail !== undefined) {
       runnerOptions.bail = options.bail
     }
 
+    /**
+     * Use timeout if defined by the end user
+     */
     if (typeof (options.timeout) === 'number') {
       runnerOptions.timeout = options.timeout
     }
 
+    /**
+     * Use files glob if defined
+     */
     if (options.files !== undefined) {
       loader.files(options.files)
     }
 
+    /**
+     * Use files filter if defined as function
+     */
     if (typeof (options.filter) === 'function') {
       loader.filter(options.filter)
     }
