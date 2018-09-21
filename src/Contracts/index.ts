@@ -76,5 +76,13 @@ export type IConfigureOptions = {
   filter: (file: string) => void,
 }
 
+/**
+ * Test callback function. Here `T` is the arguments resolved by
+ * @IResolver
+ */
 export type ICallback <T extends any[]> = (...args: T) => Promise<void> | void
+
+/**
+ * The resolver to return arguments for the tests and hooks
+ */
 export type IResolver <T> = (done: Function, postRun?: Function) => T

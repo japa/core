@@ -1,3 +1,7 @@
+/**
+ * @module Core
+ */
+
 /*
  * japa
  *
@@ -11,6 +15,10 @@ import * as timeSpan from 'time-span'
 import { IReport, IGroupReport, ITestReport, ITestStatus, IGroupStatus } from '../Contracts'
 import * as exceptions from '../Exceptions'
 
+/**
+ * Tests store class records the tests being executed and
+ * returns a report to be used by the reporters.
+ */
 export class TestsStore {
   private _store: IReport = {
     passedCount: 0,

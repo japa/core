@@ -18,6 +18,9 @@ import { InvalidAssertionsCount } from '../Exceptions'
  * The assert interface to run assertions using chaijs.
  * This class is a thin wrapper over [chaijs#assert](http://www.chaijs.com/api/assert/) allowing
  * assertion planning and all existing methods from chaijs are supported.
+ *
+ * The API doesn't cover all the methods. However, all methods from the chaiJs assert syntax are
+ * supported.
  */
 export class Assert {
   private _counts: number = 0

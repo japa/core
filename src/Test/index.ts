@@ -118,7 +118,7 @@ export class Test <T extends any[]> {
   /**
    * Runs test for given number retries
    */
-  private _runTest () {
+  private _runTest (): Promise<void> {
     return new Promise((resolve, reject) => {
       const op = retry.operation({ retries: this._retries, factor: 1 })
 

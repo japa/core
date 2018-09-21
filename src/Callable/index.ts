@@ -33,7 +33,11 @@ async function asPromise (fn, args) {
  * relies on `done`, then it will wait for `done` to be called. Also if timeout is
  * defined, the function will fail if doesn't return before the timeout.
  */
-export function Callable <T extends any[]> (resolveFn: IResolver<T>, callback: ICallback<T>, timeout: number) {
+export function Callable <T extends any[]> (
+  resolveFn: IResolver<T>,
+  callback: ICallback<T>,
+  timeout: number,
+): Promise<void> {
   return new Promise((resolve, reject) => {
     let postCallable: null | Function = null
     const args: T = resolveFn(done, function postRun (fn) {

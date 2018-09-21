@@ -267,7 +267,8 @@ export class Group <T extends any[], H extends any[]> {
   }
 
   /**
-   * Run the group with it's hooks and all tests.
+   * Run the group with it's hooks and all tests. Shouldn't be called
+   * by the end user and Japa itself will call this method
    */
   public async run () {
     emitter.emit(IEvents.GROUPSTARTED, this.toJSON())

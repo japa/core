@@ -11,8 +11,17 @@
  * file that was distributed with this source code.
 */
 
+/**
+ * Raised when test or hook times out
+ */
 export class TimeoutException extends Error {}
 
+/**
+ * Raised when regression test passes instead of failing
+ */
 export class RegressionException extends Error {}
 
+/**
+ * Raised when assertion planning fails
+ */
 export class InvalidAssertionsCount extends Error {}

@@ -1,5 +1,5 @@
 /**
- * @module Core
+ * @module SlimRunner
  */
 
 /*
@@ -11,6 +11,11 @@
  * file that was distributed with this source code.
 */
 
+/**
+ * Loads files using the glob patterns.
+ *
+ * @class Loader
+ */
 export class Loader {
   private _glob: string[] | string
   private _filterFn: (file: string) => void

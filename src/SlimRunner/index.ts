@@ -1,5 +1,5 @@
 /**
- * @module Core
+ * @module SlimRunner
  */
 
 /*
