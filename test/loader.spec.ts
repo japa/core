@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
 */
 
-import { posix } from 'path'
+import { normalize, join } from 'path'
 import { assert } from 'chai'
 import { Loader } from '../src/SlimRunner/Loader'
 
@@ -18,7 +18,7 @@ describe('Loader', () => {
 
     const files = await loader.loadFiles()
 
-    assert.deepEqual(files, [
+    assert.deepEqual(files.map((file) => normalize(file)), [
       'test/assert.spec.ts',
       'test/callable.spec.ts',
       'test/group.spec.ts',
@@ -27,7 +27,7 @@ describe('Loader', () => {
       'test/slim-runner.spec.ts',
       'test/test.spec.ts',
       'test/tests-store.spec.ts',
-    ].map((file) => posix.join(__dirname, '..', file)))
+    ].map((file) => join(__dirname, '..', file)))
   })
 
   it('allow negate globs', async () => {
@@ -36,7 +36,7 @@ describe('Loader', () => {
 
     const files = await loader.loadFiles()
 
-    assert.deepEqual(files, [
+    assert.deepEqual(files.map((file) => normalize(file)), [
       'test/assert.spec.ts',
       'test/callable.spec.ts',
       'test/loader.spec.ts',
@@ -44,7 +44,7 @@ describe('Loader', () => {
       'test/slim-runner.spec.ts',
       'test/test.spec.ts',
       'test/tests-store.spec.ts',
-    ].map((file) => posix.join(__dirname, '..', file)))
+    ].map((file) => join(__dirname, '..', file)))
   })
 
   it('filter files using filterFn', async () => {
@@ -54,7 +54,7 @@ describe('Loader', () => {
 
     const files = await loader.loadFiles()
 
-    assert.deepEqual(files, [
+    assert.deepEqual(files.map((file) => normalize(file)), [
       'test/assert.spec.ts',
       'test/callable.spec.ts',
       'test/loader.spec.ts',
@@ -62,6 +62,6 @@ describe('Loader', () => {
       'test/slim-runner.spec.ts',
       'test/test.spec.ts',
       'test/tests-store.spec.ts',
-    ].map((file) => posix.join(__dirname, '..', file)))
+    ].map((file) => join(__dirname, '..', file)))
   })
 })
