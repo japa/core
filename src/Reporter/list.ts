@@ -67,6 +67,7 @@ class ListReporter {
    * the store on this event
    */
   private _onStart () {
+    console.log('')
     this._store.open()
   }
 
