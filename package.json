@@ -14,7 +14,7 @@
     "test": "npm run test:win",
     "posttest": "npm run coverage",
     "commit": "git-cz",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && pkg-ok",
     "test:win": "nyc mocha -r ts-node/register test/*.spec.ts",
     "clean": "del build",
     "compile": "npm run lint && npm run clean && tsc",
@@ -79,9 +79,6 @@
     "extension": [
       ".ts"
     ]
-  },
-  "bin": {
-    "japa": "postBuild.js"
   },
   "directories": {
     "doc": "docs",
