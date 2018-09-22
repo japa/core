@@ -14,6 +14,7 @@ export enum IEvents {
 export type IOptions = {
   bail: boolean,
   timeout: number,
+  grep?: RegExp,
 }
 
 export type ITestOptions = {
@@ -72,6 +73,7 @@ export type IConfigureOptions = {
   bail: boolean,
   timeout: number,
   files: string[] | string,
+  grep: string | RegExp,
   reporterFn: (emitter) => void,
   filter: (file: string) => void,
 }

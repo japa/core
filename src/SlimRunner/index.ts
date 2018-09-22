@@ -220,5 +220,12 @@ export namespace test {
     if (typeof (options.filter) === 'function') {
       loader.filter(options.filter)
     }
+
+    /**
+     * If grep is defined, then normalize it to regex
+     */
+    if (options.grep) {
+      runnerOptions.grep = options.grep instanceof RegExp ? options.grep : new RegExp(options.grep)
+    }
   }
 }

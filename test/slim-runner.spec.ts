@@ -379,4 +379,243 @@ describe('SlimRunner', () => {
       },
     ])
   })
+
+  it('only run tests matching the grep string', async () => {
+    const reporter = getTestReporter()
+    test.configure({
+      reporterFn: reporter.fn.bind(reporter),
+      bail: true,
+      grep: 'hi',
+    })
+
+    let executed = false
+
+    test.group('foo', () => {
+      test('hi', () => {
+      })
+
+      test('hello', () => {
+        executed = true
+      })
+    })
+
+    await run()
+    assert.isFalse(executed)
+    assert.deepEqual(reporter.events, [
+      {
+        event: 'group:started',
+        data: {
+          error: null,
+          status: 'pending',
+          title: 'foo',
+        },
+      },
+      {
+        event: 'test:started',
+        data: {
+          duration: 0,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'pending',
+          title: 'hi',
+        },
+      },
+      {
+        event: 'test:completed',
+        data: {
+          duration: reporter.events[2].data.duration,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'passed',
+          title: 'hi',
+        },
+      },
+      {
+        event: 'group:completed',
+        data: {
+          error: null,
+          status: 'passed',
+          title: 'foo',
+        },
+      },
+    ])
+  })
+
+  it('only run tests matching the grep regex like string', async () => {
+    const reporter = getTestReporter()
+    test.configure({
+      reporterFn: reporter.fn.bind(reporter),
+      bail: true,
+      grep: 'h(i|ey)',
+    })
+
+    let executed = false
+
+    test.group('foo', () => {
+      test('hi', () => {
+      })
+
+      test('hey', () => {
+      })
+
+      test('hello', () => {
+        executed = true
+      })
+    })
+
+    await run()
+    assert.isFalse(executed)
+    assert.deepEqual(reporter.events, [
+      {
+        event: 'group:started',
+        data: {
+          error: null,
+          status: 'pending',
+          title: 'foo',
+        },
+      },
+      {
+        event: 'test:started',
+        data: {
+          duration: 0,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'pending',
+          title: 'hi',
+        },
+      },
+      {
+        event: 'test:completed',
+        data: {
+          duration: reporter.events[2].data.duration,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'passed',
+          title: 'hi',
+        },
+      },
+      {
+        event: 'test:started',
+        data: {
+          duration: 0,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'pending',
+          title: 'hey',
+        },
+      },
+      {
+        event: 'test:completed',
+        data: {
+          duration: reporter.events[2].data.duration,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'passed',
+          title: 'hey',
+        },
+      },
+      {
+        event: 'group:completed',
+        data: {
+          error: null,
+          status: 'passed',
+          title: 'foo',
+        },
+      },
+    ])
+  })
+
+  it('only run tests matching the grep regex', async () => {
+    const reporter = getTestReporter()
+    test.configure({
+      reporterFn: reporter.fn.bind(reporter),
+      bail: true,
+      grep: /h(i|ey)/,
+    })
+
+    let executed = false
+
+    test.group('foo', () => {
+      test('hi', () => {
+      })
+
+      test('hey', () => {
+      })
+
+      test('hello', () => {
+        executed = true
+      })
+    })
+
+    await run()
+    assert.isFalse(executed)
+    assert.deepEqual(reporter.events, [
+      {
+        event: 'group:started',
+        data: {
+          error: null,
+          status: 'pending',
+          title: 'foo',
+        },
+      },
+      {
+        event: 'test:started',
+        data: {
+          duration: 0,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'pending',
+          title: 'hi',
+        },
+      },
+      {
+        event: 'test:completed',
+        data: {
+          duration: reporter.events[2].data.duration,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'passed',
+          title: 'hi',
+        },
+      },
+      {
+        event: 'test:started',
+        data: {
+          duration: 0,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'pending',
+          title: 'hey',
+        },
+      },
+      {
+        event: 'test:completed',
+        data: {
+          duration: reporter.events[2].data.duration,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'passed',
+          title: 'hey',
+        },
+      },
+      {
+        event: 'group:completed',
+        data: {
+          error: null,
+          status: 'passed',
+          title: 'foo',
+        },
+      },
+    ])
+  })
 })

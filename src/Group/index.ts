@@ -173,7 +173,9 @@ export class Group <T extends any[], H extends any[]> {
         break
       }
 
-      await this._runTest(test)
+      if (!this._options.grep || this._options.grep.test(test.toJSON().title)) {
+        await this._runTest(test)
+      }
     }
   }
 

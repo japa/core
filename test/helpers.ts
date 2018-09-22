@@ -36,6 +36,7 @@ export function getTestReporter () {
   } = {
     events: [],
     fn (emitter) {
+      emitter.removeAllListeners()
       emitter.on('test:started', (data) => {
         this.events.push({ event: 'test:started', data })
       })
