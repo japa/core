@@ -194,6 +194,14 @@ class ListReporter {
     this._store.close()
     const report = this._store.getReport()
 
+    /**
+     * Show zero executed tests when no tests were ran
+     */
+    if (report.total === 0) {
+      console.log(chalk.bgMagenta.white(' ZERO TESTS EXECUTED '))
+      return
+    }
+
     const failedGroups = report.groups.filter((group) => {
       return group.failedTests.length || group.failedHooks.length
     })
