@@ -1,7 +1,7 @@
 {
   "name": "japa",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.0.0",
+  "description": "Lean test runner for Node.js",
   "main": "build/index.js",
   "files": [
     "build/src",
@@ -79,5 +79,16 @@
     "extension": [
       ".ts"
     ]
-  }
+  },
+  "bin": {
+    "japa": "postBuild.js"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "keywords": [
+    "test",
+    "test-runner"
+  ]
 }
