@@ -3,7 +3,7 @@
 # Japa
 > A test runner to create test runners
 
-Japa is a tiny **Node.js** test runner that you can use to [**test your apps**]() or even [**create your test runner**]().
+Japa is a tiny **Node.js** test runner that you can use to [**test your apps**]() or even [**create your test runner**](https://github.com/thetutlage/japa/wiki/Create-your-test-runner-using-Japa).
 
 Japa is **simple**, **fast** and has **minimal core**. Japa doesn't ship with any CLI. You run your test files as standard Node.js scripts.
 
@@ -11,21 +11,53 @@ Japa is **simple**, **fast** and has **minimal core**. Japa doesn't ship with an
 node test/list-users.spec.js
 ```
 
+## Table of Contents
+
+* [Features](#features)
+* [Why Japa?](#why-japa)
+   * [Faster boot time <g-emoji class="g-emoji" alias="alarm_clock" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/23f0.png">⏰</g-emoji>](#faster-boot-time-)
+   * [Simpler Syntax <g-emoji class="g-emoji" alias="nail_care" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f485.png">💅</g-emoji>](#simpler-syntax-)
+* [Test your apps](#test-your-apps)
+   * [Installation](#installation)
+   * [Writing your first test](#writing-your-first-test)
+   * [async/await](#asyncawait)
+   * [Test timeouts](#test-timeouts)
+   * [Test groups](#test-groups)
+   * [Skipping tests](#skipping-tests)
+   * [Skipping/Running tests in CI](#skippingrunning-tests-in-ci)
+   * [Retry flaky tests](#retry-flaky-tests)
+   * [Regression tests](#regression-tests)
+   * [Assertion Planning](#assertion-planning)
+   * [Cleaner Error Stack](#cleaner-error-stack)
+* [Japa flow](#japa-flow)
+* [Running multiple test files](#running-multiple-test-files)
+   * [Filtering files](#filtering-files)
+* [Configure options](#configure-options)
+* [Running typescript tests](#running-typescript-tests)
+
+<br>
+
+---
+
 ## Features
 
-- Supports [ES6 async/await](#async-await) style tests.
+- Supports [ES6 async/await](#asyncawait) style tests.
 - Doesn't pollute the global namespace.
 - First class support for [regression](#regression-tests) tests.
 - Conditionally [skip](#skipping-tests) when running tests in CI like **travis**.
 - [Retry flaky tests](#retry-flaky-tests).
-- Define [test timeout](#timeouts).
+- Define [test timeout](#test-timeouts).
 - Cleaner [error stack](#cleaner-error-stack).
 - [Test groups](#test-groups) with lifecycle hooks.
 - Inbuilt assertion library with [assertion planning](#assertion-planning).
 
+<br>
+
+---
+
 ## Why Japa?
 
-The primary reason to use Japa is that you can [**create your test runner**]() using it. Which is impossible or cumbersome with other test runners like Ava or Mocha.
+The primary reason to use Japa is that you can [**create your test runner**](https://github.com/thetutlage/japa/wiki/Create-your-test-runner-using-Japa) using it. Which is impossible or cumbersome with other test runners like Ava or Mocha.
 
 However, Japa also shines as a standalone test runner.
 
