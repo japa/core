@@ -11,6 +11,7 @@
  * file that was distributed with this source code.
 */
 
+import chalk from 'chalk'
 import { Runner } from '../Runner'
 import { Group } from '../Group'
 import { Test } from '../Test'
@@ -108,13 +109,14 @@ export function test (title: string, callback: ICallback<testArgs>) {
 /**
  * Run all the tests using the runner
  */
-export async function run () {
+export async function run (exitProcess = true) {
   const runner = new Runner(groups, runnerOptions)
   runner.reporter(reporterFn)
 
   const loaderFiles = await loader.loadFiles()
   if (loaderFiles.length && groups.length) {
-    throw new Error('Calling test.configure inside test file is not allowed. Create a master file for same')
+    console.log(chalk.bgRed('Calling configure inside test file is not allowed. Create a master file for same'))
+    process.exit(1)
   }
 
   /**
@@ -122,7 +124,16 @@ export async function run () {
    */
   loaderFiles.forEach((file) => require(file))
 
-  await runner.run()
+  try {
+    await runner.run()
+    if (exitProcess) {
+      process.exit(0)
+    }
+  } catch (error) {
+    if (exitProcess) {
+      process.exit(1)
+    }
+  }
 
   groups = []
   activeGroup = null

@@ -1,3 +1,19 @@
+<a name="2.0.2"></a>
+## [2.0.2](https://github.com/thetutlage/japa/compare/v2.0.1...v2.0.2) (2018-09-25)
+
+
+### Bug Fixes
+
+* **package:** use chai as the main dependency ([e020428](https://github.com/thetutlage/japa/commit/e020428))
+* **slimRunner:** exit process with correct signals ([4d187f1](https://github.com/thetutlage/japa/commit/4d187f1))
+
+
+### Features
+
+* **api:** export api module for custom test runners ([d626168](https://github.com/thetutlage/japa/commit/d626168))
+
+
+
 <a name="2.0.1"></a>
 ## [2.0.1](https://github.com/thetutlage/japa/compare/v2.0.0...v2.0.1) (2018-09-22)
 

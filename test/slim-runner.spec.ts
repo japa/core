@@ -21,7 +21,7 @@ describe('SlimRunner', () => {
       executed = true
     })
 
-    await run()
+    await run(false)
     assert.isTrue(executed)
     assert.deepEqual(reporter.events, [
       {
@@ -76,7 +76,7 @@ describe('SlimRunner', () => {
       })
     })
 
-    await run()
+    await run(false)
     assert.isTrue(executed)
     assert.deepEqual(reporter.events, [
       {
@@ -132,7 +132,7 @@ describe('SlimRunner', () => {
     test('hello', () => {
     })
 
-    await run()
+    await run(false)
     assert.deepEqual(reporter.events, [
       {
         event: 'group:started',
@@ -222,7 +222,7 @@ describe('SlimRunner', () => {
       executed = true
     })
 
-    await run()
+    await run(false)
     assert.isFalse(executed)
 
     assert.deepEqual(reporter.events, [
@@ -275,7 +275,7 @@ describe('SlimRunner', () => {
       throw new Error('See it fails')
     })
 
-    await run()
+    await run(false)
 
     assert.deepEqual(reporter.events, [
       {
@@ -336,7 +336,7 @@ describe('SlimRunner', () => {
       })
     })
 
-    await run()
+    await run(false)
     assert.isFalse(executed)
     assert.deepEqual(reporter.events, [
       {
@@ -399,7 +399,7 @@ describe('SlimRunner', () => {
       })
     })
 
-    await run()
+    await run(false)
     assert.isFalse(executed)
     assert.deepEqual(reporter.events, [
       {
@@ -465,7 +465,7 @@ describe('SlimRunner', () => {
       })
     })
 
-    await run()
+    await run(false)
     assert.isFalse(executed)
     assert.deepEqual(reporter.events, [
       {
@@ -512,7 +512,7 @@ describe('SlimRunner', () => {
       {
         event: 'test:completed',
         data: {
-          duration: reporter.events[2].data.duration,
+          duration: reporter.events[4].data.duration,
           error: null,
           regression: false,
           regressionMessage: '',
@@ -553,7 +553,7 @@ describe('SlimRunner', () => {
       })
     })
 
-    await run()
+    await run(false)
     assert.isFalse(executed)
     assert.deepEqual(reporter.events, [
       {
@@ -600,7 +600,7 @@ describe('SlimRunner', () => {
       {
         event: 'test:completed',
         data: {
-          duration: reporter.events[2].data.duration,
+          duration: reporter.events[4].data.duration,
           error: null,
           regression: false,
           regressionMessage: '',
