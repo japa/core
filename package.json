@@ -1,6 +1,6 @@
 {
   "name": "japa",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Lean test runner for Node.js",
   "main": "build/index.js",
   "files": [
