@@ -1,3 +1,13 @@
+<a name="2.0.4"></a>
+## [2.0.4](https://github.com/thetutlage/japa/compare/v2.0.3...v2.0.4) (2018-10-04)
+
+
+### Bug Fixes
+
+* **slimRunner:** exit process with error when there are errors ([88d41f9](https://github.com/thetutlage/japa/commit/88d41f9))
+
+
+
 <a name="2.0.3"></a>
 ## [2.0.3](https://github.com/thetutlage/japa/compare/v2.0.2...v2.0.3) (2018-09-27)
 
