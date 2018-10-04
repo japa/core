@@ -127,7 +127,7 @@ export async function run (exitProcess = true) {
   try {
     await runner.run()
     if (exitProcess) {
-      process.exit(0)
+      runner.hasErrors ? process.exit(1) : process.exit(0)
     }
   } catch (error) {
     if (exitProcess) {
