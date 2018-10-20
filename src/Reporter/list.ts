@@ -198,7 +198,7 @@ class ListReporter {
     /**
      * Show zero executed tests when no tests were ran
      */
-    if (report.total === 0) {
+    if (report.total === 0 && report.groups.length === 0) {
       console.log(chalk.bgMagenta.white(' ZERO TESTS EXECUTED '))
       return
     }
