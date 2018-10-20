@@ -1,3 +1,16 @@
+export interface AssertStatic extends Assert {
+}
+
+declare namespace Chai {
+  interface ChaiStatic {
+    use(fn: (chai: any, utils: any) => void): ChaiStatic;
+    assert: AssertStatic;
+  }
+}
+
+export type Operator = string; // "==" | "===" | ">" | ">=" | "<" | "<=" | "!=" | "!==";
+export type OperatorComparable = boolean | null | number | string | undefined | Date;
+
 export declare class Assert {
   private _counts;
   private _plannedCounts;
