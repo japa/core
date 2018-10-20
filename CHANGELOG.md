@@ -1,3 +1,14 @@
+<a name="2.0.6"></a>
+## [2.0.6](https://github.com/thetutlage/japa/compare/v2.0.5...v2.0.6) (2018-10-20)
+
+
+### Bug Fixes
+
+* **assert:** copy missing chai interfaces ([1e3da2c](https://github.com/thetutlage/japa/commit/1e3da2c))
+* **reporter:** check for groups length and tests total to decide status ([e19b0ba](https://github.com/thetutlage/japa/commit/e19b0ba))
+
+
+
 <a name="2.0.5"></a>
 ## [2.0.5](https://github.com/thetutlage/japa/compare/v2.0.4...v2.0.5) (2018-10-10)
 
