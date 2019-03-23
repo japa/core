@@ -1,3 +1,30 @@
+## [2.0.8](https://github.com/thetutlage/japa/compare/2.0.7...2.0.8) (2019-03-23)
+
+
+### Features
+
+* **Runner:** add option to define before and after hooks ([12186db](https://github.com/thetutlage/japa/commit/12186db))
+* **slimRunner:** expose before and after hooks via configure options ([fec01bb](https://github.com/thetutlage/japa/commit/fec01bb))
+
+The runner hooks can be defined inside the `configure` method object.
+
+```js
+const { configure } = require('japa')
+
+configure({
+  before: [
+    async (runner) => {
+      // setup db
+    }
+  ],
+  after: [
+    async (runner) => {
+      // cleanup db
+    }  
+  ]
+})
+```
+
 <a name="2.0.7"></a>
 ## [2.0.7](https://github.com/thetutlage/japa/compare/v2.0.6...v2.0.7) (2019-01-01)
 
