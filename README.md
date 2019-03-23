@@ -381,6 +381,29 @@ The default `list` reporter, will clean the stack traces by removing Japa core f
 
 <img src="assets/stack-traces.png" width="600px" />
 
+
+## Runner hooks
+Runner hooks are executed before and after running the entire test suite. These hooks can be used to perform global actions, which are required for all test groups.
+
+The `before` and `after` hooks can be defined inside the configure object.
+
+```js
+const { configure } = require('japa')
+
+configure({
+  before: [
+    async (runner) => {
+      // setup db
+    }
+  ],
+  after: [
+    async (runner) => {
+      // cleanup db
+    }  
+  ]
+})
+```
+
 ## Japa flow
 
 Japa will attempt to run as many tests as possible when tests or group hooks start failing. 
@@ -466,6 +489,19 @@ Here's the list of the options the `configure` method accepts.
   <td valign="top"><code>filter:</code></td>
   <td>
     <p>A custom callback to dynamically filter tests.</p>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>before:</code></td>
+  <td>
+    <p>An array of hooks to be executed before running all the tests. <strong>Hooks are executed in sequence</strong></p>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>after
+  :</code></td>
+  <td>
+    <p>An array of hooks to be executed after running all the tests. <strong>Hooks are executed in sequence</strong></p>
   </td>
 </tr>
 <tr>
