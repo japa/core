@@ -14,6 +14,9 @@
 import { IOptions, IEvents } from '../Contracts'
 import { Group } from '../Group'
 import { emitter } from '../Emitter'
+import ow from 'ow'
+
+type IRunnerHook<T extends any[], H extends any[]> = ((runner: Runner<T, H>) => Promise<void>)
 
 /**
  * Runner class is used for defining global properties
@@ -21,6 +24,13 @@ import { emitter } from '../Emitter'
  */
 export class Runner <T extends any[], H extends any[]> {
   private _reporterFn: ((emitter, options) => void) | null
+  private _hooks: {
+    before: IRunnerHook<T, H>[],
+    after: IRunnerHook<T, H>[],
+  } = {
+    before: [],
+    after: [],
+  }
 
   constructor (private _groups: Group<T, H>[], private _options: IOptions) {
   }
@@ -37,7 +47,29 @@ export class Runner <T extends any[], H extends any[]> {
    * Define custom reporter
    */
   public reporter (fn: (emitter) => void): this {
+    ow(fn, 'callback', ow.function)
     this._reporterFn = fn
+    return this
+  }
+
+  /**
+   * Define hooks to be executed before the runner starts
+   * the tests
+   */
+  public before (fn: (runner: Runner<T, H>) => Promise<void>): this {
+    ow(fn, 'callback', ow.function)
+    this._hooks.before.push(fn)
+
+    return this
+  }
+
+  /**
+   * Define hooks to be executed after runner tests are over
+   */
+  public after (fn: (runner: Runner<T, H>) => Promise<void>): this {
+    ow(fn, 'callback', ow.function)
+    this._hooks.after.push(fn)
+
     return this
   }
 
@@ -47,6 +79,13 @@ export class Runner <T extends any[], H extends any[]> {
   public async run () {
     if (typeof (this._reporterFn) !== 'function') {
       throw new Error('Make sure to define tests reporter as a function')
+    }
+
+    /**
+     * Execute before hooks
+     */
+    for (let hook of this._hooks.before) {
+      await hook(this)
     }
 
     /**
@@ -77,5 +116,12 @@ export class Runner <T extends any[], H extends any[]> {
      * Emit completed event
      */
     emitter.emit(IEvents.COMPLETED)
+
+    /**
+     * Execute after hooks
+     */
+    for (let hook of this._hooks.after) {
+      await hook(this)
+    }
   }
 }
