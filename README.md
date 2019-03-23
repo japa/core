@@ -1,3 +1,34 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of contents
+
+- [Japa](#japa)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Why Japa?](#why-japa)
+    - [Faster boot time ⏰](#faster-boot-time-)
+    - [Simpler Syntax 💅](#simpler-syntax-)
+  - [Test your apps](#test-your-apps)
+    - [Installation](#installation)
+    - [Writing your first test](#writing-your-first-test)
+    - [async/await](#asyncawait)
+    - [Test timeouts](#test-timeouts)
+    - [Test groups](#test-groups)
+    - [Skipping tests](#skipping-tests)
+    - [Skipping/Running tests in CI](#skippingrunning-tests-in-ci)
+    - [Retry flaky tests](#retry-flaky-tests)
+    - [Regression tests](#regression-tests)
+    - [Assertion Planning](#assertion-planning)
+    - [Cleaner Error Stack](#cleaner-error-stack)
+  - [Runner hooks](#runner-hooks)
+  - [Japa flow](#japa-flow)
+  - [Running multiple test files](#running-multiple-test-files)
+    - [Filtering files](#filtering-files)
+  - [Configure options](#configure-options)
+  - [Running typescript tests](#running-typescript-tests)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ![](http://res.cloudinary.com/adonisjs/image/upload/v1484834197/monk_di16hz.png)
 
 # Japa

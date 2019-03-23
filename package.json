@@ -55,6 +55,7 @@
     "coveralls": "^3.0.3",
     "cz-conventional-changelog": "^2.1.0",
     "del-cli": "^1.1.0",
+    "doctoc": "^1.4.0",
     "mocha": "^6.0.2",
     "mrm": "^1.2.1",
     "nyc": "^13.3.0",
@@ -65,7 +66,8 @@
     "typedoc": "^0.14.2",
     "typedoc-plugin-external-module-name": "^2.0.0",
     "typedoc-plugin-single-line-tags": "^1.0.0",
-    "typescript": "^3.3.4000"
+    "typescript": "^3.3.4000",
+    "yorkie": "^2.0.0"
   },
   "config": {
     "commitizen": {
@@ -88,5 +90,8 @@
   "keywords": [
     "test",
     "test-runner"
-  ]
+  ],
+  "gitHooks": {
+    "pre-commit": "doctoc README.md --title='## Table of contents' && git add README.md"
+  }
 }
