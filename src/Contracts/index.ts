@@ -74,6 +74,8 @@ export type IConfigureOptions = {
   timeout: number,
   files: string[] | string,
   grep: string | RegExp,
+  before: ((runner, emitter) => Promise<void>)[],
+  after: ((runner, emitter) => Promise<void>)[],
   reporterFn: (emitter) => void,
   filter: (file: string) => void,
 }

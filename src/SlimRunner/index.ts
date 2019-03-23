@@ -11,6 +11,7 @@
  * file that was distributed with this source code.
 */
 
+import ow from 'ow'
 import chalk from 'chalk'
 import { Runner } from '../Runner'
 import { Group } from '../Group'
@@ -87,6 +88,13 @@ let runnerOptions: IOptions = {
 let reporterFn: ((emitter) => void) = listReporter
 
 /**
+ * Reference to runner hooks, to be defined inside configure
+ * method
+ */
+let beforeHooks: ((runner: Runner<testArgs, hookArgs>, emitter) => Promise<void>)[] = []
+let afterHooks: ((runner: Runner<testArgs, hookArgs>, emitter) => Promise<void>)[] = []
+
+/**
  * Adds the test to the active group. If there isn't any active
  * group, it will be created.
  */
@@ -112,6 +120,8 @@ export function test (title: string, callback: ICallback<testArgs>) {
 export async function run (exitProcess = true) {
   const runner = new Runner(groups, runnerOptions)
   runner.reporter(reporterFn)
+  beforeHooks.forEach((hook) => runner.before(hook))
+  afterHooks.forEach((hook) => runner.after(hook))
 
   const loaderFiles = await loader.loadFiles()
   if (loaderFiles.length && groups.length) {
@@ -230,6 +240,22 @@ export namespace test {
      */
     if (typeof (options.filter) === 'function') {
       loader.filter(options.filter)
+    }
+
+    /**
+     * Set after hooks
+     */
+    if (options.before) {
+      ow(options.before, 'configure.before', ow.array)
+      beforeHooks = options.before
+    }
+
+    /**
+     * Set before hooks
+     */
+    if (options.after) {
+      ow(options.after, 'configure.after', ow.array)
+      afterHooks = options.after
     }
 
     /**

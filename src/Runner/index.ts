@@ -16,7 +16,12 @@ import { Group } from '../Group'
 import { emitter } from '../Emitter'
 import ow from 'ow'
 
-type IRunnerHook<T extends any[], H extends any[]> = ((runner: Runner<T, H>) => Promise<void>)
+/**
+ * Shape of hook function
+ */
+type IRunnerHook<T extends any[], H extends any[]> = (
+  (runner: Runner<T, H>, emitter) => Promise<void>
+)
 
 /**
  * Runner class is used for defining global properties
@@ -56,7 +61,7 @@ export class Runner <T extends any[], H extends any[]> {
    * Define hooks to be executed before the runner starts
    * the tests
    */
-  public before (fn: (runner: Runner<T, H>) => Promise<void>): this {
+  public before (fn: IRunnerHook<T, H>): this {
     ow(fn, 'callback', ow.function)
     this._hooks.before.push(fn)
 
@@ -66,7 +71,7 @@ export class Runner <T extends any[], H extends any[]> {
   /**
    * Define hooks to be executed after runner tests are over
    */
-  public after (fn: (runner: Runner<T, H>) => Promise<void>): this {
+  public after (fn: IRunnerHook<T, H>): this {
     ow(fn, 'callback', ow.function)
     this._hooks.after.push(fn)
 
@@ -85,7 +90,7 @@ export class Runner <T extends any[], H extends any[]> {
      * Execute before hooks
      */
     for (let hook of this._hooks.before) {
-      await hook(this)
+      await hook(this, emitter)
     }
 
     /**
@@ -121,7 +126,7 @@ export class Runner <T extends any[], H extends any[]> {
      * Execute after hooks
      */
     for (let hook of this._hooks.after) {
-      await hook(this)
+      await hook(this, emitter)
     }
   }
 }
