@@ -14,7 +14,6 @@
     "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
     "test": "npm run test:win",
-    "posttest": "npm run coverage",
     "commit": "git-cz",
     "prepublishOnly": "npm run build && pkg-ok",
     "test:win": "nyc mocha -r ts-node/register test/*.spec.ts",
