@@ -1,34 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-## Table of contents
-
-- [Japa](#japa)
-  - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Why Japa?](#why-japa)
-    - [Faster boot time ⏰](#faster-boot-time-)
-    - [Simpler Syntax 💅](#simpler-syntax-)
-  - [Test your apps](#test-your-apps)
-    - [Installation](#installation)
-    - [Writing your first test](#writing-your-first-test)
-    - [async/await](#asyncawait)
-    - [Test timeouts](#test-timeouts)
-    - [Test groups](#test-groups)
-    - [Skipping tests](#skipping-tests)
-    - [Skipping/Running tests in CI](#skippingrunning-tests-in-ci)
-    - [Retry flaky tests](#retry-flaky-tests)
-    - [Regression tests](#regression-tests)
-    - [Assertion Planning](#assertion-planning)
-    - [Cleaner Error Stack](#cleaner-error-stack)
-  - [Runner hooks](#runner-hooks)
-  - [Japa flow](#japa-flow)
-  - [Running multiple test files](#running-multiple-test-files)
-    - [Filtering files](#filtering-files)
-  - [Configure options](#configure-options)
-  - [Running typescript tests](#running-typescript-tests)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 ![](http://res.cloudinary.com/adonisjs/image/upload/v1484834197/monk_di16hz.png)
 
 # Japa
@@ -42,29 +11,34 @@ Japa is **simple**, **fast** and has **minimal core**. Japa doesn't ship with an
 node test/list-users.spec.js
 ```
 
-## Table of Contents
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of contents
 
-* [Features](#features)
-* [Why Japa?](#why-japa)
-   * [Faster boot time <g-emoji class="g-emoji" alias="alarm_clock" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/23f0.png">⏰</g-emoji>](#faster-boot-time-)
-   * [Simpler Syntax <g-emoji class="g-emoji" alias="nail_care" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f485.png">💅</g-emoji>](#simpler-syntax-)
-* [Test your apps](#test-your-apps)
-   * [Installation](#installation)
-   * [Writing your first test](#writing-your-first-test)
-   * [async/await](#asyncawait)
-   * [Test timeouts](#test-timeouts)
-   * [Test groups](#test-groups)
-   * [Skipping tests](#skipping-tests)
-   * [Skipping/Running tests in CI](#skippingrunning-tests-in-ci)
-   * [Retry flaky tests](#retry-flaky-tests)
-   * [Regression tests](#regression-tests)
-   * [Assertion Planning](#assertion-planning)
-   * [Cleaner Error Stack](#cleaner-error-stack)
-* [Japa flow](#japa-flow)
-* [Running multiple test files](#running-multiple-test-files)
-   * [Filtering files](#filtering-files)
-* [Configure options](#configure-options)
-* [Running typescript tests](#running-typescript-tests)
+- [Features](#features)
+- [Why Japa?](#why-japa)
+  - [Faster boot time ⏰](#faster-boot-time-)
+  - [Simpler Syntax 💅](#simpler-syntax-)
+- [Test your apps](#test-your-apps)
+  - [Installation](#installation)
+  - [Writing your first test](#writing-your-first-test)
+  - [async/await](#asyncawait)
+  - [Test timeouts](#test-timeouts)
+  - [Test groups](#test-groups)
+  - [Skipping tests](#skipping-tests)
+  - [Skipping/Running tests in CI](#skippingrunning-tests-in-ci)
+  - [Retry flaky tests](#retry-flaky-tests)
+  - [Regression tests](#regression-tests)
+  - [Assertion Planning](#assertion-planning)
+  - [Cleaner Error Stack](#cleaner-error-stack)
+- [Runner hooks](#runner-hooks)
+- [Japa flow](#japa-flow)
+- [Running multiple test files](#running-multiple-test-files)
+  - [Filtering files](#filtering-files)
+- [Configure options](#configure-options)
+- [Running typescript tests](#running-typescript-tests)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 <br>
 
@@ -412,6 +386,9 @@ The default `list` reporter, will clean the stack traces by removing Japa core f
 
 <img src="assets/stack-traces.png" width="600px" />
 
+<br>
+
+---
 
 ## Runner hooks
 Runner hooks are executed before and after running the entire test suite. These hooks can be used to perform global actions, which are required for all test groups.
@@ -435,6 +412,10 @@ configure({
 })
 ```
 
+<br>
+
+---
+
 ## Japa flow
 
 Japa will attempt to run as many tests as possible when tests or group hooks start failing. 
@@ -447,6 +428,10 @@ However, if `lifecycle hooks` will fail, they will exit early and will mark the 
 Check out the following flowchart to understand it better.
 
 <img src="assets/japa-flow-chart.png" width="400px">
+
+<br>
+
+---
 
 ## Running multiple test files
 Sooner or later, you will have multiple tests files, that you would like to run together, instead of running one file at a time. Doing same is very simple and is achieved using a **master test file**.
@@ -484,6 +469,10 @@ configure({
   files: ['test/*.spec.js', '!test/users.spec.js']
 })
 ```
+
+<br>
+
+---
 
 ## Configure options
 Here's the list of the options the `configure` method accepts.
@@ -539,6 +528,10 @@ Here's the list of the options the `configure` method accepts.
   <td colspan="2"><code>}</code></td>
 </tr>
 </table>
+
+<br>
+
+---
 
 ## Running typescript tests
 Running test files written in `Typescript` is a piece of cake for Japa. Since everything is done inside the Javascript files, we can ask `japaFile.js` to load `ts-node`.
