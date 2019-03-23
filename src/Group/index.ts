@@ -204,7 +204,7 @@ export class Group <T extends any[], H extends any[]> {
    * each test can override it's own timeout.
    */
   public timeout (duration: number): this {
-    ow(duration, ow.number.label('duration').integer)
+    ow(duration, 'duration', ow.number.integer)
 
     if (this._tests.length) {
       throw new Error('group.timeout must be called before defining the tests')
@@ -218,7 +218,7 @@ export class Group <T extends any[], H extends any[]> {
    * Create a new test as part of this group.
    */
   public test (title: string, callback: ICallback<T>, testOptions?: Partial<ITestOptions>): Test<T> {
-    ow(title, ow.string.label('title').nonEmpty)
+    ow(title, 'title', ow.string.nonEmpty)
 
     testOptions = Object.assign({
       regression: false,
@@ -243,7 +243,7 @@ export class Group <T extends any[], H extends any[]> {
    * executing tests.
    */
   public before (cb: ICallback<H>): this {
-    ow(cb, ow.function.label('cb'))
+    ow(cb, 'cb', ow.function)
 
     this._hooks.before.push(new Hook(this._resolveHookFn, cb, 'before'))
     return this
@@ -254,7 +254,7 @@ export class Group <T extends any[], H extends any[]> {
    * all the tests.
    */
   public after (cb: ICallback<H>): this {
-    ow(cb, ow.function.label('cb'))
+    ow(cb, 'cb', ow.function)
 
     this._hooks.after.push(new Hook(this._resolveHookFn, cb, 'after'))
     return this
@@ -264,7 +264,7 @@ export class Group <T extends any[], H extends any[]> {
    * Add before each hook to be execute before each test
    */
   public beforeEach (cb: ICallback<H>): this {
-    ow(cb, ow.function.label('cb'))
+    ow(cb, 'cb', ow.function)
 
     this._hooks.beforeEach.push(new Hook(this._resolveHookFn, cb, 'beforeEach'))
     return this
@@ -274,7 +274,7 @@ export class Group <T extends any[], H extends any[]> {
    * Add after each hook to be execute before each test
    */
   public afterEach (cb: ICallback<H>): this {
-    ow(cb, ow.function.label('cb'))
+    ow(cb, 'cb', ow.function)
 
     this._hooks.afterEach.push(new Hook(this._resolveHookFn, cb, 'afterEach'))
     return this

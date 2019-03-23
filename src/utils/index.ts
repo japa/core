@@ -11,7 +11,7 @@
  * file that was distributed with this source code.
 */
 
-import * as timeSpan from 'time-span'
+import timeSpan from 'time-span'
 import { IReport, IGroupReport, ITestReport, ITestStatus, IGroupStatus } from '../Contracts'
 import * as exceptions from '../Exceptions'
 

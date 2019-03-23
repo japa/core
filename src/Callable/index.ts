@@ -25,7 +25,7 @@ const debug = Debug('japa')
  * @ignore
  */
 async function asPromise (fn, args) {
-  return await fn(...args)
+  return fn(...args)
 }
 
 /**

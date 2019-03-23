@@ -12,7 +12,7 @@
 */
 
 import ow from 'ow'
-import * as timeSpan from 'time-span'
+import timeSpan from 'time-span'
 import * as retry from 'retry'
 import * as isCI from 'is-ci'
 
@@ -167,7 +167,7 @@ export class Test <T extends any[]> {
    * it as failed.
    */
   public retry (counts: number): this {
-    ow(counts, ow.number.label('counts').integer)
+    ow(counts, 'counts', ow.number.integer)
 
     this._retries = counts
     return this
@@ -177,7 +177,7 @@ export class Test <T extends any[]> {
    * Set explicit timeout for the given test.
    */
   public timeout (duration: number): this {
-    ow(duration, ow.number.label('duration').integer)
+    ow(duration, 'duration', ow.number.integer)
 
     this._timeout = duration
     return this
