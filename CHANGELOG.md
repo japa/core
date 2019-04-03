@@ -1,3 +1,7 @@
+## [2.0.9](https://github.com/thetutlage/japa/compare/v2.0.8...v2.0.9) (2019-04-03)
+
+
+
 ## [2.0.8](https://github.com/thetutlage/japa/compare/2.0.7...2.0.8) (2019-03-23)
 
 
