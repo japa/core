@@ -3,8 +3,6 @@ node_js:
   - node
   - 8.0.0
 sudo: false
-services:
-  - redis-server
 install:
   - npm install
 notifications:
