@@ -20,6 +20,8 @@ import { Assert } from '../Assert'
 import listReporter from '../Reporter/list'
 import { ICallback, IOptions, ITestOptions, IConfigureOptions } from '../Contracts'
 import { Loader } from './Loader'
+import { emitter } from '../Emitter'
+import { EventEmitter } from 'events'
 
 const loader = new Loader()
 
@@ -85,14 +87,14 @@ let runnerOptions: IOptions = {
 /**
  * Custom reporter function
  */
-let reporterFn: ((emitter) => void) = listReporter
+let reporterFn: ((emitter: EventEmitter) => void) = listReporter
 
 /**
  * Reference to runner hooks, to be defined inside configure
  * method
  */
-let beforeHooks: ((runner: Runner<testArgs, hookArgs>, emitter) => Promise<void>)[] = []
-let afterHooks: ((runner: Runner<testArgs, hookArgs>, emitter) => Promise<void>)[] = []
+let beforeHooks: ((runner: Runner<testArgs, hookArgs>, emitter: EventEmitter) => Promise<void>)[] = []
+let afterHooks: ((runner: Runner<testArgs, hookArgs>, emitter: EventEmitter) => Promise<void>)[] = []
 
 /**
  * Adds the test to the active group. If there isn't any active
@@ -120,8 +122,14 @@ export function test (title: string, callback: ICallback<testArgs>) {
 export async function run (exitProcess = true) {
   const runner = new Runner(groups, runnerOptions)
   runner.reporter(reporterFn)
-  beforeHooks.forEach((hook) => runner.before(hook))
-  afterHooks.forEach((hook) => runner.after(hook))
+
+  /**
+   * Execute before hooks before loading any files
+   * from the disk
+   */
+  for (let hook of beforeHooks) {
+    await hook(runner, emitter)
+  }
 
   const loaderFiles = await loader.loadFiles()
   if (loaderFiles.length && groups.length) {
@@ -133,16 +141,23 @@ export async function run (exitProcess = true) {
    * Load all files from the loader
    */
   loaderFiles.forEach((file) => require(file))
+  let hardException = null
 
   try {
     await runner.run()
-    if (exitProcess) {
-      runner.hasErrors ? process.exit(1) : process.exit(0)
-    }
   } catch (error) {
-    if (exitProcess) {
-      process.exit(1)
-    }
+    hardException = error
+  }
+
+  /**
+   * Executing after hooks before cleanup
+   */
+  for (let hook of afterHooks) {
+    await hook(runner, emitter)
+  }
+
+  if (exitProcess) {
+    runner.hasErrors || hardException ? process.exit(1) : process.exit(0)
   }
 
   groups = []

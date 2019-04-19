@@ -98,44 +98,4 @@ describe('Runner', () => {
     await runner.run()
     assert.isFalse(invoked)
   })
-
-  it('run runner hooks', async () => {
-    const stack: string[] = []
-    const reporter = getTestReporter()
-
-    const group = new Group('sample', getFn([]), getFn([]), { bail: true, timeout: 2000 })
-
-    group.test('sample test', function cb () {
-      stack.push('test')
-    })
-
-    const runner = new Runner([group], {
-      bail: true,
-      timeout: 2000,
-    })
-
-    runner.reporter(reporter.fn.bind(reporter))
-    runner.before(async () => {
-      stack.push('runner:before:1')
-    })
-    runner.before(async () => {
-      stack.push('runner:before:2')
-    })
-
-    runner.after(async () => {
-      stack.push('runner:after:1')
-    })
-    runner.after(async () => {
-      stack.push('runner:after:2')
-    })
-
-    await runner.run()
-    assert.deepEqual(stack, [
-      'runner:before:1',
-      'runner:before:2',
-      'test',
-      'runner:after:1',
-      'runner:after:2',
-    ])
-  })
 })
