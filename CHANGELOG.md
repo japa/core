@@ -1,3 +1,21 @@
+## [2.0.10](https://github.com/thetutlage/japa/compare/v2.0.9...v2.0.10) (2019-04-19)
+
+
+### Code Refactoring
+
+* **slimrunner:** call hooks before loading test files ([e231d80](https://github.com/thetutlage/japa/commit/e231d80))
+
+
+### BREAKING CHANGES
+
+* **slimrunner:** The Runner class hooks support has been removed, since calling
+hooks after loading the test files beats it's purpose.
+
+Anyone using `Runner` class to build their own runtime has to add support for before
+and after hooks like `slimRunner`
+
+
+
 ## [2.0.9](https://github.com/thetutlage/japa/compare/v2.0.8...v2.0.9) (2019-04-03)
 
 
