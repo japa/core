@@ -15,12 +15,13 @@
     "pretest": "npm run lint",
     "test": "npm run test:win",
     "commit": "git-cz",
-    "prepublishOnly": "npm run build && pkg-ok",
     "test:win": "nyc mocha -r ts-node/register test/*.spec.ts",
     "clean": "del build",
     "compile": "npm run lint && npm run clean && tsc",
     "build": "npm run compile && typedoc && node bin/postBuild.js",
-    "lint": "tslint --project tsconfig.json"
+    "lint": "tslint --project tsconfig.json",
+    "release": "np",
+    "version": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -56,7 +57,7 @@
     "doctoc": "^1.4.0",
     "mocha": "^6.2.0",
     "mrm": "^1.2.2",
-    "pkg-ok": "^2.3.1",
+    "np": "^5.0.3",
     "ts-node": "^8.3.0",
     "tslint": "^5.19.0",
     "tslint-eslint-rules": "^5.4.0",
@@ -90,5 +91,9 @@
   ],
   "gitHooks": {
     "pre-commit": "doctoc README.md --title='## Table of contents' && git add README.md"
+  },
+  "np": {
+    "contents": ".",
+    "anyBranch": false
   }
 }
