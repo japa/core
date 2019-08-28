@@ -15,7 +15,7 @@
     "pretest": "npm run lint",
     "test": "npm run test:win",
     "commit": "git-cz",
-    "test:win": "nyc mocha -r ts-node/register test/*.spec.ts",
+    "test:win": "mocha -r ts-node/register test/*.spec.ts",
     "clean": "del build",
     "compile": "npm run lint && npm run clean && tsc",
     "build": "npm run compile && typedoc && node bin/postBuild.js",
