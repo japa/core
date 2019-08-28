@@ -63,7 +63,6 @@
     "tslint-eslint-rules": "^5.4.0",
     "typedoc": "^0.15.0",
     "typedoc-plugin-external-module-name": "^2.1.0",
-    "typedoc-plugin-single-line-tags": "^1.0.0",
     "typescript": "^3.5.3",
     "yorkie": "^2.0.0"
   },
