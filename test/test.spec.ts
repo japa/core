@@ -57,7 +57,7 @@ describe('Test', () => {
       }, 100)
     }
 
-    const test = new Test('sample test', getFn([]), callback, testOptions())
+    const test = new Test('sample test', getFn([] as any), callback, testOptions())
     await test.run()
 
     assert.isTrue(invoked)
@@ -71,7 +71,7 @@ describe('Test', () => {
       }, 300)
     }
 
-    const test = new Test('sample test', getFn([]), callback, testOptions({ timeout: 100 }))
+    const test = new Test('sample test', getFn([] as any), callback, testOptions({ timeout: 100 }))
     await test.run()
 
     assert.instanceOf(test.toJSON().error, TimeoutException)
@@ -85,7 +85,7 @@ describe('Test', () => {
       }, 300)
     }
 
-    const test = new Test('sample test', getFn([]), callback, testOptions({ timeout: 0 }))
+    const test = new Test('sample test', getFn([] as any), callback, testOptions({ timeout: 0 }))
     await test.run()
 
     assert.isNull(test.toJSON().error)
@@ -112,7 +112,12 @@ describe('Test', () => {
       }, 300)
     }
 
-    const test = new Test('sample test', getFn([]), callback, testOptions({ regression: true, timeout: 100 }))
+    const test = new Test(
+      'sample test',
+      getFn([] as any),
+      callback,
+      testOptions({ regression: true, timeout: 100 }),
+    )
     await test.run()
 
     assert.equal(test.toJSON().error!.message, 'Test timeout after 100 milliseconds')

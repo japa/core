@@ -13,7 +13,7 @@
 
 import { TimeoutException } from '../Exceptions'
 import { IResolver, ICallback } from '../Contracts'
-import * as Debug from 'debug'
+import Debug from 'debug'
 
 /**
  * @ignore

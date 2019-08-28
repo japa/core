@@ -12,9 +12,9 @@
 */
 
 import chalk from 'chalk'
-import * as ms from 'ms'
-import * as variableDiff from 'variable-diff'
-import * as rightPad from 'right-pad'
+import ms from 'ms'
+import variableDiff from 'variable-diff'
+import rightPad from 'right-pad'
 
 import { TestsStore, isCoreException } from '../utils'
 import { IEvents, IGroupReport, ITestReport } from '../Contracts'

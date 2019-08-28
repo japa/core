@@ -1,6 +1,7 @@
 {
   "extends": "./node_modules/@adonisjs/mrm-preset/_tsconfig",
   "compilerOptions": {
-    "target": "ES2017"
+    "target": "ES2017",
+    "esModuleInterop": true
   }
 }
