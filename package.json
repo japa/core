@@ -47,10 +47,10 @@
     "variable-diff": "^1.1.0"
   },
   "devDependencies": {
-    "@adonisjs/mrm-preset": "^2.0.3",
-    "@types/chai": "^4.2.0",
+    "@adonisjs/mrm-preset": "^2.1.0",
+    "@types/chai": "^4.2.1",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.7.2",
+    "@types/node": "^12.7.4",
     "commitizen": "^4.0.3",
     "cz-conventional-changelog": "^3.0.2",
     "del-cli": "^2.0.0",
@@ -63,7 +63,7 @@
     "tslint-eslint-rules": "^5.4.0",
     "typedoc": "^0.15.0",
     "typedoc-plugin-external-module-name": "^2.1.0",
-    "typescript": "^3.5.3",
+    "typescript": "^3.6.2",
     "yorkie": "^2.0.0"
   },
   "config": {

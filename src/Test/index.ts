@@ -13,8 +13,8 @@
 
 import ow from 'ow'
 import timeSpan from 'time-span'
-import * as retry from 'retry'
-import * as isCI from 'is-ci'
+import retry from 'retry'
+import isCI from 'is-ci'
 
 import { Callable } from '../Callable'
 import { emitter } from '../Emitter'
