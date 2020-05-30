@@ -15,7 +15,6 @@ import { IOptions, IEvents } from '../Contracts'
 import { Group } from '../Group'
 import { emitter } from '../Emitter'
 import { EventEmitter } from 'events'
-import ow from 'ow'
 
 /**
  * Runner class is used for defining global properties
@@ -39,7 +38,10 @@ export class Runner <T extends any[], H extends any[]> {
    * Define custom reporter
    */
   public reporter (fn: (emitter: EventEmitter) => void): this {
-    ow(fn, 'callback', ow.function)
+    if (typeof (fn) !== 'function') {
+      throw new Error('"runner.reporter" expects callback to be a valid function')
+    }
+
     this._reporterFn = fn
     return this
   }

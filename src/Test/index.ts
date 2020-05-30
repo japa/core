@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
 */
 
-import ow from 'ow'
 import retry from 'retry'
 import isCI from 'is-ci'
 import timeSpan from 'time-span'
@@ -167,7 +166,9 @@ export class Test <T extends any[]> {
    * it as failed.
    */
   public retry (counts: number): this {
-    ow(counts, 'counts', ow.number.integer)
+    if (typeof (counts) !== 'number') {
+      throw new Error('"test.retry" expects a number value')
+    }
 
     this._retries = counts
     return this
@@ -177,7 +178,9 @@ export class Test <T extends any[]> {
    * Set explicit timeout for the given test.
    */
   public timeout (duration: number): this {
-    ow(duration, 'duration', ow.number.integer)
+    if (typeof (duration) !== 'number') {
+      throw new Error('"test.timeout" expects a number value')
+    }
 
     this._timeout = duration
     return this

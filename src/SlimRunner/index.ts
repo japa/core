@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
 */
 
-import ow from 'ow'
 import chalk from 'chalk'
 import { EventEmitter } from 'events'
 
@@ -271,7 +270,15 @@ export namespace test {
      * Set after hooks
      */
     if (options.before) {
-      ow(options.before, 'configure.before', ow.array)
+      if (!Array.isArray(options.before)) {
+        throw new Error('"configure.before" expects an array of functions')
+      }
+      options.before.forEach((fn, index) => {
+        if (typeof (fn) !== 'function') {
+          throw new Error(`invalid value for "configure.before" at ${index} index`)
+        }
+      })
+
       beforeHooks = options.before
     }
 
@@ -279,7 +286,16 @@ export namespace test {
      * Set before hooks
      */
     if (options.after) {
-      ow(options.after, 'configure.after', ow.array)
+      if (!Array.isArray(options.after)) {
+        throw new Error('"configure.after" expects an array of functions')
+      }
+
+      options.after.forEach((fn, index) => {
+        if (typeof (fn) !== 'function') {
+          throw new Error(`invalid value for "configure.after" at ${index} index`)
+        }
+      })
+
       afterHooks = options.after
     }
 
