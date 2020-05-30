@@ -11,14 +11,14 @@
  * file that was distributed with this source code.
 */
 
-import retry from 'retry'
 import isCI from 'is-ci'
+import retry from 'retry'
 import timeSpan from 'time-span'
 
-import { Callable } from '../Callable'
 import { emitter } from '../Emitter'
-import { RegressionException } from '../Exceptions'
+import { Callable } from '../Callable'
 import { isCoreException } from '../utils'
+import { RegressionException } from '../Exceptions'
 
 import {
   ITestOptions,

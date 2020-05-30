@@ -35,6 +35,14 @@ export class Runner <T extends any[], H extends any[]> {
   }
 
   /**
+   * Define a set of test groups to use
+   */
+  public useGroups (groups: Group<T, H>[]): this {
+    this._groups = groups
+    return this
+  }
+
+  /**
    * Define custom reporter
    */
   public reporter (fn: (emitter: EventEmitter) => void): this {

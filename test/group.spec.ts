@@ -444,4 +444,42 @@ describe('Group', () => {
     await group.run()
     assert.deepEqual(stack, [])
   })
+
+  it('do not register tests after the .only test', async () => {
+    const stack: string[] = []
+    const group = new Group('sample', getFn([]), getFn([]), {
+      bail: false,
+      timeout: 2000,
+    })
+
+    group.test('sample', function cb () {
+      stack.push('sample')
+    }, { only: true })
+
+    group.test('another sample', function cb () {
+      stack.push('another sample')
+    })
+
+    await group.run()
+    assert.deepEqual(stack, ['sample'])
+  })
+
+  it('remove tests registered before the .only test', async () => {
+    const stack: string[] = []
+    const group = new Group('sample', getFn([]), getFn([]), {
+      bail: false,
+      timeout: 2000,
+    })
+
+    group.test('another sample', function cb () {
+      stack.push('another sample')
+    })
+
+    group.test('sample', function cb () {
+      stack.push('sample')
+    }, { only: true })
+
+    await group.run()
+    assert.deepEqual(stack, ['sample'])
+  })
 })

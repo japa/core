@@ -20,6 +20,7 @@ export type IOptions = {
 export type ITestOptions = {
   timeout: number,
   regression: boolean,
+  only?: boolean,
   skip?: boolean,
   skipInCI?: boolean,
   runInCI?: boolean,

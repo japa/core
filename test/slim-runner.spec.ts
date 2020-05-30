@@ -619,11 +619,12 @@ describe('SlimRunner', () => {
     ])
   })
 
-  it('define grep regex using test.only method', async () => {
+  it('cherry pick test using the .only method', async () => {
     const reporter = getTestReporter()
     test.configure({
       reporterFn: reporter.fn.bind(reporter),
       bail: true,
+      grep: undefined,
     })
 
     let executed = false

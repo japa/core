@@ -72,6 +72,12 @@ export class Group <T extends any[], H extends any[]> {
    */
   private _hasFailingTests = false
 
+  /**
+   * Is there a cherry picked test using the `only` property
+   * or not?
+   */
+  private _hasCherryPickedTest = false
+
   constructor (
     public title: string,
     private _resolveTestFn: IResolver<T>,
@@ -246,8 +252,23 @@ export class Group <T extends any[], H extends any[]> {
      * Using group timeout as a priority over runner timeout
      */
     testOptions.timeout = this._timeout !== undefined ? this._timeout : this._options.timeout
-
     const test = new Test(title, this._resolveTestFn, callback, testOptions as ITestOptions)
+
+    /**
+     * Do not track test when a test has been cherry picked earlier
+     */
+    if (this._hasCherryPickedTest) {
+      return test
+    }
+
+    /**
+     * Remove all existing tests, when a test has a `.only` property
+     * set to true.
+     */
+    if (testOptions.only === true) {
+      this._hasCherryPickedTest = true
+      this._tests = []
+    }
 
     this._tests.push(test)
     return test

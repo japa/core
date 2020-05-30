@@ -77,6 +77,13 @@ let groups: Group<testArgs, hookArgs>[] = []
 let activeGroup: Group<testArgs, hookArgs> | null = null
 
 /**
+ * A flag to track, if `test.only` is used to cherry pick a
+ * single test. All other tests are ignored from here
+ * on.
+ */
+let cherryPickedTest = false
+
+/**
  * Options for the test runner
  */
 let runnerOptions: IOptions = {
@@ -120,7 +127,7 @@ export function test (title: string, callback: ICallback<testArgs>) {
  * Run all the tests using the runner
  */
 export async function run (exitProcess = true) {
-  const runner = new Runner(groups, runnerOptions)
+  const runner = new Runner([] as Group<testArgs, hookArgs>[], runnerOptions)
   runner.reporter(reporterFn)
 
   /**
@@ -140,11 +147,21 @@ export async function run (exitProcess = true) {
   /**
    * Load all files from the loader
    */
-  loaderFiles.forEach((file) => require(file))
+  loaderFiles.forEach((file) => {
+    /**
+     * Do not require more files, when cherry picking
+     * tests
+     */
+    if (cherryPickedTest) {
+      return
+    }
+    require(file)
+  })
+
   let hardException = null
 
   try {
-    await runner.run()
+    await runner.useGroups(groups).run()
   } catch (error) {
     hardException = error
   }
@@ -170,7 +187,18 @@ export namespace test {
    * Create a new test to group all test together
    */
   export function group (title: string, callback: (group: runnerGroup) => void) {
+    /**
+     * Do not add new groups when already cherry picked a test
+     */
+    if (cherryPickedTest) {
+      return
+    }
+
     activeGroup = new Group(title, testArgsFn, hookArgsFn, runnerOptions)
+
+    /**
+     * Track the group
+     */
     groups.push(activeGroup)
 
     /**
@@ -189,8 +217,24 @@ export namespace test {
    * Only run the specified test
    */
   export function only (title: string, callback: ICallback<testArgs>) {
-    runnerOptions.grep = new RegExp(`^${title}$`)
-    return addTest(title, callback)
+    const testInstance = addTest(title, callback, { only: true })
+
+    /**
+     * Empty out existing groups
+     */
+    groups = []
+
+    /**
+     * Push the current active group
+     */
+    groups.push(activeGroup!)
+
+    /**
+     * Turn on the flag
+     */
+    cherryPickedTest = true
+
+    return testInstance
   }
 
   /**
@@ -227,6 +271,14 @@ export namespace test {
    * Configure test runner
    */
   export function configure (options: Partial<IConfigureOptions>) {
+    /**
+     * Reset runner options before every configure call
+     */
+    runnerOptions = {
+      bail: false,
+      timeout: 2000,
+    }
+
     if (groups.length) {
       throw new Error('test.configure must be called before creating any tests')
     }
