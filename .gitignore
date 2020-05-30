@@ -16,3 +16,4 @@ build
 dist
 package-lock.json
 docs
+shrinkwrap.yaml
