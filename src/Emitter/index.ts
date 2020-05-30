@@ -5,6 +5,6 @@
 /**
  * @hidden
  */
-import Emitter from 'events'
-const emitter = new Emitter()
+import { EventEmitter } from 'events'
+const emitter = new EventEmitter()
 export { emitter }

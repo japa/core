@@ -11,10 +11,10 @@
  * file that was distributed with this source code.
 */
 
-import chalk from 'chalk'
 import ms from 'ms'
-import variableDiff from 'variable-diff'
+import chalk from 'chalk'
 import rightPad from 'right-pad'
+import variableDiff from 'variable-diff'
 
 import { TestsStore, isCoreException } from '../utils'
 import { IEvents, IGroupReport, ITestReport } from '../Contracts'
@@ -228,15 +228,15 @@ class ListReporter {
       console.log(failedHooks.length ? this._getFailingTitle(title) : title)
 
       if (failedHooks.length) {
-        const { error, title } = failedHooks[0]
-        console.log(`${chalk.red(`  (${title})`)} ${this._getStack(error.stack)}`)
+        const failedHook = failedHooks[0]
+        console.log(`${chalk.red(`  (${failedHook.title})`)} ${this._getStack(failedHook.error.stack)}`)
       }
 
       if (failedTests.length) {
-        failedTests.forEach(({ title, error }) => {
+        failedTests.forEach((test) => {
           console.log('')
-          console.log(`  ${this._getFailingTitle(title)}`)
-          this._printTestError(error)
+          console.log(`  ${this._getFailingTitle(test.title)}`)
+          this._printTestError(test.error)
         })
       }
     })

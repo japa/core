@@ -16,13 +16,13 @@ import { test, run } from './src/SlimRunner'
 const nextTick = typeof (setImmediate) !== 'undefined' ? setImmediate : process.nextTick
 nextTick(function cb () {
   run()
-  .then(() => {
-    process.exit(0)
-  })
-  .catch((error) => {
-    console.log(error)
-    process.exit(1)
-  })
+    .then(() => {
+      process.exit(0)
+    })
+    .catch((error) => {
+      console.log(error)
+      process.exit(1)
+    })
 })
 
 export = test

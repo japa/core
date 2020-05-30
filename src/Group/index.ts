@@ -24,7 +24,7 @@ import {
   ITestStatus,
   ITestOptions,
   IOptions,
- } from '../Contracts'
+} from '../Contracts'
 
 /**
  * Group holds `n` number of tests to be executed. Groups also allows

@@ -12,9 +12,9 @@
 */
 
 import ow from 'ow'
-import timeSpan from 'time-span'
 import retry from 'retry'
 import isCI from 'is-ci'
+import timeSpan from 'time-span'
 
 import { Callable } from '../Callable'
 import { emitter } from '../Emitter'
@@ -124,13 +124,13 @@ export class Test <T extends any[]> {
 
       op.attempt(async () => {
         Callable(this._resolveFn, this._callback!, this._timeout)
-        .then(resolve)
-        .catch((error) => {
-          if (op.retry(error)) {
-            return
-          }
-          reject(op.mainError())
-        })
+          .then(resolve)
+          .catch((error) => {
+            if (op.retry(error)) {
+              return
+            }
+            reject(op.mainError())
+          })
       })
     })
   }

@@ -13,15 +13,16 @@
 
 import ow from 'ow'
 import chalk from 'chalk'
-import { Runner } from '../Runner'
-import { Group } from '../Group'
+import { EventEmitter } from 'events'
+
 import { Test } from '../Test'
+import { Group } from '../Group'
+import { Loader } from './Loader'
+import { Runner } from '../Runner'
 import { Assert } from '../Assert'
+import { emitter } from '../Emitter'
 import listReporter from '../Reporter/list'
 import { ICallback, IOptions, ITestOptions, IConfigureOptions } from '../Contracts'
-import { Loader } from './Loader'
-import { emitter } from '../Emitter'
-import { EventEmitter } from 'events'
 
 const loader = new Loader()
 
@@ -164,6 +165,7 @@ export async function run (exitProcess = true) {
   activeGroup = null
 }
 
+// eslint-disable-next-line no-redeclare
 export namespace test {
   /**
    * Create a new test to group all test together
