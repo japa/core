@@ -27,6 +27,7 @@ node test/list-users.spec.js
   - [Test groups](#test-groups)
   - [Skipping tests](#skipping-tests)
   - [Skipping/Running tests in CI](#skippingrunning-tests-in-ci)
+  - [Run selected tests](#run-selected-tests)
   - [Retry flaky tests](#retry-flaky-tests)
   - [Regression tests](#regression-tests)
   - [Assertion Planning](#assertion-planning)
@@ -290,6 +291,20 @@ The opposite of same is also available.
 
 ```js
 test.skipInCI('I will be skipped in CI', () => {
+})
+```
+
+<br>
+
+---
+
+### Run selected tests
+Just like skipping tests, you can also run a specific test using `test.only` method.
+
+- If multiple tests uses `test.only`, then only the last one will be entertained.
+
+```js
+test.only('all other tests will be skipped, except me', () => {
 })
 ```
 

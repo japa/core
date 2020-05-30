@@ -376,4 +376,72 @@ describe('Group', () => {
     const fn = () => group.timeout(300)
     assert.throw(fn, 'group.timeout must be called before defining the tests')
   })
+
+  it('should not run before hooks when group has zero tests', async () => {
+    const stack: string[] = []
+    const group = new Group('sample', getFn([]), getFn([]), { bail: false, timeout: 2000 })
+
+    group.before(function cb () {
+      stack.push('before')
+    })
+
+    await group.run()
+    assert.deepEqual(stack, [])
+  })
+
+  it('should not run beforeEach hooks when group has zero tests', async () => {
+    const stack: string[] = []
+    const group = new Group('sample', getFn([]), getFn([]), { bail: false, timeout: 2000 })
+
+    group.beforeEach(function cb () {
+      stack.push('beforeEach')
+    })
+
+    await group.run()
+    assert.deepEqual(stack, [])
+  })
+
+  it('should not run after hooks when group has zero tests', async () => {
+    const stack: string[] = []
+    const group = new Group('sample', getFn([]), getFn([]), { bail: false, timeout: 2000 })
+
+    group.after(function cb () {
+      stack.push('after')
+    })
+
+    await group.run()
+    assert.deepEqual(stack, [])
+  })
+
+  it('should not run afterEach hooks when group has zero tests', async () => {
+    const stack: string[] = []
+    const group = new Group('sample', getFn([]), getFn([]), { bail: false, timeout: 2000 })
+
+    group.afterEach(function cb () {
+      stack.push('afterEach')
+    })
+
+    await group.run()
+    assert.deepEqual(stack, [])
+  })
+
+  it('do not run hooks when tests are removed using grep filter', async () => {
+    const stack: string[] = []
+    const group = new Group('sample', getFn([]), getFn([]), {
+      bail: false,
+      timeout: 2000,
+      grep: new RegExp('foo'),
+    })
+
+    group.test('sample', function cb () {
+      stack.push('test')
+    })
+
+    group.before(function cb () {
+      stack.push('before')
+    })
+
+    await group.run()
+    assert.deepEqual(stack, [])
+  })
 })

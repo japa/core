@@ -60,7 +60,9 @@ export class Group <T extends any[], H extends any[]> {
   private _completed: boolean = false
 
   /**
-   * An array of tests related to the group
+   * An array of tests related to the group. They are mutated by the
+   * run method to filter and keep only the one's that matches
+   * the grep filter.
    */
   private _tests: Test<T>[] = []
 
@@ -71,7 +73,7 @@ export class Group <T extends any[], H extends any[]> {
   private _hasFailingTests = false
 
   constructor (
-    private _title: string,
+    public title: string,
     private _resolveTestFn: IResolver<T>,
     private _resolveHookFn: IResolver<H>,
     private _options: IOptions) {
@@ -83,6 +85,18 @@ export class Group <T extends any[], H extends any[]> {
    */
   public get hasErrors (): boolean {
     return this._hasFailingTests || !!this._error
+  }
+
+  /**
+   * Filter tests if grep value is defined
+   */
+  private _filterTests () {
+    if (!this._options.grep) {
+      return
+    }
+
+    const filteredTests = this._tests.filter((test) => this._options.grep!.test(test.title))
+    this._tests = filteredTests
   }
 
   /**
@@ -172,9 +186,7 @@ export class Group <T extends any[], H extends any[]> {
         break
       }
 
-      if (!this._options.grep || this._options.grep.test(test.toJSON().title)) {
-        await this._runTest(test)
-      }
+      await this._runTest(test)
     }
   }
 
@@ -192,7 +204,7 @@ export class Group <T extends any[], H extends any[]> {
     }
 
     return {
-      title: this._title,
+      title: this.title,
       status: status,
       error: this._error,
     }
@@ -296,6 +308,16 @@ export class Group <T extends any[], H extends any[]> {
    * by the end user and Japa itself will call this method
    */
   public async run () {
+    this._filterTests()
+
+    /**
+     * Return early when no tests are defined
+     */
+    if (!this._tests.length) {
+      this._completed = true
+      return
+    }
+
     emitter.emit(IEvents.GROUPSTARTED, this.toJSON())
 
     /**

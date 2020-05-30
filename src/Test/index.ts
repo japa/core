@@ -88,7 +88,7 @@ export class Test <T extends any[]> {
   private _completed: boolean = false
 
   constructor (
-    private _title: string,
+    public title: string,
     private _resolveFn: IResolver<T>,
     private _callback: ICallback<T> | undefined,
     options: ITestOptions,
@@ -152,7 +152,7 @@ export class Test <T extends any[]> {
     }
 
     return {
-      title: this._title,
+      title: this.title,
       status: status,
       regression: this._regression,
       regressionMessage: this._regressionMessage,
