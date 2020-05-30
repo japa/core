@@ -618,4 +618,69 @@ describe('SlimRunner', () => {
       },
     ])
   })
+
+  it('define grep regex using test.only method', async () => {
+    const reporter = getTestReporter()
+    test.configure({
+      reporterFn: reporter.fn.bind(reporter),
+      bail: true,
+    })
+
+    let executed = false
+
+    test.group('foo', () => {
+      test('hi', () => {
+      })
+
+      test('hey', () => {
+      })
+
+      test.only('hello', () => {
+        executed = true
+      })
+    })
+
+    await run(false)
+    assert.isTrue(executed)
+    assert.deepEqual(reporter.events, [
+      {
+        event: 'group:started',
+        data: {
+          error: null,
+          status: 'pending',
+          title: 'foo',
+        },
+      },
+      {
+        event: 'test:started',
+        data: {
+          duration: 0,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'pending',
+          title: 'hello',
+        },
+      },
+      {
+        event: 'test:completed',
+        data: {
+          duration: reporter.events[2].data.duration,
+          error: null,
+          regression: false,
+          regressionMessage: '',
+          status: 'passed',
+          title: 'hello',
+        },
+      },
+      {
+        event: 'group:completed',
+        data: {
+          error: null,
+          status: 'passed',
+          title: 'foo',
+        },
+      },
+    ])
+  })
 })

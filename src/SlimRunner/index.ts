@@ -187,6 +187,14 @@ export namespace test {
   }
 
   /**
+   * Only run the specified test
+   */
+  export function only (title: string, callback: ICallback<testArgs>) {
+    runnerOptions.grep = new RegExp(`^${title}$`)
+    return addTest(title, callback)
+  }
+
+  /**
    * Create a test, and mark it as skipped. Skipped functions are
    * never executed. However, their hooks are executed
    */
@@ -280,6 +288,20 @@ export namespace test {
      */
     if (options.grep) {
       runnerOptions.grep = options.grep instanceof RegExp ? options.grep : new RegExp(options.grep)
+    }
+  }
+
+  /**
+   * Nested only
+   */
+  export namespace failing {
+    /**
+   * Only run the specified test
+   */
+    // eslint-disable-next-line no-shadow
+    export function only (title: string, callback: ICallback<testArgs>) {
+      runnerOptions.grep = new RegExp(title)
+      return addTest(title, callback, { regression: true })
     }
   }
 }
