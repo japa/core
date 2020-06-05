@@ -27,6 +27,8 @@ export class Assert {
   private _plannedCounts: number = 0
 
   constructor () {
+    // config.includeStack = true
+
     return new Proxy(this, {
       get (target, name, receiver) {
         if (typeof (target[name]) !== 'undefined') {

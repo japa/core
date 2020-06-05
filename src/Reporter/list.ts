@@ -14,7 +14,8 @@
 import ms from 'ms'
 import chalk from 'chalk'
 import rightPad from 'right-pad'
-import variableDiff from 'variable-diff'
+import jestDiff from 'jest-diff'
+import { EventEmitter } from 'events'
 
 import { TestsStore, isCoreException } from '../utils'
 import { IEvents, IGroupReport, ITestReport } from '../Contracts'
@@ -50,7 +51,7 @@ const colors = {
 class ListReporter {
   private _store: TestsStore = new TestsStore()
 
-  constructor (emitter) {
+  constructor (emitter: EventEmitter) {
     emitter.on(IEvents.STARTED, this._onStart.bind(this))
     emitter.on(IEvents.COMPLETED, this._onEnd.bind(this))
     emitter.on(IEvents.GROUPSTARTED, this._onGroupStart.bind(this))
@@ -112,15 +113,23 @@ class ListReporter {
     }
 
     const { actual, expected } = error
+
     if (actual && expected) {
-      console.log(chalk.red(`    Assertion Error: ${error.message}`))
-      variableDiff(actual, expected).text.split('\n').forEach((line) => {
-        console.log(`    ${line}`)
-      })
+      const diff = jestDiff(expected, actual)
+      const mainLine = this._cleanupErrorStack(error.stack)[1]
+      if (mainLine) {
+        console.log(chalk.dim(`    source => ${mainLine.trim().replace(/at\s+/, '')}`))
+      }
+
+      if (diff) {
+        console.log(diff)
+      } else {
+        console.log(chalk.red(`    Assertion Error: ${error.message}`))
+      }
       return
     }
 
-    console.log(`    ${this._getStack(error.stack)}`)
+    console.log(`    ${this._formatErrorStack(error.stack)}`)
   }
 
   /**
@@ -164,28 +173,40 @@ class ListReporter {
   }
 
   /**
-   * Returns the error stack by filtering the japa core
-   * lines from it.
+   * Cleans up the error stack
    */
-  private _getStack (errorStack) {
+  private _cleanupErrorStack (errorStack?: string): string[] {
     let prevIsNative = false
+    if (!errorStack) {
+      return []
+    }
 
     return errorStack
       .split('\n')
-      .filter((line) => {
+      .filter((line: string) => {
         if (prevIsNative && this._isNativeSorroundedLine(line)) {
           return false
         }
         prevIsNative = this._isNativeStackLine(line)
         return !prevIsNative
       })
-      .map((line, index) => {
-        if (index === 0) {
-          return chalk.red(line)
-        }
-        return chalk.dim(line)
-      })
-      .join('\n')
+  }
+
+  /**
+   * Returns the error stack by filtering the japa core
+   * lines from it.
+   */
+  private _formatErrorStack (errorStack?: string): string | undefined {
+    if (!errorStack) {
+      return
+    }
+
+    return this._cleanupErrorStack(errorStack).map((line, index) => {
+      if (index === 0) {
+        return chalk.red(line)
+      }
+      return chalk.dim(line)
+    }).join('\n')
   }
 
   /**
@@ -229,7 +250,9 @@ class ListReporter {
 
       if (failedHooks.length) {
         const failedHook = failedHooks[0]
-        console.log(`${chalk.red(`  (${failedHook.title})`)} ${this._getStack(failedHook.error.stack)}`)
+        console.log(
+          `${chalk.red(`  (${failedHook.title})`)} ${this._formatErrorStack(failedHook.error.stack)}`
+        )
       }
 
       if (failedTests.length) {
