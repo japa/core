@@ -13,7 +13,6 @@
 
 import ms from 'ms'
 import chalk from 'chalk'
-import rightPad from 'right-pad'
 import jestDiff from 'jest-diff'
 import { EventEmitter } from 'events'
 
@@ -98,7 +97,7 @@ class ListReporter {
    */
   private _printCount (label, count) {
     if (count) {
-      console.log(chalk.dim(`${rightPad(label, 13)} : ${count}`))
+      console.log(chalk.dim(`${label.padEnd(13)} : ${count}`))
     }
   }
 
