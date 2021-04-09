@@ -571,7 +571,7 @@ npm install -D nyc
 
 Following is a screenshot from one of my projects.
 
-<img width="789" alt="84738609-da0f2600-afc7-11ea-841c-09273cb29a56" src="https://user-images.githubusercontent.com/1658644/114153565-ba166d80-991f-11eb-8860-426610573c9b.png">
+<img width="789" alt="Coverage image with NYC" src="/assets/coverage.png">
 
 Then, in your package.json file, just add:
 
