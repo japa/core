@@ -38,6 +38,7 @@ node test/list-users.spec.js
   - [Filtering files](#filtering-files)
 - [Configure options](#configure-options)
 - [Running typescript tests](#running-typescript-tests)
+- [Coverage](#running-typescript-tests)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -559,4 +560,26 @@ const { configure } = require('japa')
 configure({
   files: ['test/*.ts']
 })
+```
+
+## Coverage
+You can use [nyc](https://www.npmjs.com/package/nyc) to check the coverage of your code. It works for Typescript files too.
+
+```
+npm install -D nyc
+```
+
+Following is a screenshot from one of my projects.
+
+<img width="789" alt="84738609-da0f2600-afc7-11ea-841c-09273cb29a56" src="https://user-images.githubusercontent.com/1658644/114153565-ba166d80-991f-11eb-8860-426610573c9b.png">
+
+Then, in your package.json file, just add:
+
+```json
+{
+  "scripts": {
+    "test": "node japaFile.js",
+    "coverage": "nyc npm run test"
+  }
+}
 ```
