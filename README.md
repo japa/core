@@ -38,6 +38,7 @@ node test/list-users.spec.js
   - [Filtering files](#filtering-files)
 - [Configure options](#configure-options)
 - [Running typescript tests](#running-typescript-tests)
+- [ES modules support](#es-modules-support)
 - [Coverage](#coverage)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -49,6 +50,7 @@ node test/list-users.spec.js
 ## Features
 
 - Supports [ES6 async/await](#asyncawait) style tests.
+- Support for ES modules.
 - Doesn't pollute the global namespace.
 - First class support for [regression](#regression-tests) tests.
 - Conditionally [skip](#skipping-tests) when running tests in CI like **travis**.
@@ -218,6 +220,22 @@ Japa adds a timeout of `2000 milliseconds` by default to all of your tests, whic
 test('query contributors from github', async () => {
   await gh.getContributors()
 }).timeout(6000)
+```
+
+You can also configure the timeout for group using the `group` object.
+
+```ts
+test.group('Test group', (group) => {
+  group.timeout(6000)
+
+  test('slow test', () => {
+    // timeout is set 6000
+  })
+  
+  test('fast test', () => {
+    // timeout is set 2000
+  }).timeout(2000)
+})
 ```
 
 <br>
@@ -559,6 +577,17 @@ require('ts-node').register()
 const { configure } = require('japa')
 configure({
   files: ['test/*.ts']
+})
+```
+
+## ES modules support
+Japa automatically imports the ES modules with the `.mjs` extension. However, for files with `.js` extension, you will have to explicitly tell japa to import test files as ES modules and not CJS.
+
+```ts
+const { configure } = require('japa')
+configure({
+  files: ['test/*.js'],
+  experimentalEsmSupport: true,
 })
 ```
 
