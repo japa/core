@@ -84,6 +84,11 @@ let activeGroup: Group<TestArgs, HookArgs> | null = null
 let cherryPickedTest = false
 
 /**
+ * Import files instead of require. This does not enable
+ */
+let experimentalEsmSupport = false
+
+/**
  * Options for the test runner
  */
 let runnerOptions: IOptions = {
@@ -147,7 +152,7 @@ export async function run (exitProcess = true) {
   /**
    * Load all files from the loader
    */
-  loaderFiles.forEach((file) => {
+  await Promise.all(loaderFiles.map((file) => {
     /**
      * Do not require more files, when cherry picking
      * tests
@@ -155,8 +160,33 @@ export async function run (exitProcess = true) {
     if (cherryPickedTest) {
       return
     }
-    require(file)
-  })
+
+    /**
+     * Explicit ESM
+     */
+    if (file.endsWith('.mjs')) {
+      return import(file)
+    }
+
+    /**
+     * Explicit CommonJS
+     */
+    if (file.endsWith('.cjs')) {
+      return require(file)
+    }
+
+    /**
+     * Opt in ESM
+     */
+    if (experimentalEsmSupport) {
+      return import(file)
+    }
+
+    /**
+     * Defaults to CommonJS
+     */
+    return require(file)
+  }))
 
   let hardException = null
 
@@ -356,6 +386,13 @@ export namespace test {
      */
     if (options.grep) {
       runnerOptions.grep = options.grep instanceof RegExp ? options.grep : new RegExp(options.grep)
+    }
+
+    /**
+     * The test files are written in ESM
+     */
+    if (options.experimentalEsmSupport) {
+      experimentalEsmSupport = true
     }
   }
 

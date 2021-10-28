@@ -18,7 +18,7 @@
     "test:win": "mocha -r ts-node/register test/*.spec.ts",
     "clean": "del build",
     "compile": "npm run lint && npm run clean && tsc",
-    "build": "npm run compile && typedoc && node bin/postBuild.js",
+    "build": "npm run compile && node bin/postBuild.js",
     "lint": "eslint . --ext=.ts",
     "release": "np",
     "version": "npm run build",
@@ -54,16 +54,14 @@
     "cz-conventional-changelog": "^3.2.0",
     "del-cli": "^3.0.1",
     "doctoc": "^1.4.0",
-    "eslint": "^7.1.0",
-    "eslint-plugin-adonis": "^1.0.10",
+    "eslint": "^8.1.0",
+    "eslint-plugin-adonis": "^2.0.0",
     "husky": "^4.2.5",
     "mocha": "^7.2.0",
     "mrm": "^2.3.0",
     "np": "^6.2.3",
     "ts-node": "^8.10.2",
-    "typedoc": "^0.17.7",
-    "typedoc-plugin-external-module-name": "^3.1.0",
-    "typescript": "^3.9.3"
+    "typescript": "^4.5.0-beta"
   },
   "config": {
     "commitizen": {

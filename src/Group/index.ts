@@ -37,11 +37,11 @@ export class Group <T extends any[], H extends any[]> {
     beforeEach: Hook<H>[],
     afterEach: Hook<H>[],
   } = {
-    before: [],
-    after: [],
-    beforeEach: [],
-    afterEach: [],
-  }
+      before: [],
+      after: [],
+      beforeEach: [],
+      afterEach: [],
+    }
 
   /**
    * Timeout defined on group will be applied to

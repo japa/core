@@ -75,6 +75,7 @@ export type IConfigureOptions = {
   timeout: number,
   files: string[] | string,
   grep: string | RegExp,
+  experimentalEsmSupport: boolean,
   before: ((runner, emitter) => Promise<void>)[],
   after: ((runner, emitter) => Promise<void>)[],
   reporterFn: (emitter) => void,

@@ -1,7 +1,20 @@
 {
-  "extends": "./node_modules/@adonisjs/mrm-preset/_tsconfig",
   "compilerOptions": {
     "target": "ES2017",
-    "esModuleInterop": true
-  }
+    "module": "node12",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "declaration": true,
+    "rootDir": "./",
+    "outDir": "./build",
+    "strictNullChecks": true
+  },
+  "include": [
+    "./**/*"
+  ],
+  "exclude": [
+    "./node_modules",
+    "./build"
+  ]
 }
