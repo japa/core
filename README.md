@@ -38,7 +38,7 @@ node test/list-users.spec.js
   - [Filtering files](#filtering-files)
 - [Configure options](#configure-options)
 - [Running typescript tests](#running-typescript-tests)
-- [Coverage](#running-typescript-tests)
+- [Coverage](#coverage)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

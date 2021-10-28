@@ -29,29 +29,29 @@ const loader = new Loader()
  * The type for the arguments to be passed to a
  * test
  */
-type testArgs = [Assert, Function]
+type TestArgs = [Assert, Function]
 
 /**
  * The type for the arguments to be passed to a
  * hook
  */
-type hookArgs = [Function]
+type HookArgs = [Function]
 
 /**
  * Group instance exposed by slim runner
  */
-type runnerGroup = Pick<Group<testArgs, hookArgs>, Exclude<keyof Group<testArgs, hookArgs>, 'run' | 'toJSON' | 'test'>>
+type RunnerGroup = Pick<Group<TestArgs, HookArgs>, Exclude<keyof Group<TestArgs, HookArgs>, 'run' | 'toJSON' | 'test'>>
 
 /**
  * Test instance exposed by slim runner
  */
-type runnerTest = Pick<Test<testArgs>, Exclude<keyof Test<testArgs>, 'run' | 'toJSON'>>
+type RunnerTest = Pick<Test<TestArgs>, Exclude<keyof Test<TestArgs>, 'run' | 'toJSON'>>
 
 /**
  * Returns arguments to be passed to the callback
  * of a test
  */
-function testArgsFn (done: Function, postRun: Function): testArgs {
+function testArgsFn (done: Function, postRun: Function): TestArgs {
   postRun(function postRunFn (assert) {
     assert.evaluate()
   })
@@ -62,19 +62,19 @@ function testArgsFn (done: Function, postRun: Function): testArgs {
  * Returns arguments to be passed to the callback of
  * a hook
  */
-function hookArgsFn (done: Function): hookArgs {
+function hookArgsFn (done: Function): HookArgs {
   return [done]
 }
 
 /**
  * Store of groups
  */
-let groups: Group<testArgs, hookArgs>[] = []
+let groups: Group<TestArgs, HookArgs>[] = []
 
 /**
  * The active group, in which all tests must be scoped
  */
-let activeGroup: Group<testArgs, hookArgs> | null = null
+let activeGroup: Group<TestArgs, HookArgs> | null = null
 
 /**
  * A flag to track, if `test.only` is used to cherry pick a
@@ -100,14 +100,14 @@ let reporterFn: ((emitter: EventEmitter) => void) = listReporter
  * Reference to runner hooks, to be defined inside configure
  * method
  */
-let beforeHooks: ((runner: Runner<testArgs, hookArgs>, emitter: EventEmitter) => Promise<void>)[] = []
-let afterHooks: ((runner: Runner<testArgs, hookArgs>, emitter: EventEmitter) => Promise<void>)[] = []
+let beforeHooks: ((runner: Runner<TestArgs, HookArgs>, emitter: EventEmitter) => Promise<void>)[] = []
+let afterHooks: ((runner: Runner<TestArgs, HookArgs>, emitter: EventEmitter) => Promise<void>)[] = []
 
 /**
  * Adds the test to the active group. If there isn't any active
  * group, it will be created.
  */
-function addTest (title: string, callback: ICallback<testArgs>, options?: Partial<ITestOptions>): runnerTest {
+function addTest (title: string, callback: ICallback<TestArgs>, options?: Partial<ITestOptions>): RunnerTest {
   if (!activeGroup) {
     activeGroup = new Group('root', testArgsFn, hookArgsFn, runnerOptions)
     groups.push(activeGroup)
@@ -119,7 +119,7 @@ function addTest (title: string, callback: ICallback<testArgs>, options?: Partia
 /**
  * Create a new test
  */
-export function test (title: string, callback: ICallback<testArgs>) {
+export function test (title: string, callback: ICallback<TestArgs>) {
   return addTest(title, callback)
 }
 
@@ -127,7 +127,7 @@ export function test (title: string, callback: ICallback<testArgs>) {
  * Run all the tests using the runner
  */
 export async function run (exitProcess = true) {
-  const runner = new Runner([] as Group<testArgs, hookArgs>[], runnerOptions)
+  const runner = new Runner([] as Group<TestArgs, HookArgs>[], runnerOptions)
   runner.reporter(reporterFn)
 
   /**
@@ -186,7 +186,7 @@ export namespace test {
   /**
    * Create a new test to group all test together
    */
-  export function group (title: string, callback: (group: runnerGroup) => void) {
+  export function group (title: string, callback: (group: RunnerGroup) => void) {
     /**
      * Do not add new groups when already cherry picked a test
      */
@@ -216,7 +216,7 @@ export namespace test {
   /**
    * Only run the specified test
    */
-  export function only (title: string, callback: ICallback<testArgs>) {
+  export function only (title: string, callback: ICallback<TestArgs>) {
     const testInstance = addTest(title, callback, { only: true })
 
     /**
@@ -241,7 +241,7 @@ export namespace test {
    * Create a test, and mark it as skipped. Skipped functions are
    * never executed. However, their hooks are executed
    */
-  export function skip (title: string, callback: ICallback<testArgs>) {
+  export function skip (title: string, callback: ICallback<TestArgs>) {
     return addTest(title, callback, { skip: true })
   }
 
@@ -249,21 +249,21 @@ export namespace test {
    * Create a test, and mark it as skipped only when running in CI. Skipped
    * functions are never executed. However, their hooks are executed.
    */
-  export function skipInCI (title: string, callback: ICallback<testArgs>) {
+  export function skipInCI (title: string, callback: ICallback<TestArgs>) {
     return addTest(title, callback, { skipInCI: true })
   }
 
   /**
    * Create a test and run it only in the CI.
    */
-  export function runInCI (title: string, callback: ICallback<testArgs>) {
+  export function runInCI (title: string, callback: ICallback<TestArgs>) {
     return addTest(title, callback, { runInCI: true })
   }
 
   /**
    * Create regression test
    */
-  export function failing (title: string, callback: ICallback<testArgs>) {
+  export function failing (title: string, callback: ICallback<TestArgs>) {
     return addTest(title, callback, { regression: true })
   }
 
@@ -366,8 +366,8 @@ export namespace test {
     /**
    * Only run the specified test
    */
-    // eslint-disable-next-line no-shadow
-    export function only (title: string, callback: ICallback<testArgs>) {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    export function only (title: string, callback: ICallback<TestArgs>) {
       runnerOptions.grep = new RegExp(title)
       return addTest(title, callback, { regression: true })
     }
