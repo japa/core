@@ -1,0 +1,4 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+npx doctoc README.md --title='## Table of contents'
+git add README.md

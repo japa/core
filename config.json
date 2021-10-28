@@ -1,11 +1,10 @@
 {
   "core": false,
-  "ts": true,
   "license": "MIT",
   "services": [
-    "appveyor",
-    "circleci"
+    "github-actions"
   ],
-  "appveyorUsername": "thetutlage",
-  "minNodeVersion": "10.15.3"
+  "minNodeVersion": "14.17.0",
+  "probotApps": [],
+  "runGhActionsOnWindows": true
 }
