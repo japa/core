@@ -1,5 +1,0 @@
-
-Todo:
-  ☐ Re-write `SlimRunner` in a more maintainable fashion
-  ☐ Groups run `afterEach` and `after` hooks, when a test fails and `bail = true`.
-  ☐ Create website with docs.
