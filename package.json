@@ -2,7 +2,15 @@
   "name": "@japa/core",
   "version": "0.0.0",
   "description": "The core of Japa testing framework",
-  "main": "index.js",
+  "main": "build/index.js",
+  "files": [
+    "build/src",
+    "build/index.d.ts",
+    "build/index.js"
+  ],
+  "exports": {
+    ".": "./build/index.js"
+  },
   "scripts": {
     "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
@@ -67,11 +75,6 @@
     ],
     "runGhActionsOnWindows": true
   },
-  "files": [
-    "build/src",
-    "build/index.d.ts",
-    "build/index.js"
-  ],
   "eslintConfig": {
     "extends": [
       "plugin:adonis/typescriptPackage",
