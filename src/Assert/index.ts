@@ -13,8 +13,15 @@ import { subsetCompare } from './utils'
 import { AssertContract, ChaiAssert } from '../Contracts'
 
 /**
- * The Assert class is a wrapper over chai.assert to allow support
- * for additional assertion methods and assertion planning
+ * The Assert class is derived from chai.assert to allow support
+ * for additional assertion methods and assertion planning.
+ *
+ * Also some of the methods from chai.assert are not available
+ * and some additional methods have been added.
+ *
+ * @example
+ * const assert = new Assert()
+ * assert.deepEqual({ id: 1 }, { id: 1 })
  */
 export class Assert implements AssertContract {
   /**
@@ -68,7 +75,7 @@ export class Assert implements AssertContract {
   }
 
   /**
-   * Evaluate an expression and raise Assertion error if expression
+   * Evaluate an expression and raise {@link AssertionError} if expression
    * is not truthy
    */
   public evaluate(
@@ -104,12 +111,10 @@ export class Assert implements AssertContract {
    * Optionally define the error message
    *
    * @example:
-   *
-   * ```js
    * assert(isTrue(foo))
    * assert(foo === 'bar')
    * assert(age > 18, 'Not allowed to enter the club')
-   * ```
+   *
    */
   public assert(expression: any, message?: string): void {
     this.incrementAssertionsCount()
@@ -129,6 +134,7 @@ export class Assert implements AssertContract {
    * assert.fail('Error message for the failure')
    * assert.fail(1, 2, 'expected 1 to equal 2')
    * assert.fail(1, 2, 'expected 1 to be greater than 2', '>')
+   *
    */
   public fail(message?: string): never
   public fail<T>(actual: T, expected: T, message?: string, operator?: Chai.Operator): never
@@ -152,6 +158,7 @@ export class Assert implements AssertContract {
    * @example
    * assert.isOk({ hello: 'world' }) // passes
    * assert.isOk(null) // fails
+   *
    */
   public isOk(...args: Parameters<ChaiAssert['isOk']>): ReturnType<ChaiAssert['isOk']> {
     this.incrementAssertionsCount()
@@ -167,6 +174,7 @@ export class Assert implements AssertContract {
    * @example
    * assert.ok({ hello: 'world' }) // passes
    * assert.ok(null) // fails
+   *
    */
   public ok(...args: Parameters<ChaiAssert['ok']>): ReturnType<ChaiAssert['ok']> {
     this.incrementAssertionsCount()
@@ -179,6 +187,7 @@ export class Assert implements AssertContract {
    * @example
    * assert.isNotOk({ hello: 'world' }) // fails
    * assert.isNotOk(null) // passes
+   *
    */
   public isNotOk(...args: Parameters<ChaiAssert['isNotOk']>): ReturnType<ChaiAssert['isNotOk']> {
     this.incrementAssertionsCount()
@@ -194,6 +203,7 @@ export class Assert implements AssertContract {
    * @example
    * assert.notOk({ hello: 'world' }) // fails
    * assert.notOk(null) // passes
+   *
    */
   public notOk(...args: Parameters<ChaiAssert['notOk']>): ReturnType<ChaiAssert['notOk']> {
     this.incrementAssertionsCount()
@@ -204,13 +214,14 @@ export class Assert implements AssertContract {
    * Assert two values are equal but not strictly. The comparsion
    * is same as "foo == bar".
    *
-   * See @strictEqual for strict equality
-   * See @deepEqual for comparing objects and arrays
+   * See {@link strictEqual} for strict equality
+   * See {@link deepEqual} for comparing objects and arrays
    *
    * @example
    * assert.equal(3, 3) // passes
    * assert.equal(3, '3') // passes
    * assert.equal(Symbol.for('foo'), Symbol.for('foo')) // passes
+   *
    */
   public equal(...args: Parameters<ChaiAssert['equal']>): ReturnType<ChaiAssert['equal']> {
     this.incrementAssertionsCount()
@@ -228,6 +239,7 @@ export class Assert implements AssertContract {
    * assert.notEqual(3, 2) // passes
    * assert.notEqual(3, '2') // passes
    * assert.notEqual(Symbol.for('foo'), Symbol.for('bar')) // passes
+   *
    */
   public notEqual(...args: Parameters<ChaiAssert['notEqual']>): ReturnType<ChaiAssert['notEqual']> {
     this.incrementAssertionsCount()
@@ -908,30 +920,6 @@ export class Assert implements AssertContract {
     return assert.notDeepInclude(...args)
   }
 
-  public ownInclude(
-    ...args: Parameters<ChaiAssert['ownInclude']>
-  ): ReturnType<ChaiAssert['ownInclude']> {
-    return assert.ownInclude(...args)
-  }
-
-  public notOwnInclude(
-    ...args: Parameters<ChaiAssert['notOwnInclude']>
-  ): ReturnType<ChaiAssert['notOwnInclude']> {
-    return assert.notOwnInclude(...args)
-  }
-
-  public deepOwnInclude(
-    ...args: Parameters<ChaiAssert['deepOwnInclude']>
-  ): ReturnType<ChaiAssert['deepOwnInclude']> {
-    return assert.deepOwnInclude(...args)
-  }
-
-  public notDeepOwnInclude(
-    ...args: Parameters<ChaiAssert['notDeepOwnInclude']>
-  ): ReturnType<ChaiAssert['notDeepOwnInclude']> {
-    return assert.notDeepOwnInclude(...args)
-  }
-
   /**
    * Assert the value to match the given regular expression
    *
@@ -1153,7 +1141,18 @@ export class Assert implements AssertContract {
   }
 
   /**
-   * Expect the function to raise an exception
+   * Except the function to throw an exception. Optionally, you can assert
+   * for the exception class or message.
+   *
+   * See @rejects for async function calls
+   *
+   * @example
+   * function foo() { throw new Error('blow up') }
+   *
+   * assert.throws(foo) // passes
+   * assert.throws(foo, Error) // passes
+   * assert.throws(foo, 'blow up') // passes
+   * assert.throws(foo, 'failed') // fails
    */
   public throws(fn: () => void, message?: string): void
   public throws(fn: () => void, errType: RegExp | ErrorConstructor, message?: string): void
@@ -1173,6 +1172,19 @@ export class Assert implements AssertContract {
     return assert.throws(...args)
   }
 
+  /**
+   * Except the function to not throw an exception. Optionally, you can assert
+   * the exception is not from a certain class or have a certain message
+   *
+   * See @rejects for async function calls
+   *
+   * @example
+   * function foo() { throw new Error('blow up') }
+   *
+   * assert.doesNotThrows(foo) // fails
+   * assert.doesNotThrows(foo, 'failed') // passes
+   * assert.doesNotThrows(() => {}) // passes
+   */
   public doesNotThrows(fn: () => void, message?: string): void
   public doesNotThrows(fn: () => void, regExp: RegExp): void
   public doesNotThrows(fn: () => void, constructor: ErrorConstructor, message?: string): void
@@ -1301,116 +1313,393 @@ export class Assert implements AssertContract {
     return assert['notSameDeepMembers'](...args)
   }
 
+  /**
+   * Expect two arrays to have same members and in the same order.
+   *
+   * The values comparison is same the `assert.equal` method.
+   * Use {@link sameDeepOrderedMembers} for deep comparison
+   *
+   * @example
+   * assert.sameOrderedMembers(
+   *   [1, 2, 3],
+   *   [1, 2, 3]
+   * ) // passes
+   *
+   * assert.sameOrderedMembers(
+   *   [1, 3, 2],
+   *   [1, 2, 3]
+   * ) // fails
+   */
   public sameOrderedMembers(
     ...args: Parameters<ChaiAssert['sameOrderedMembers']>
   ): ReturnType<ChaiAssert['sameOrderedMembers']> {
     return assert.sameOrderedMembers(...args)
   }
 
+  /**
+   * Expect two arrays to either have different members or in
+   * different order
+   *
+   * The values comparison is same the `assert.notEqual` method.
+   * Use {@link notSameDeepOrderedMembers} for deep comparison
+   *
+   * @example
+   * assert.notSameOrderedMembers(
+   *   [1, 2, 3],
+   *   [1, 2, 3]
+   * ) // passes
+   *
+   * assert.notSameOrderedMembers(
+   *   [1, 3, 2],
+   *   [1, 2, 3]
+   * ) // fails
+   */
   public notSameOrderedMembers(
     ...args: Parameters<ChaiAssert['notSameOrderedMembers']>
   ): ReturnType<ChaiAssert['notSameOrderedMembers']> {
     return assert.notSameOrderedMembers(...args)
   }
 
+  /**
+   * Expect two arrays to have same members and in the same order.
+   *
+   * The values comparison is same the `assert.deepEqual` method.
+   *
+   * @example
+   * assert.sameDeepOrderedMembers(
+   *   [1, { id: 1 }, { name: 'virk' }],
+   *   [1, { id: 1 }, { name: 'virk' }]
+   * ) // passes
+   *
+   * assert.sameDeepOrderedMembers(
+   *   [1, { id: 1 }, { name: 'virk' }],
+   *   [1, { name: 'virk' }, { id: 1 }]
+   * ) // fails
+   */
   public sameDeepOrderedMembers(
     ...args: Parameters<ChaiAssert['sameDeepOrderedMembers']>
   ): ReturnType<ChaiAssert['sameDeepOrderedMembers']> {
     return assert.sameDeepOrderedMembers(...args)
   }
 
+  /**
+   * Expect two arrays to either have different members or in
+   * different order
+   *
+   * The values comparison is same the `assert.notDeepEqual` method.
+   * Use {@link notSameDeepOrderedMembers} for deep comparison
+   *
+   * @example
+   * assert.notSameDeepOrderedMembers(
+   *   [1, { id: 1 }, { name: 'virk' }],
+   *   [1, { name: 'virk' }, { id: 1 }]
+   * ) // passes
+   *
+   * assert.notSameDeepOrderedMembers(
+   *   [1, { id: 1 }, { name: 'virk' }],
+   *   [1, { id: 1 }, { name: 'virk' }]
+   * ) // fails
+   */
   public notSameDeepOrderedMembers(
     ...args: Parameters<ChaiAssert['notSameDeepOrderedMembers']>
   ): ReturnType<ChaiAssert['notSameDeepOrderedMembers']> {
     return assert.notSameDeepOrderedMembers(...args)
   }
 
+  /**
+   * Assert the expected array is a subset of a given array.
+   *
+   * The values comparison is same the `assert.equal` method.
+   * Use {@link includeDeepMembers} for deep comparsion.
+   *
+   * @example
+   * assert.includeMembers([1, 2, 4, 5], [1, 2]) // passes
+   * assert.includeMembers([1, 2, 4, 5], [1, 3]) // fails
+   */
   public includeMembers(
     ...args: Parameters<ChaiAssert['includeMembers']>
   ): ReturnType<ChaiAssert['includeMembers']> {
     return assert.includeMembers(...args)
   }
 
+  /**
+   * Assert the expected array is NOT a subset of a given array.
+   *
+   * The values comparison is same the `assert.notEqual` method.
+   * Use {@link notIncludeDeepMembers} for deep comparsion.
+   *
+   * @example
+   * assert.notIncludeMembers([1, 2, 4, 5], [1, 3]) // passes
+   * assert.notIncludeMembers([1, 2, 4, 5], [1, 2]) // fails
+   */
   public notIncludeMembers(
     ...args: Parameters<ChaiAssert['notIncludeMembers']>
   ): ReturnType<ChaiAssert['notIncludeMembers']> {
     return assert.notIncludeMembers(...args)
   }
 
+  /**
+   * Assert the expected array is a subset of a given array.
+   *
+   * The values comparison is same the `assert.deepEqual` method.
+   *
+   * @example
+   * assert.includeDeepMembers(
+   *   [{ id: 1 }, { id: 2 }],
+   *   [{ id: 2 }]
+   * ) // passes
+   *
+   * assert.includeDeepMembers(
+   *   [{ id: 1 }, { id: 2 }],
+   *   [{ id: 3 }]
+   * ) // fails
+   */
   public includeDeepMembers(
     ...args: Parameters<ChaiAssert['includeDeepMembers']>
   ): ReturnType<ChaiAssert['includeDeepMembers']> {
     return assert.includeDeepMembers(...args)
   }
 
+  /**
+   * Assert the expected array is NOT a subset of a given array.
+   *
+   * The values comparison is same the `assert.notDeepEqual` method.
+   *
+   * @example
+   * assert.notIncludeDeepMembers(
+   *   [{ id: 1 }, { id: 2 }],
+   *   [{ id: 3 }]
+   * ) // passes
+   *
+   * assert.notIncludeDeepMembers(
+   *   [{ id: 1 }, { id: 2 }],
+   *   [{ id: 2 }]
+   * ) // fails
+   */
   public notIncludeDeepMembers(
     ...args: Parameters<ChaiAssert['includeDeepMembers']>
   ): ReturnType<ChaiAssert['includeDeepMembers']> {
     return assert['notIncludeDeepMembers'](...args)
   }
 
+  /**
+   * Assert the expected array is a subset of a given array and
+   * in the same order
+   *
+   * The values comparison is same the `assert.equal` method.
+   * Use {@link includeDeepOrderedMembers} for deep comparsion.
+   *
+   * @example
+   * assert.includeOrderedMembers(
+   *   [1, 2, 4, 5],
+   *   [1, 2, 4]
+   * ) // passes
+   *
+   * assert.includeOrderedMembers(
+   *   [1, 2, 4, 5],
+   *   [1, 4, 2]
+   * ) // fails
+   *
+   * assert.includeOrderedMembers(
+   *   [1, 2, 4, 5],
+   *   [1, 2, 5]
+   * ) // fails
+   */
   public includeOrderedMembers(
     ...args: Parameters<ChaiAssert['includeOrderedMembers']>
   ): ReturnType<ChaiAssert['includeOrderedMembers']> {
     return assert.includeOrderedMembers(...args)
   }
 
+  /**
+   * Assert the expected array is either not a subset of
+   * a given array or is not in the same order.
+   *
+   * The values comparison is same the `assert.notEqual` method.
+   * Use {@link notIncludeDeepOrderedMembers} for deep comparsion.
+   *
+   * @example
+   *
+   * assert.notIncludeOrderedMembers(
+   *   [1, 2, 4, 5],
+   *   [1, 4, 2]
+   * ) // passes
+   *
+   * assert.notIncludeOrderedMembers(
+   *   [1, 2, 4, 5],
+   *   [1, 2, 5]
+   * ) // passes
+   *
+   * assert.notIncludeOrderedMembers(
+   *   [1, 2, 4, 5],
+   *   [1, 2, 4]
+   * ) // fails
+   */
   public notIncludeOrderedMembers(
     ...args: Parameters<ChaiAssert['notIncludeOrderedMembers']>
   ): ReturnType<ChaiAssert['notIncludeOrderedMembers']> {
     return assert.notIncludeOrderedMembers(...args)
   }
 
+  /**
+   * Assert the expected array is a subset of a given array and
+   * in the same order
+   *
+   * The values comparison is same the `assert.deepEqual` method.
+   *
+   * @example
+   * assert.includeDeepOrderedMembers(
+   *   [{ id: 1 }, { id: 2 }, { id: 4 }],
+   *   [{ id: 1 }, { id: 2 }]
+   * ) // passes
+   *
+   * assert.includeDeepOrderedMembers(
+   *   [{ id: 1 }, { id: 2 }, { id: 4 }],
+   *   [{ id: 1 }, { id: 4 }]
+   * ) // fails
+   *
+   * assert.includeDeepOrderedMembers(
+   *   [{ id: 1 }, { id: 2 }, { id: 4 }],
+   *   [{ id: 1 }, { id: 4 }, { id: 2 }]
+   * ) // fails
+   */
   public includeDeepOrderedMembers(
     ...args: Parameters<ChaiAssert['includeDeepOrderedMembers']>
   ): ReturnType<ChaiAssert['includeDeepOrderedMembers']> {
     return assert.includeDeepOrderedMembers(...args)
   }
 
+  /**
+   * Assert the expected array is either not a subset of
+   * a given array or is not in the same order.
+   *
+   * The values comparison is same the `assert.notDeepEqual` method.
+   *
+   * @example
+   *
+   * assert.notIncludeDeepOrderedMembers(
+   *   [{ id: 1 }, { id: 2 }, { id: 4 }],
+   *   [{ id: 1 }, { id: 4 }]
+   * ) // passes
+   *
+   * assert.notIncludeDeepOrderedMembers(
+   *   [{ id: 1 }, { id: 2 }, { id: 4 }],
+   *   [{ id: 1 }, { id: 4 }, { id: 2 }]
+   * ) // passes
+   *
+   * assert.notIncludeDeepOrderedMembers(
+   *   [{ id: 1 }, { id: 2 }, { id: 4 }],
+   *   [{ id: 1 }, { id: 2 }]
+   * ) // fails
+   */
   public notIncludeDeepOrderedMembers(
     ...args: Parameters<ChaiAssert['notIncludeDeepOrderedMembers']>
   ): ReturnType<ChaiAssert['notIncludeDeepOrderedMembers']> {
     return assert.notIncludeDeepOrderedMembers(...args)
   }
 
-  public oneOf(...args: Parameters<ChaiAssert['oneOf']>): ReturnType<ChaiAssert['oneOf']> {
-    return assert.oneOf(...args)
-  }
-
+  /**
+   * Assert the object is sealed.
+   *
+   * @example
+   * assert.isSealed(Object.seal({})) // passes
+   * assert.isSealed({}) // fails
+   */
   public isSealed(...args: Parameters<ChaiAssert['isSealed']>): ReturnType<ChaiAssert['isSealed']> {
     return assert.isSealed(...args)
   }
 
+  /**
+   * Assert the object is sealed.
+   *
+   * @alias
+   * isSealed
+   *
+   * @example
+   * assert.sealed(Object.seal({})) // passes
+   * assert.sealed({}) // fails
+   */
   public sealed(...args: Parameters<ChaiAssert['isSealed']>): ReturnType<ChaiAssert['isSealed']> {
     return assert.sealed(...args)
   }
 
+  /**
+   * Assert the object is not sealed.
+   *
+   * @example
+   * assert.isNotSealed({}) // passes
+   * assert.isNotSealed(Object.seal({})) // fails
+   */
   public isNotSealed(
     ...args: Parameters<ChaiAssert['isNotSealed']>
   ): ReturnType<ChaiAssert['isNotSealed']> {
     return assert.isNotSealed(...args)
   }
 
+  /**
+   * Assert the object is not sealed.
+   *
+   * @alias
+   * isNotSealed
+   *
+   * @example
+   * assert.notSealed({}) // passes
+   * assert.notSealed(Object.seal({})) // fails
+   */
   public notSealed(
     ...args: Parameters<ChaiAssert['notSealed']>
   ): ReturnType<ChaiAssert['notSealed']> {
     return assert.notSealed(...args)
   }
 
+  /**
+   * Assert the object is frozen.
+   *
+   * @example
+   * assert.isFrozen(Object.freeze({})) // passes
+   * assert.isFrozen({}) // fails
+   */
   public isFrozen(...args: Parameters<ChaiAssert['isFrozen']>): ReturnType<ChaiAssert['isFrozen']> {
     return assert.isFrozen(...args)
   }
 
+  /**
+   * Assert the object is frozen.
+   *
+   * @alias
+   * isFrozen
+   *
+   * @example
+   * assert.frozen(Object.freeze({})) // passes
+   * assert.frozen({}) // fails
+   */
   public frozen(...args: Parameters<ChaiAssert['frozen']>): ReturnType<ChaiAssert['frozen']> {
     return assert.frozen(...args)
   }
 
+  /**
+   * Assert the object is not frozen.
+   *
+   * @example
+   * assert.isNotFrozen({}) // passes
+   * assert.isNotFrozen(Object.freeze({})) // fails
+   */
   public isNotFrozen(
     ...args: Parameters<ChaiAssert['isNotFrozen']>
   ): ReturnType<ChaiAssert['isNotFrozen']> {
     return assert.isNotFrozen(...args)
   }
 
+  /**
+   * Assert the object is not frozen.
+   *
+   * @alias
+   * isNotFrozen
+   *
+   * @example
+   * assert.notFrozen({}) // passes
+   * assert.notFrozen(Object.freeze({})) // fails
+   */
   public notFrozen(
     ...args: Parameters<ChaiAssert['notFrozen']>
   ): ReturnType<ChaiAssert['notFrozen']> {
@@ -1473,42 +1762,6 @@ export class Assert implements AssertContract {
     ...args: Parameters<ChaiAssert['isNotEmpty']>
   ): ReturnType<ChaiAssert['isNotEmpty']> {
     return assert.isNotEmpty(...args)
-  }
-
-  public ownProperty(
-    ...args: Parameters<ChaiAssert['property']>
-  ): ReturnType<ChaiAssert['property']> {
-    return assert['ownProperty'](...args)
-  }
-
-  public notOwnProperty(
-    ...args: Parameters<ChaiAssert['notProperty']>
-  ): ReturnType<ChaiAssert['notProperty']> {
-    return assert['notOwnProperty'](...args)
-  }
-
-  public ownPropertyVal(
-    ...args: Parameters<ChaiAssert['propertyVal']>
-  ): ReturnType<ChaiAssert['propertyVal']> {
-    return assert['ownPropertyVal'](...args)
-  }
-
-  public notOwnPropertyVal(
-    ...args: Parameters<ChaiAssert['notPropertyVal']>
-  ): ReturnType<ChaiAssert['notPropertyVal']> {
-    return assert['notOwnPropertyVal'](...args)
-  }
-
-  public deepOwnPropertyVal(
-    ...args: Parameters<ChaiAssert['deepPropertyVal']>
-  ): ReturnType<ChaiAssert['deepPropertyVal']> {
-    return assert['deepOwnPropertyVal'](...args)
-  }
-
-  public notDeepOwnPropertyVal(
-    ...args: Parameters<ChaiAssert['notDeepPropertyVal']>
-  ): ReturnType<ChaiAssert['notDeepPropertyVal']> {
-    return assert['notDeepOwnPropertyVal'](...args)
   }
 
   /**

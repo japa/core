@@ -15,7 +15,17 @@ import { Emitter } from '../Emitter'
 import { ReporterContract, RunnerEndNode, RunnerHooksHandler } from '../Contracts'
 
 /**
- * Exposes the API to run one or more suite of tests
+ * The Runner class exposes the API to register test suites and execute
+ * them sequentially.
+ *
+ * @example
+ * const runner = new Runner(emitter)
+ * const suite = new Suite('unit', emitter)
+ *
+ * runner.add(suite)
+ * runner.registerReporter(reporters.list)
+ *
+ * await runner.exec()
  */
 export class Runner extends Macroable {
   public static macros = {}

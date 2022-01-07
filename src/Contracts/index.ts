@@ -74,6 +74,11 @@ export type AssertContract = Omit<
   | 'doesNotHaveAllDeepKeys'
   | 'closeTo'
   | 'operator'
+  | 'oneOf'
+  | 'ownInclude'
+  | 'notOwnInclude'
+  | 'deepOwnInclude'
+  | 'notDeepOwnInclude'
 >
 
 /**

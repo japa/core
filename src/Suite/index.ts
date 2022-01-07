@@ -17,6 +17,26 @@ import { Emitter } from '../Emitter'
 import { SuiteRunner } from './Runner'
 import { DataSetNode, SuiteHooksHandler } from '../Contracts'
 
+/**
+ * The Suite class exposes the API to run a group of tests
+ * or independent tests together as part of a suite.
+ *
+ * You can think of suites as
+ *   - unit tests suite
+ *   - e2e tests suites
+ *   - and so on
+ *
+ * @example
+ * const suite = new Suite('unit', emitter)
+ * const group = new Group('addition', emitter, refiner)
+ * const test = new Test('2 + 2 = 4', emitter, refiner)
+ *
+ * suite.add(group)
+ * group.add(test)
+ *
+ * // Runs all the tests inside the registered group
+ * await suite.exec()
+ */
 export class Suite extends Macroable {
   public static macros = {}
   public static getters = {}

@@ -16,6 +16,19 @@ import { Refiner } from '../Refiner'
 import { GroupRunner } from './Runner'
 import { DataSetNode, GroupHooksHandler, TestHooksHandler } from '../Contracts'
 
+/**
+ * Group class exposes an API to group multiple tests together
+ * and bulk configure them.
+ *
+ * NOTE: Nested groups are not supported on purpose.
+ *
+ * @example
+ * const group = new Group('addition', emitter, refiner)
+ * const test = new Test('2 + 2 = 4', emitter, refiner)
+ *
+ * group.add(test)
+ * await group.exec()
+ */
 export class Group extends Macroable {
   public static macros = {}
   public static getters = {}
@@ -39,7 +52,7 @@ export class Group extends Macroable {
   private testTeardownHooks: TestHooksHandler[] = []
 
   /**
-   * Group tests
+   * An array of tests registered under the given group
    */
   public tests: Test<DataSetNode>[] = []
 
@@ -51,16 +64,39 @@ export class Group extends Macroable {
     teardown: (handler: TestHooksHandler) => void
     timeout: (timeout: number) => void
     retry: (retries: number) => void
+    disableTimeout: () => void
   } = {
+    /**
+     * Define setup hook for all tests inside the group
+     */
     setup: (handler: TestHooksHandler) => {
       this.testSetupHooks.push(handler)
     },
+
+    /**
+     * Define teardown hook for all tests inside the group
+     */
     teardown: (handler: TestHooksHandler) => {
       this.testTeardownHooks.push(handler)
     },
+
+    /**
+     * Define timeout for all tests inside the group
+     */
     timeout: (timeout: number) => {
       this.testsTimeout = timeout
     },
+
+    /**
+     * Disable timeout for all tests inside the group
+     */
+    disableTimeout: () => {
+      this.testsTimeout = 0
+    },
+
+    /**
+     * Define retries for all tests inside the group
+     */
     retry: (retries: number) => {
       this.testsRetries = retries
     },
@@ -71,7 +107,8 @@ export class Group extends Macroable {
   }
 
   /**
-   * Add a test to the group. Adding a test to the group mutates the test properties
+   * Add a test to the group. Adding a test to the group
+   * mutates the test properties
    */
   public add(test: Test<DataSetNode>): this {
     /**
@@ -108,7 +145,7 @@ export class Group extends Macroable {
   }
 
   /**
-   * Register a test setup function
+   * Define setup hook for the group
    */
   public setup(handler: GroupHooksHandler): this {
     this.hooks.add('setup', handler)
@@ -116,7 +153,7 @@ export class Group extends Macroable {
   }
 
   /**
-   * Register a test teardown function
+   * Define teardown hook for the group
    */
   public teardown(handler: GroupHooksHandler): this {
     this.hooks.add('teardown', handler)

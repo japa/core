@@ -121,6 +121,9 @@
     "time-span": "^4.0.0"
   },
   "nyc": {
-    "exclude": ["test", "test-helpers"]
+    "exclude": [
+      "test",
+      "test-helpers"
+    ]
   }
 }

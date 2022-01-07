@@ -7,12 +7,21 @@
  * file that was distributed with this source code.
  */
 
-import { FilteringOptions, DataSetNode } from '../Contracts'
 import { Test } from '../Test'
+import { FilteringOptions, DataSetNode } from '../Contracts'
 
 /**
  * Exposes the API to refine unwanted tests based upon applied
- * filters
+ * filters.
+ *
+ * @example
+ * const refiner = new Refiner({ tags: ['@slow'] })
+ * refiner.allows('tags', ['@slow']) // true
+ * refiner.allows('tags', ['@regression']) // false
+ *
+ * const refiner = new Refiner({ tags: [] })
+ * refiner.allows('tags', ['@slow']) // true
+ * refiner.allows('tags', ['@regression']) // true
  */
 export class Refiner {
   /**
@@ -30,7 +39,7 @@ export class Refiner {
   }
 
   /**
-   * Returns pinned test
+   * Returns a set of all the pinned tests
    */
   public getPinned(): Set<Test<DataSetNode>> {
     return this.pinnedTests

@@ -989,56 +989,6 @@ test.group('assert', function () {
     }, "blah: expected { foo: { a: 1 }, bar: { b: 2 } } to not have deep property 'foo' of { a: 1 }")
   })
 
-  test('ownInclude and notOwnInclude', function () {
-    const assert = new Assert()
-
-    assert.ownInclude({ a: 1 }, { a: 1 })
-    assert.notOwnInclude({ a: 1 }, { a: 3 })
-    assert.notOwnInclude({ a: 1 }, { toString: Object.prototype.toString })
-
-    assert.notOwnInclude({ a: { b: 2 } }, { a: { b: 2 } })
-
-    expectError(function () {
-      assert.ownInclude({ a: 1 }, { a: 3 }, 'blah')
-    }, "blah: expected { a: 1 } to have own property 'a' of 3, but got 1")
-
-    expectError(function () {
-      assert.ownInclude({ a: 1 }, { a: 3 }, 'blah')
-    }, "blah: expected { a: 1 } to have own property 'a' of 3, but got 1")
-
-    expectError(function () {
-      assert.ownInclude({ a: 1 }, { toString: Object.prototype.toString })
-    }, "expected { a: 1 } to have own property 'toString'")
-
-    expectError(function () {
-      assert.notOwnInclude({ a: 1 }, { a: 1 }, 'blah')
-    }, "blah: expected { a: 1 } to not have own property 'a' of 1")
-  })
-
-  test('deepOwnInclude and notDeepOwnInclude', function () {
-    const assert = new Assert()
-
-    assert.deepOwnInclude({ a: { b: 2 } }, { a: { b: 2 } })
-    assert.notDeepOwnInclude({ a: { b: 2 } }, { a: { c: 3 } })
-    assert.notDeepOwnInclude({ a: { b: 2 } }, { toString: Object.prototype.toString })
-
-    expectError(function () {
-      assert.deepOwnInclude({ a: { b: 2 } }, { a: { c: 3 } }, 'blah')
-    }, "blah: expected { a: { b: 2 } } to have deep own property 'a' of { c: 3 }, but got { b: 2 }")
-
-    expectError(function () {
-      assert.deepOwnInclude({ a: { b: 2 } }, { a: { c: 3 } }, 'blah')
-    }, "blah: expected { a: { b: 2 } } to have deep own property 'a' of { c: 3 }, but got { b: 2 }")
-
-    expectError(function () {
-      assert.deepOwnInclude({ a: { b: 2 } }, { toString: Object.prototype.toString })
-    }, "expected { a: { b: 2 } } to have deep own property 'toString'")
-
-    expectError(function () {
-      assert.notDeepOwnInclude({ a: { b: 2 } }, { a: { b: 2 } }, 'blah')
-    }, "blah: expected { a: { b: 2 } } to not have deep own property 'a' of { b: 2 }")
-  })
-
   test('keys(array|Object|arguments)', function () {
     const assert = new Assert()
 
@@ -1571,75 +1521,6 @@ test.group('assert', function () {
     expectError(function () {
       assert.notDeepPropertyVal(obj, 'a', { b: 1 }, 'blah')
     }, "blah: expected { a: { b: 1 } } to not have deep nested property 'a' of { b: 1 }")
-  })
-
-  test('ownProperty', function () {
-    const assert = new Assert()
-    const coffeeObj = { coffee: 'is good' }
-
-    // This has length = 17
-    const teaObj = 'but tea is better'
-
-    assert.ownProperty(coffeeObj, 'coffee')
-    assert.ownProperty(teaObj, 'length')
-
-    assert.ownPropertyVal(coffeeObj, 'coffee', 'is good')
-    assert.ownPropertyVal(teaObj, 'length', 17)
-
-    assert.notOwnProperty(coffeeObj, 'length')
-    assert.notOwnProperty(coffeeObj, 'toString')
-    assert.notOwnProperty(teaObj, 'calories')
-
-    assert.notOwnPropertyVal(coffeeObj, 'coffee', 'is bad')
-    assert.notOwnPropertyVal(teaObj, 'length', 1)
-    assert.notOwnPropertyVal(coffeeObj, 'toString', Object.prototype.toString)
-    assert.notOwnPropertyVal({ a: { b: 1 } }, 'a', { b: 1 })
-
-    expectError(function () {
-      assert.ownProperty(coffeeObj, 'calories', 'blah')
-    }, "blah: expected { coffee: 'is good' } to have own property 'calories'")
-
-    expectError(function () {
-      assert.notOwnProperty(coffeeObj, 'coffee', 'blah')
-    }, "blah: expected { coffee: 'is good' } to not have own property 'coffee'")
-
-    expectError(function () {
-      assert.ownPropertyVal(teaObj, 'length', 1, 'blah')
-    }, "blah: expected 'but tea is better' to have own property 'length' of 1, but got 17")
-
-    expectError(function () {
-      assert.notOwnPropertyVal(teaObj, 'length', 17, 'blah')
-    }, "blah: expected 'but tea is better' to not have own property 'length' of 17")
-
-    expectError(function () {
-      assert.ownPropertyVal(teaObj, 'calories', 17)
-    }, "expected 'but tea is better' to have own property 'calories'")
-
-    expectError(function () {
-      assert.ownPropertyVal(teaObj, 'calories', 17)
-    }, "expected 'but tea is better' to have own property 'calories'")
-  })
-
-  test('deepOwnPropertyVal', function () {
-    const assert = new Assert()
-    const obj = { a: { b: 1 } }
-
-    assert.deepOwnPropertyVal(obj, 'a', { b: 1 })
-    assert.notDeepOwnPropertyVal(obj, 'a', { z: 1 })
-    assert.notDeepOwnPropertyVal(obj, 'a', { b: 7 })
-    assert.notDeepOwnPropertyVal(obj, 'toString', Object.prototype.toString)
-
-    expectError(function () {
-      assert.deepOwnPropertyVal(obj, 'a', { z: 7 }, 'blah')
-    }, "blah: expected { a: { b: 1 } } to have deep own property 'a' of { z: 7 }, but got { b: 1 }")
-
-    expectError(function () {
-      assert.deepOwnPropertyVal(obj, 'z', { b: 1 }, 'blah')
-    }, "blah: expected { a: { b: 1 } } to have deep own property 'z'")
-
-    expectError(function () {
-      assert.notDeepOwnPropertyVal(obj, 'a', { b: 1 }, 'blah')
-    }, "blah: expected { a: { b: 1 } } to not have deep own property 'a' of { b: 1 }")
   })
 
   test('deepNestedPropertyVal', function () {
@@ -2401,10 +2282,19 @@ test.group('assert', function () {
     const assert = new Assert()
 
     assert.includeOrderedMembers([1, 2, 3], [1, 2])
+    assert.includeOrderedMembers([1, 2, 4, 5], [1, 2, 4])
 
     expectError(function () {
       assert.includeOrderedMembers([1, 2, 3], [2, 1], 'blah')
     }, 'blah: expected [ 1, 2, 3 ] to be an ordered superset of [ 2, 1 ]')
+
+    expectError(function () {
+      assert.includeOrderedMembers([1, 2, 4, 5], [1, 4, 2])
+    }, 'expected [ 1, 2, 4, 5 ] to be an ordered superset of [ 1, 4, 2 ]')
+
+    expectError(function () {
+      assert.includeOrderedMembers([1, 2, 4, 5], [1, 2, 5])
+    }, 'expected [ 1, 2, 4, 5 ] to be an ordered superset of [ 1, 2, 5 ]')
   })
 
   test('notIncludeOrderedMembers', function () {
@@ -2423,6 +2313,18 @@ test.group('assert', function () {
     const assert = new Assert()
 
     assert.includeDeepOrderedMembers([{ a: 1 }, { b: 2 }, { c: 3 }], [{ a: 1 }, { b: 2 }])
+    assert.includeDeepOrderedMembers([{ id: 1 }, { id: 2 }, { id: 4 }], [{ id: 1 }, { id: 2 }])
+
+    expectError(function () {
+      assert.includeDeepOrderedMembers([{ id: 1 }, { id: 2 }, { id: 4 }], [{ id: 1 }, { id: 4 }])
+    }, 'expected [ { id: 1 }, { id: 2 }, { id: 4 } ] to be an ordered superset of [ { id: 1 }, { id: 4 } ]')
+
+    expectError(function () {
+      assert.includeDeepOrderedMembers(
+        [{ id: 1 }, { id: 2 }, { id: 4 }],
+        [{ id: 1 }, { id: 4 }, { id: 2 }]
+      )
+    }, 'expected [ { id: 1 }, { id: 2 }, { id: 4 } ] to be an ordered superset of [ { id: 1 }, { id: 4 }, { id: 2 } ]')
 
     expectError(function () {
       assert.includeDeepOrderedMembers([{ a: 1 }, { b: 2 }, { c: 3 }], [{ b: 2 }, { a: 1 }], 'blah')
@@ -2446,38 +2348,6 @@ test.group('assert', function () {
         'blah'
       )
     }, 'blah: expected [ { a: 1 }, { b: 2 }, { c: 3 } ] to not be an ordered superset of [ { a: 1 }, { b: 2 } ]')
-  })
-
-  test('oneOf', function () {
-    const assert = new Assert()
-
-    assert.oneOf(1, [1, 2, 3])
-
-    var three = [3]
-    assert.oneOf(three, [1, 2, three])
-
-    var four = { four: 4 }
-    assert.oneOf(four, [1, 2, four])
-
-    expectError(function () {
-      assert.oneOf(1, 1 as any, 'blah')
-    }, 'blah: expected 1 to be an array')
-
-    expectError(function () {
-      assert.oneOf(1, { a: 1 } as any)
-    }, 'expected { a: 1 } to be an array')
-
-    expectError(function () {
-      assert.oneOf(9, [1, 2, 3], 'Message')
-    }, 'Message: expected 9 to be one of [ 1, 2, 3 ]')
-
-    expectError(function () {
-      assert.oneOf([3], [1, 2, [3]])
-    }, 'expected [ 3 ] to be one of [ 1, 2, [ 3 ] ]')
-
-    expectError(function () {
-      assert.oneOf({ four: 4 }, [1, 2, { four: 4 }])
-    }, 'expected { four: 4 } to be one of [ 1, 2, { four: 4 } ]')
   })
 
   test('above', function () {

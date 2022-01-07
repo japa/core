@@ -17,7 +17,15 @@ import { DummyRunner, TestRunner } from './Runner'
 import { TestExecutor, TestOptions, TestHooksHandler, DataSetNode } from '../Contracts'
 
 /**
- * Exposes the API to configure and execute a test
+ * Test class exposes a self contained API to configure and run
+ * tests along with its hooks.
+ *
+ * @example
+ * const test = new Test('2 + 2 = 4', emitter, refiner)
+ *
+ * test.run(async ({ assert }) => {
+ *   assert.equal(2 + 2 , 4)
+ * })
  */
 export class Test<TestData extends DataSetNode> extends Macroable {
   public static macros = {}
@@ -128,7 +136,7 @@ export class Test<TestData extends DataSetNode> extends Macroable {
   }
 
   /**
-   * Disable test timeout
+   * Disable test timeout. It is same as calling `test.timeout(0)`
    */
   public disableTimeout(): this {
     return this.timeout(0)
@@ -172,7 +180,7 @@ export class Test<TestData extends DataSetNode> extends Macroable {
 
   /**
    * Pin current test. Pinning a test will only run the
-   * pinned tests
+   * pinned tests.
    */
   public pin(): this {
     this.refiner.pinTest(this)
