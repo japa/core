@@ -128,5 +128,9 @@
       "test",
       "test-helpers"
     ]
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "next"
   }
 }
