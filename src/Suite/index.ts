@@ -37,7 +37,7 @@ import { SuiteHooksHandler } from '../Contracts'
  * // Runs all the tests inside the registered group
  * await suite.exec()
  */
-export class Suite extends Macroable {
+export class Suite<Context> extends Macroable {
   public static macros = {}
   public static getters = {}
 
@@ -49,13 +49,13 @@ export class Suite extends Macroable {
   /**
    * Callbacks to invoke on each test and group
    */
-  private configureTestCallbacks: ((test: Test<any, any>) => void)[] = []
-  private configureGroupCallbacks: ((group: Group<any>) => void)[] = []
+  private configureTestCallbacks: ((test: Test<Context, any>) => void)[] = []
+  private configureGroupCallbacks: ((group: Group<Context>) => void)[] = []
 
   /**
    * A collection of tests and groups both
    */
-  public stack: (Test<any, any> | Group<any>)[] = []
+  public stack: (Test<Context, any> | Group<Context>)[] = []
 
   constructor(public name: string, private emitter: Emitter) {
     super()
@@ -64,7 +64,7 @@ export class Suite extends Macroable {
   /**
    * Add a test or a group to the execution stack
    */
-  public add(testOrGroup: Test<any, any> | Group<any>): this {
+  public add(testOrGroup: Test<Context, any> | Group<Context>): this {
     if (testOrGroup instanceof Group) {
       this.configureGroupCallbacks.forEach((callback) => callback(testOrGroup))
     }
@@ -80,7 +80,7 @@ export class Suite extends Macroable {
   /**
    * Tap into each test and configure it
    */
-  public onTest(callback: (test: Test<any, any>) => void): this {
+  public onTest(callback: (test: Test<Context, any>) => void): this {
     this.configureTestCallbacks.push(callback)
     return this
   }
@@ -88,7 +88,7 @@ export class Suite extends Macroable {
   /**
    * Tap into each group and configure it
    */
-  public onGroup(callback: (group: Group<any>) => void): this {
+  public onGroup(callback: (group: Group<Context>) => void): this {
     this.configureGroupCallbacks.push(callback)
     return this
   }
@@ -96,7 +96,7 @@ export class Suite extends Macroable {
   /**
    * Register a test setup function
    */
-  public setup(handler: SuiteHooksHandler): this {
+  public setup(handler: SuiteHooksHandler<Context>): this {
     this.hooks.add('setup', handler)
     return this
   }
@@ -104,7 +104,7 @@ export class Suite extends Macroable {
   /**
    * Register a test teardown function
    */
-  public teardown(handler: SuiteHooksHandler): this {
+  public teardown(handler: SuiteHooksHandler<Context>): this {
     this.hooks.add('teardown', handler)
     return this
   }

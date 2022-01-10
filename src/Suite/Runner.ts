@@ -40,7 +40,7 @@ export class SuiteRunner {
    */
   private hasError: boolean = false
 
-  constructor(private suite: Suite, private hooks: Hooks, private emitter: Emitter) {}
+  constructor(private suite: Suite<any>, private hooks: Hooks, private emitter: Emitter) {}
 
   /**
    * Notify the reporter about the suite start

@@ -60,14 +60,21 @@ export type GroupHooksHandler<Context> = (
 /**
  * The cleanup function for suite hooks
  */
-export type SuiteHooksCleanupHandler = (error: null | any, suite: Suite) => Promise<any> | any
+export type SuiteHooksCleanupHandler<Context> = (
+  error: null | any,
+  suite: Suite<Context>
+) => Promise<any> | any
 
 /**
  * The function that can be registered as a suite hook
  */
-export type SuiteHooksHandler = (
-  suite: Suite
-) => Promise<any> | any | SuiteHooksCleanupHandler | Promise<SuiteHooksCleanupHandler>
+export type SuiteHooksHandler<Context> = (
+  suite: Suite<Context>
+) =>
+  | Promise<any>
+  | any
+  | SuiteHooksCleanupHandler<Context>
+  | Promise<SuiteHooksCleanupHandler<Context>>
 
 /**
  * The cleanup function for runner hooks

@@ -67,7 +67,7 @@ export class Runner extends Macroable {
   /**
    * A collection of suites
    */
-  public suites: Suite[] = []
+  public suites: Suite<any>[] = []
 
   /**
    * Registered tests reporter
@@ -158,7 +158,7 @@ export class Runner extends Macroable {
   /**
    * Add a suite to the runner
    */
-  public add(suite: Suite): this {
+  public add(suite: Suite<any>): this {
     this.suites.push(suite)
     return this
   }
