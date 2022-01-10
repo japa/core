@@ -8,7 +8,6 @@
  */
 
 import { Macroable } from 'macroable'
-import { Assert } from '../Assert'
 
 /**
  * A fresh copy of test context is shared with all the tests
@@ -16,6 +15,4 @@ import { Assert } from '../Assert'
 export class TestContext extends Macroable {
   public static macros = {}
   public static getters = {}
-
-  public assert = new Assert()
 }

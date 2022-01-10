@@ -41,6 +41,37 @@ test.group('execute | async', () => {
     await testInstance.exec()
   })
 
+  test('compute test context using a function', async (assert, done) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      try {
+        assert.isFalse(event.hasError)
+        assert.lengthOf(event.errors, 0)
+        assert.deepEqual(stack, ['executed'])
+        done()
+      } catch (error) {
+        done(error)
+      }
+    })
+
+    const testInstance = new Test(
+      '2 + 2 = 4',
+      async () => {
+        return new TestContext()
+      },
+      emitter,
+      refiner
+    )
+    testInstance.run(async () => {
+      stack.push('executed')
+    })
+
+    await testInstance.exec()
+  })
+
   test('multiple calls to exec should result in a noop', async (assert) => {
     const stack: string[] = []
     const emitter = new Emitter()
@@ -833,7 +864,7 @@ test.group('execute | dataset', () => {
     assert.lengthOf(events, 2)
     assert.deepEqual(events[0].dataset, { size: 2, row: 'foo', index: 0 })
     assert.isTrue(events[0].hasError)
-    // assert.equal(events[0].error.message, 'blow up')
+    assert.equal(events[0].errors[0].error.message, 'blow up')
 
     assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
     assert.isFalse(events[1].hasError)

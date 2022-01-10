@@ -14,7 +14,7 @@ import { Test } from '../Test'
 import { Emitter } from '../Emitter'
 import { Refiner } from '../Refiner'
 import { GroupRunner } from './Runner'
-import { DataSetNode, GroupHooksHandler, TestHooksHandler } from '../Contracts'
+import { GroupHooksHandler, TestHooksHandler } from '../Contracts'
 
 /**
  * Group class exposes an API to group multiple tests together
@@ -29,7 +29,7 @@ import { DataSetNode, GroupHooksHandler, TestHooksHandler } from '../Contracts'
  * group.add(test)
  * await group.exec()
  */
-export class Group extends Macroable {
+export class Group<Context> extends Macroable {
   public static macros = {}
   public static getters = {}
 
@@ -41,27 +41,27 @@ export class Group extends Macroable {
   /**
    * Callbacks to invoke on each test
    */
-  private tapsCallbacks: ((test: Test<DataSetNode>) => void)[] = []
+  private tapsCallbacks: ((test: Test<Context, any>) => void)[] = []
 
   /**
    * Properties to configure on every test
    */
   private testsTimeout?: number
   private testsRetries?: number
-  private testSetupHooks: TestHooksHandler[] = []
-  private testTeardownHooks: TestHooksHandler[] = []
+  private testSetupHooks: TestHooksHandler<Context>[] = []
+  private testTeardownHooks: TestHooksHandler<Context>[] = []
 
   /**
    * An array of tests registered under the given group
    */
-  public tests: Test<DataSetNode>[] = []
+  public tests: Test<Context, any>[] = []
 
   /**
    * Shortcut methods to configure tests
    */
   public each: {
-    setup: (handler: TestHooksHandler) => void
-    teardown: (handler: TestHooksHandler) => void
+    setup: (handler: TestHooksHandler<Context>) => void
+    teardown: (handler: TestHooksHandler<Context>) => void
     timeout: (timeout: number) => void
     retry: (retries: number) => void
     disableTimeout: () => void
@@ -69,14 +69,14 @@ export class Group extends Macroable {
     /**
      * Define setup hook for all tests inside the group
      */
-    setup: (handler: TestHooksHandler) => {
+    setup: (handler: TestHooksHandler<Context>) => {
       this.testSetupHooks.push(handler)
     },
 
     /**
      * Define teardown hook for all tests inside the group
      */
-    teardown: (handler: TestHooksHandler) => {
+    teardown: (handler: TestHooksHandler<Context>) => {
       this.testTeardownHooks.push(handler)
     },
 
@@ -110,7 +110,7 @@ export class Group extends Macroable {
    * Add a test to the group. Adding a test to the group
    * mutates the test properties
    */
-  public add(test: Test<DataSetNode>): this {
+  public add(test: Test<Context, any>): this {
     /**
      * Bulk configure
      */
@@ -139,7 +139,7 @@ export class Group extends Macroable {
   /**
    * Tap into each test and configure it
    */
-  public tap(callback: (test: Test<DataSetNode>) => void): this {
+  public tap(callback: (test: Test<Context, any>) => void): this {
     this.tapsCallbacks.push(callback)
     return this
   }
@@ -147,7 +147,7 @@ export class Group extends Macroable {
   /**
    * Define setup hook for the group
    */
-  public setup(handler: GroupHooksHandler): this {
+  public setup(handler: GroupHooksHandler<Context>): this {
     this.hooks.add('setup', handler)
     return this
   }
@@ -155,7 +155,7 @@ export class Group extends Macroable {
   /**
    * Define teardown hook for the group
    */
-  public teardown(handler: GroupHooksHandler): this {
+  public teardown(handler: GroupHooksHandler<Context>): this {
     this.hooks.add('teardown', handler)
     return this
   }

@@ -12,7 +12,6 @@ import { Hooks } from '@poppinss/hooks'
 
 import { Refiner } from '../Refiner'
 import { Emitter } from '../Emitter'
-import { TestContext } from '../TestContext'
 import { DummyRunner, TestRunner } from './Runner'
 import { TestExecutor, TestOptions, TestHooksHandler, DataSetNode } from '../Contracts'
 
@@ -27,7 +26,10 @@ import { TestExecutor, TestOptions, TestHooksHandler, DataSetNode } from '../Con
  *   assert.equal(2 + 2 , 4)
  * })
  */
-export class Test<TestData extends DataSetNode> extends Macroable {
+export class Test<
+  Context extends Record<any, any>,
+  TestData extends DataSetNode = undefined
+> extends Macroable {
   public static macros = {}
   public static getters = {}
 
@@ -52,6 +54,17 @@ export class Test<TestData extends DataSetNode> extends Macroable {
   public dataset?: any[]
 
   /**
+   * Reference to the test context. Available at the time
+   * of running the test
+   */
+  public context: Context
+
+  /**
+   * The function for creating the test context
+   */
+  private contextAccumlator?: () => Promise<Context> | Context
+
+  /**
    * The function for computing if test should
    * be skipped or not
    */
@@ -64,11 +77,18 @@ export class Test<TestData extends DataSetNode> extends Macroable {
 
   constructor(
     public title: string,
-    public context: TestContext,
+    context: Context | (() => Context | Promise<Context>),
     private emitter: Emitter,
     private refiner: Refiner
   ) {
     super()
+
+    if (typeof context === 'function') {
+      this.contextAccumlator = context
+    } else {
+      this.context = context
+    }
+
     this.options = {
       title,
       tags: [],
@@ -101,6 +121,17 @@ export class Test<TestData extends DataSetNode> extends Macroable {
     }
 
     return this.dataset
+  }
+
+  /**
+   * Get context instance for the test
+   */
+  private async computeContext(): Promise<Context> {
+    if (typeof this.contextAccumlator === 'function') {
+      this.context = await this.contextAccumlator()
+    }
+
+    return this.context
   }
 
   /**
@@ -191,15 +222,15 @@ export class Test<TestData extends DataSetNode> extends Macroable {
    * Define the dataset for the test. The test executor will be invoked
    * for all the items inside the dataset array
    */
-  public with<Dataset extends TestData>(dataset: Dataset): Test<Dataset> {
+  public with<Dataset extends DataSetNode>(dataset: Dataset): Test<Context, Dataset> {
     if (Array.isArray(dataset)) {
       this.dataset = dataset
-      return this
+      return this as unknown as Test<Context, Dataset>
     }
 
     if (typeof dataset === 'function') {
       this.datasetAccumlator = dataset
-      return this
+      return this as unknown as Test<Context, Dataset>
     }
 
     throw new Error('dataset must be an array or a function that returns an array')
@@ -208,7 +239,7 @@ export class Test<TestData extends DataSetNode> extends Macroable {
   /**
    * Define the test executor function
    */
-  public run(executor: TestExecutor<TestData>): this {
+  public run(executor: TestExecutor<Context, TestData>): this {
     this.options.executor = executor
     return this
   }
@@ -216,7 +247,7 @@ export class Test<TestData extends DataSetNode> extends Macroable {
   /**
    * Register a test setup function
    */
-  public setup(handler: TestHooksHandler): this {
+  public setup(handler: TestHooksHandler<Context>): this {
     this.hooks.add('setup', handler)
     return this
   }
@@ -224,7 +255,7 @@ export class Test<TestData extends DataSetNode> extends Macroable {
   /**
    * Register a test teardown function
    */
-  public teardown(handler: TestHooksHandler): this {
+  public teardown(handler: TestHooksHandler<Context>): this {
     this.hooks.add('teardown', handler)
     return this
   }
@@ -290,6 +321,8 @@ export class Test<TestData extends DataSetNode> extends Macroable {
       new DummyRunner(this, this.emitter).run()
       return
     }
+
+    await this.computeContext()
 
     /**
      * Run for each row inside dataset

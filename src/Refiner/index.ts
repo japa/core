@@ -8,7 +8,7 @@
  */
 
 import { Test } from '../Test'
-import { FilteringOptions, DataSetNode } from '../Contracts'
+import { FilteringOptions } from '../Contracts'
 
 /**
  * Exposes the API to refine unwanted tests based upon applied
@@ -27,28 +27,28 @@ export class Refiner {
   /**
    * A set of pinned tests
    */
-  private pinnedTests: Set<Test<DataSetNode>> = new Set()
+  private pinnedTests: Set<Test<any, any>> = new Set()
 
   constructor(private filters: FilteringOptions) {}
 
   /**
    * Pin a test to be executed.
    */
-  public pinTest(test: Test<DataSetNode>): void {
+  public pinTest(test: Test<any, any>): void {
     this.pinnedTests.add(test)
   }
 
   /**
    * Returns a set of all the pinned tests
    */
-  public getPinned(): Set<Test<DataSetNode>> {
+  public getPinned(): Set<Test<any, any>> {
     return this.pinnedTests
   }
 
   /**
    * Find if a test is pinned
    */
-  public isPinned(test: Test<DataSetNode>): boolean {
+  public isPinned(test: Test<any, any>): boolean {
     return this.pinnedTests.has(test)
   }
 

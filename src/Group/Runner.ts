@@ -40,7 +40,7 @@ export class GroupRunner {
    */
   private hasError: boolean = false
 
-  constructor(private group: Group, private hooks: Hooks, private emitter: Emitter) {}
+  constructor(private group: Group<any>, private hooks: Hooks, private emitter: Emitter) {}
 
   /**
    * Notify the reporter about the group start

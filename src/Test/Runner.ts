@@ -13,13 +13,13 @@ import timeSpan, { TimeEndFunction } from 'time-span'
 
 import { Test } from '.'
 import { Emitter } from '../Emitter'
-import { DataSetNode, TestEndNode, TestStartNode } from '../Contracts'
+import { TestEndNode, TestStartNode } from '../Contracts'
 
 /**
  * Dummy test runner that just emits the required events
  */
 export class DummyRunner {
-  constructor(private test: Test<DataSetNode>, private emitter: Emitter) {}
+  constructor(private test: Test<any, any>, private emitter: Emitter) {}
 
   /**
    * Notify the reporter about the test start
@@ -92,7 +92,7 @@ export class TestRunner {
   private uncaughtExceptionHandler?: NodeJS.UncaughtExceptionListener
 
   constructor(
-    private test: Test<DataSetNode>,
+    private test: Test<any, any>,
     private hooks: Hooks,
     private emitter: Emitter,
     private datasetCurrentIndex?: number
@@ -197,8 +197,8 @@ export class TestRunner {
         : undefined
 
     return datasetRow !== undefined
-      ? this.test.options.executor!(this.test.context, datasetRow, done)
-      : this.test.options.executor!(this.test.context, done)
+      ? (this.test.options.executor as any)(this.test.context, datasetRow, done)
+      : (this.test.options.executor as any)(this.test.context, done)
   }
 
   /**

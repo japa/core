@@ -14,7 +14,6 @@ import { Group } from '../Group'
 import { Suite } from '../Suite'
 import { Runner } from '../Runner'
 import { Emitter } from '../Emitter'
-import { TestContext } from '../TestContext'
 
 /**
  * Unnecessary similar methods have been removed
@@ -85,34 +84,45 @@ export type AssertContract = Omit<
  * Shape of test data set. Should be an array of a function that
  * returns an array
  */
-export type DataSetNode = any[] | (() => any[] | Promise<any[]>)
+export type DataSetNode = undefined | any[] | (() => any[] | Promise<any[]>)
 
 /**
  * The cleanup function for test hooks
  */
-export type TestHooksCleanupHandler = (
+export type TestHooksCleanupHandler<Context> = (
   error: null | any,
-  test: Test<DataSetNode>
+  test: Test<Context, any>
 ) => Promise<any> | any
 
 /**
  * The function that can be registered as a test hook
  */
-export type TestHooksHandler = (
-  test: Test<DataSetNode>
-) => Promise<any> | any | TestHooksCleanupHandler | Promise<TestHooksCleanupHandler>
+export type TestHooksHandler<Context> = (
+  test: Test<any, any>
+) =>
+  | Promise<any>
+  | any
+  | TestHooksCleanupHandler<Context>
+  | Promise<TestHooksCleanupHandler<Context>>
 
 /**
  * The cleanup function for group hooks
  */
-export type GroupHooksCleanupHandler = (error: null | any, group: Group) => Promise<any> | any
+export type GroupHooksCleanupHandler<Context> = (
+  error: null | any,
+  group: Group<Context>
+) => Promise<any> | any
 
 /**
  * The function that can be registered as a group hook
  */
-export type GroupHooksHandler = (
-  group: Group
-) => Promise<any> | any | GroupHooksCleanupHandler | Promise<GroupHooksCleanupHandler>
+export type GroupHooksHandler<Context> = (
+  group: Group<Context>
+) =>
+  | Promise<any>
+  | any
+  | GroupHooksCleanupHandler<Context>
+  | Promise<GroupHooksCleanupHandler<Context>>
 
 /**
  * The cleanup function for suite hooks
@@ -141,16 +151,15 @@ export type RunnerHooksHandler = (
 /**
  * The function to execute the test
  */
-export type TestExecutor<DataSet> = (
-  ctx: TestContext,
-  ...args: DataSet extends any[]
-    ? [value: DataSet[number], done?: (error?: any) => void] // Dataset is array
-    : DataSet extends () => infer A
-    ? Awaited<A> extends any[] // Dataset function returns an array
-      ? [value: Awaited<A>[number], done?: (error?: any) => void]
-      : [done?: (error?: any) => void]
-    : [done?: (error?: any) => void]
-) => any | Promise<any>
+export type TestExecutor<Context, DataSet> = DataSet extends any[]
+  ? (context: Context, value: DataSet[number], done: (error?: any) => void) => void | Promise<void>
+  : DataSet extends () => infer A
+  ? (
+      context: Context,
+      value: Awaited<A> extends any[] ? Awaited<A>[number] : Awaited<A>,
+      done?: (error?: any) => void
+    ) => void | Promise<void>
+  : (context: Context, done: (error?: any) => void) => void | Promise<void>
 
 /**
  * Test configuration options.
@@ -160,7 +169,7 @@ export type TestOptions = {
   tags: string[]
   timeout: number
   waitsForDone?: boolean
-  executor?: TestExecutor<any>
+  executor?: TestExecutor<any, any>
   isTodo?: boolean
   isSkipped?: boolean
   isFailing?: boolean
