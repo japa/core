@@ -8,11 +8,10 @@
  */
 
 export * from './src/Contracts'
-export { Assert } from './src/Assert'
-export { Emitter } from './src/Emitter'
-export { Group } from './src/Group'
-export { Refiner } from './src/Refiner'
-export { Runner } from './src/Runner'
-export { Suite } from './src/Suite'
 export { Test } from './src/Test'
+export { Suite } from './src/Suite'
+export { Group } from './src/Group'
+export { Runner } from './src/Runner'
+export { Emitter } from './src/Emitter'
+export { Refiner } from './src/Refiner'
 export { TestContext } from './src/TestContext'

@@ -7,78 +7,11 @@
  * file that was distributed with this source code.
  */
 
-import { assert } from 'chai'
-
 import { Test } from '../Test'
 import { Group } from '../Group'
 import { Suite } from '../Suite'
 import { Runner } from '../Runner'
 import { Emitter } from '../Emitter'
-
-/**
- * Unnecessary similar methods have been removed
- */
-export type ChaiAssert = { [K in keyof typeof assert]: typeof assert[K] }
-
-/**
- * Assert contract
- */
-export type AssertContract = Omit<
-  ChaiAssert,
-  | 'deepStrictEqual'
-  | 'nestedInclude'
-  | 'notNestedInclude'
-  | 'deepNestedInclude'
-  | 'notDeepNestedInclude'
-  | 'ifError'
-  | 'changes'
-  | 'changesBy'
-  | 'doesNotChange'
-  | 'changesButNotBy'
-  | 'increases'
-  | 'increasesBy'
-  | 'doesNotIncrease'
-  | 'increasesButNotBy'
-  | 'decreases'
-  | 'decreasesBy'
-  | 'doesNotDecrease'
-  | 'doesNotDecreaseBy'
-  | 'decreasesButNotBy'
-  | 'extensible'
-  | 'isExtensible'
-  | 'notExtensible'
-  | 'isNotExtensible'
-  | 'deepProperty'
-  | 'notDeepProperty'
-  | 'nestedProperty'
-  | 'nestedPropertyVal'
-  | 'notNestedProperty'
-  | 'notNestedPropertyVal'
-  | 'deepNestedProperty'
-  | 'notDeepNestedProperty'
-  | 'deepNestedPropertyVal'
-  | 'notDeepNestedPropertyVal'
-  | 'hasAnyKeys'
-  | 'hasAllKeys'
-  | 'containsAllKeys'
-  | 'doesNotHaveAnyKeys'
-  | 'doesNotHaveAllKeys'
-  | 'throw'
-  | 'Throw'
-  | 'doesNotThrow'
-  | 'hasAnyDeepKeys'
-  | 'hasAllDeepKeys'
-  | 'containsAllDeepKeys'
-  | 'doesNotHaveAnyDeepKeys'
-  | 'doesNotHaveAllDeepKeys'
-  | 'closeTo'
-  | 'operator'
-  | 'oneOf'
-  | 'ownInclude'
-  | 'notOwnInclude'
-  | 'deepOwnInclude'
-  | 'notDeepOwnInclude'
->
 
 /**
  * Shape of test data set. Should be an array of a function that
