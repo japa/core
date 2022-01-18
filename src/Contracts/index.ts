@@ -233,3 +233,32 @@ export interface ReporterContract {
   open(runner: Runner, emitter: Emitter): void | Promise<void>
   close(): void | Promise<void>
 }
+
+/**
+ * The test node inside the failure tree
+ */
+export type FailureTreeTestNode = {
+  title: string
+  type: 'test'
+  errors: TestEndNode['errors']
+}
+
+/**
+ * The group node inside the failure tree
+ */
+export type FailureTreeGroupNode = {
+  name: string
+  type: 'group'
+  errors: GroupEndNode['errors']
+  children: FailureTreeTestNode[]
+}
+
+/**
+ * The suite node inside the failure tree
+ */
+export type FailureTreeSuiteNode = {
+  name: string
+  type: 'suite'
+  errors: SuiteEndNode['errors']
+  children: (FailureTreeTestNode | FailureTreeGroupNode)[]
+}
