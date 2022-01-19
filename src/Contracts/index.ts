@@ -231,7 +231,7 @@ export type FilteringOptions = {
 export interface ReporterContract {
   name: string
   open(runner: Runner, emitter: Emitter): void | Promise<void>
-  close(): void | Promise<void>
+  close(runner: Runner): void | Promise<void>
 }
 
 /**

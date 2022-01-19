@@ -17,6 +17,7 @@ import {
   SuiteStartNode,
   FailureTreeGroupNode,
   FailureTreeSuiteNode,
+  RunnerEndNode,
 } from '../Contracts'
 
 /**
@@ -38,6 +39,16 @@ export class Tracker {
    * Currently active group
    */
   private currentGroup?: FailureTreeGroupNode
+
+  /**
+   * If the entire run cycle has one or more errors
+   */
+  private hasError: boolean = false
+
+  /**
+   * Reference to the errors on the runner
+   */
+  private runnerErrors: RunnerEndNode['errors'] = []
 
   /**
    * Storing state if current suite and group has errors. These
@@ -95,6 +106,7 @@ export class Tracker {
    */
   private onSuiteEnd(payload: SuiteEndNode) {
     if (payload.hasError) {
+      this.hasError = true
       this.currentSuiteHasError = true
       this.currentSuite!.errors = payload.errors
     }
@@ -123,6 +135,7 @@ export class Tracker {
    */
   private onGroupEnd(payload: GroupEndNode) {
     if (payload.hasError) {
+      this.hasError = true
       this.currentGroupHasError = true
       this.currentGroup!.errors = payload.errors
     }
@@ -130,6 +143,17 @@ export class Tracker {
     if (this.currentGroupHasError) {
       this.currentSuiteHasError = true
       this.currentSuite!.children.push(this.currentGroup!)
+    }
+  }
+
+  /**
+   * Move suite to the failure tree when the suite
+   * has errors
+   */
+  private onRunnerEnd(payload: RunnerEndNode) {
+    if (payload.hasError) {
+      this.hasError = true
+      this.runnerErrors = payload.errors
     }
   }
 
@@ -173,6 +197,7 @@ export class Tracker {
      * Bump failed count
      */
     this.aggregates.failed++
+    this.hasError = true
 
     /**
      * Test payload
@@ -227,6 +252,7 @@ export class Tracker {
         this.timeTracker = timeSpan()
         break
       case 'runner:end':
+        this.onRunnerEnd(payload as RunnerEndNode)
         this.duration = this.timeTracker()
         break
     }
@@ -238,6 +264,8 @@ export class Tracker {
   public getSummary() {
     return {
       ...this.aggregates,
+      hasError: this.hasError,
+      runnerErrors: this.runnerErrors,
       duration: this.duration,
       failureTree: this.failureTree,
       failedTestsTitles: this.failedTestsTitles,

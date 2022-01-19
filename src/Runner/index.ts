@@ -12,6 +12,7 @@ import { Hooks } from '@poppinss/hooks'
 
 import { Suite } from '../Suite'
 import { Emitter } from '../Emitter'
+import { Tracker } from '../Tracker'
 import { ReporterContract, RunnerEndNode, RunnerHooksHandler } from '../Contracts'
 
 /**
@@ -35,6 +36,11 @@ export class Runner extends Macroable {
    * Reference to registered hooks
    */
   private hooks = new Hooks()
+
+  /**
+   * Reference to tests tracker
+   */
+  private tracker: Tracker
 
   /**
    * Reference to the startup runner
@@ -139,8 +145,18 @@ export class Runner extends Macroable {
   private boot() {
     this.setupRunner = this.hooks.runner('setup')
     this.teardownRunner = this.hooks.runner('teardown')
+    this.tracker = new Tracker()
     this.errors = []
     this.hasError = false
+
+    this.emitter.on('runner:start', (payload) => this.tracker.processEvent('runner:start', payload))
+    this.emitter.on('runner:end', (payload) => this.tracker.processEvent('runner:end', payload))
+    this.emitter.on('suite:start', (payload) => this.tracker.processEvent('suite:start', payload))
+    this.emitter.on('suite:end', (payload) => this.tracker.processEvent('suite:end', payload))
+    this.emitter.on('group:start', (payload) => this.tracker.processEvent('group:start', payload))
+    this.emitter.on('group:end', (payload) => this.tracker.processEvent('group:end', payload))
+    this.emitter.on('test:start', (payload) => this.tracker.processEvent('test:start', payload))
+    this.emitter.on('test:end', (payload) => this.tracker.processEvent('test:end', payload))
   }
 
   /**
@@ -200,6 +216,13 @@ export class Runner extends Macroable {
   }
 
   /**
+   * Get tests summary
+   */
+  public getSummary() {
+    return this.tracker.getSummary()
+  }
+
+  /**
    * Execute runner suites
    */
   public async exec() {
@@ -219,7 +242,7 @@ export class Runner extends Macroable {
     if (this.hasError) {
       await this.runSetupCleanupFunctions()
       this.notifyEnd()
-      return
+      return this.getSummary()
     }
 
     /**
@@ -249,7 +272,9 @@ export class Runner extends Macroable {
      * Close reporters
      */
     for (let reporter of this.reporters) {
-      await reporter.close()
+      await reporter.close(this)
     }
+
+    return this.getSummary()
   }
 }
