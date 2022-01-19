@@ -13,11 +13,11 @@ import {
   GroupEndNode,
   SuiteEndNode,
   RunnerEvents,
+  RunnerEndNode,
   GroupStartNode,
   SuiteStartNode,
   FailureTreeGroupNode,
   FailureTreeSuiteNode,
-  RunnerEndNode,
 } from '../Contracts'
 
 /**
@@ -253,7 +253,7 @@ export class Tracker {
         break
       case 'runner:end':
         this.onRunnerEnd(payload as RunnerEndNode)
-        this.duration = this.timeTracker()
+        this.duration = this.timeTracker.rounded()
         break
     }
   }
