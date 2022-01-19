@@ -13,7 +13,7 @@ import { Hooks } from '@poppinss/hooks'
 import { Suite } from '../Suite'
 import { Emitter } from '../Emitter'
 import { Tracker } from '../Tracker'
-import { ReporterContract, RunnerEndNode, RunnerHooksHandler } from '../Contracts'
+import { ReporterContract, RunnerEndNode, RunnerHooksHandler, RunnerSummary } from '../Contracts'
 
 /**
  * The Runner class exposes the API to register test suites and execute
@@ -218,7 +218,7 @@ export class Runner extends Macroable {
   /**
    * Get tests summary
    */
-  public getSummary() {
+  public getSummary(): RunnerSummary {
     return this.tracker.getSummary()
   }
 

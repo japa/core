@@ -262,3 +262,20 @@ export type FailureTreeSuiteNode = {
   errors: SuiteEndNode['errors']
   children: (FailureTreeTestNode | FailureTreeGroupNode)[]
 }
+
+/**
+ * Runner summary properties
+ */
+export type RunnerSummary = {
+  total: number
+  failed: number
+  passed: number
+  regression: number
+  skipped: number
+  todo: number
+  hasError: boolean
+  runnerErrors: RunnerEndNode['errors']
+  duration: number
+  failureTree: FailureTreeSuiteNode[]
+  failedTestsTitles: string[]
+}

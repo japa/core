@@ -13,6 +13,7 @@ import {
   GroupEndNode,
   SuiteEndNode,
   RunnerEvents,
+  RunnerSummary,
   RunnerEndNode,
   GroupStartNode,
   SuiteStartNode,
@@ -261,7 +262,7 @@ export class Tracker {
   /**
    * Returns the tests runner summary
    */
-  public getSummary() {
+  public getSummary(): RunnerSummary {
     return {
       ...this.aggregates,
       hasError: this.hasError,
