@@ -235,21 +235,32 @@ export class TestRunner {
    * Run the test executor and make sure it times out after the configured
    * timeout.
    */
-  private wrapTestInTimeout() {
+  private async wrapTestInTimeout() {
     if (!this.test.options.timeout) {
       return this.test.options.waitsForDone ? this.runTestWithDone() : this.runTest()
     }
 
+    let timeoutTimer: null | NodeJS.Timeout = null
+
     const timeout = () => {
       return new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Test timeout')), this.test.options.timeout)
+        timeoutTimer = setTimeout(
+          () => reject(new Error('Test timeout')),
+          this.test.options.timeout
+        )
       })
     }
 
-    return Promise.race([
-      this.test.options.waitsForDone ? this.runTestWithDone() : this.runTest(),
-      timeout(),
-    ])
+    try {
+      await Promise.race([
+        this.test.options.waitsForDone ? this.runTestWithDone() : this.runTest(),
+        timeout(),
+      ])
+    } finally {
+      if (timeoutTimer) {
+        clearTimeout(timeoutTimer)
+      }
+    }
   }
 
   /**
