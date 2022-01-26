@@ -177,13 +177,13 @@ export class Test<
    * Assign tags to the test. Later you can use the tags to run
    * specific tests
    */
-  public tags(tags: string[], replace: boolean = true, prepend: boolean = false): this {
-    if (replace) {
+  public tags(tags: string[], strategy: 'replace' | 'append' | 'prepend' = 'replace'): this {
+    if (strategy === 'replace') {
       this.options.tags = tags
       return this
     }
 
-    if (prepend) {
+    if (strategy === 'prepend') {
       this.options.tags = tags.concat(this.options.tags)
       return this
     }

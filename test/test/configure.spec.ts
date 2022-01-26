@@ -110,7 +110,7 @@ test.group('configure', () => {
 
   test('append tags', async (assert) => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
-    testInstance.tags(['@slow']).tags(['@regression'], false)
+    testInstance.tags(['@slow']).tags(['@regression'], 'append')
 
     assert.deepEqual(testInstance.options, {
       tags: ['@slow', '@regression'],
@@ -121,7 +121,7 @@ test.group('configure', () => {
 
   test('prepend tags', async (assert) => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
-    testInstance.tags(['@slow']).tags(['@regression'], false, true)
+    testInstance.tags(['@slow']).tags(['@regression'], 'prepend')
 
     assert.deepEqual(testInstance.options, {
       tags: ['@regression', '@slow'],
