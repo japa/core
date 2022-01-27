@@ -228,11 +228,7 @@ export type FilteringOptions = {
 /**
  * Test reporters must adhere to the following contract
  */
-export interface ReporterContract {
-  name: string
-  open(runner: Runner, emitter: Emitter): void | Promise<void>
-  close(runner: Runner): void | Promise<void>
-}
+export type ReporterContract = (runner: Runner, emitter: Emitter) => void | Promise<void>
 
 /**
  * The test node inside the failure tree

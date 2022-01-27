@@ -35,11 +35,7 @@ test.group('configure', () => {
     const emitter = new Emitter()
 
     const runner = new Runner(emitter)
-    const listReporter: ReporterContract = {
-      name: 'list',
-      open() {},
-      close() {},
-    }
+    const listReporter: ReporterContract = () => {}
 
     runner.registerReporter(listReporter)
     assert.deepEqual(runner.reporters, new Set([listReporter]))

@@ -229,7 +229,7 @@ export class Runner extends Macroable {
     this.boot()
 
     for (let reporter of this.reporters) {
-      await reporter.open(this, this.emitter)
+      await reporter(this, this.emitter)
     }
 
     this.notifyStart()
@@ -267,13 +267,6 @@ export class Runner extends Macroable {
      * Notify test end
      */
     this.notifyEnd()
-
-    /**
-     * Close reporters
-     */
-    for (let reporter of this.reporters) {
-      await reporter.close(this)
-    }
 
     return this.getSummary()
   }

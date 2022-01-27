@@ -442,14 +442,8 @@ test.group('execute | reporters', () => {
     })
 
     const runner = new Runner(emitter)
-    runner.registerReporter({
-      name: 'list',
-      open() {
-        stack.push('list reporter open')
-      },
-      close() {
-        stack.push('list reporter close')
-      },
+    runner.registerReporter(() => {
+      stack.push('list reporter open')
     })
 
     const unit = new Suite('unit', emitter)
@@ -485,7 +479,7 @@ test.group('execute | reporters', () => {
     assert.isFalse(events[3].hasError)
 
     assert.isNotNull(runnerEndEvent)
-    assert.deepEqual(stack, ['list reporter open', 'test', 'test 1', 'list reporter close'])
+    assert.deepEqual(stack, ['list reporter open', 'test', 'test 1'])
   })
 })
 
