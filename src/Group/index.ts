@@ -164,7 +164,7 @@ export class Group<Context> extends Macroable {
    * Execute group hooks and tests
    */
   public async exec() {
-    if (!this.refiner.allows('group', this.title)) {
+    if (!this.refiner.allows(this)) {
       return
     }
 

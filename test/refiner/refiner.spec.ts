@@ -8,100 +8,67 @@
  */
 
 import test from 'japa'
+import { Test } from '../../src/Test'
+import { Group } from '../../src/Group'
+import { Emitter } from '../../src/Emitter'
 import { Refiner } from '../../src/Refiner'
 
-test.group('Refiner | add', () => {
+test.group('Refiner', () => {
   test('add filter for test title', (assert) => {
     const refiner = new Refiner({})
-    refiner.add('test', ['2 + 2 = 4'])
-    assert.deepEqual(refiner.get('test'), ['2 + 2 = 4'])
+
+    const emitter = new Emitter()
+    const testInstance = new Test('2 + 2 = 4', {}, emitter, refiner)
+    refiner.add('tests', [testInstance.title])
+
+    assert.isTrue(refiner.allows(testInstance))
   })
 
   test('add filter for test tags', (assert) => {
     const refiner = new Refiner({})
+
+    const emitter = new Emitter()
+    const testInstance = new Test('2 + 2 = 4', {}, emitter, refiner)
+    testInstance.tags(['@fixes: #441'])
+
     refiner.add('tags', ['@slow', '@regression'])
     refiner.add('tags', ['@fixes: #441'])
-    assert.deepEqual(refiner.get('tags'), ['@slow', '@regression', '@fixes: #441'])
-  })
-
-  test('raise error when filter layer is invalid', (assert) => {
-    const refiner = new Refiner({})
-    assert.throw(
-      () => refiner.add('foo' as any, ['@slow', '@regression']),
-      'Cannot apply filter. Invalid layer "foo"'
-    )
+    assert.isTrue(refiner.allows(testInstance))
   })
 
   test('add filter for group title', (assert) => {
     const refiner = new Refiner({})
-    refiner.add('group', ['Model | save'])
-    assert.deepEqual(refiner.get('group'), ['Model | save'])
-  })
-})
+    const emitter = new Emitter()
+    const groupInstance = new Group('Maths', emitter, refiner)
 
-test.group('Refiner | has', () => {
-  test('return true when has applied one or more filters', (assert) => {
-    const refiner = new Refiner({})
-    refiner.add('test', ['2 + 2 = 4'])
-    assert.isTrue(refiner.has('test'))
+    refiner.add('groups', [groupInstance.title])
+    assert.isTrue(refiner.allows(groupInstance))
   })
 
-  test('return false when no filters are applied', (assert) => {
+  test('pin test', (assert) => {
     const refiner = new Refiner({})
-    assert.isFalse(refiner.has('test'))
+    const emitter = new Emitter()
+    const testInstance = new Test('2 + 2 = 4', {}, emitter, refiner)
+    refiner.pinTest(testInstance)
+
+    assert.isTrue(refiner.allows(testInstance))
   })
 
-  test('match specific value to exist inside applied filters', (assert) => {
+  test('apply layers of filters on a test', (assert) => {
     const refiner = new Refiner({})
-    refiner.add('tags', ['@slow', '@regression'])
-    assert.isFalse(refiner.has('tags', '@foo'))
-    assert.isTrue(refiner.has('tags', '@slow'))
-  })
-})
+    const emitter = new Emitter()
 
-test.group('Refiner | hasAny', () => {
-  test('match any value to exists inside applied filters', (assert) => {
-    const refiner = new Refiner({})
-    refiner.add('tags', ['@slow', '@regression'])
-    assert.isFalse(refiner.hasAny('tags', ['@foo', '@bar']))
-    assert.isTrue(refiner.hasAny('tags', ['@foo', '@bar', '@slow']))
-  })
+    const testInstance = new Test('2 + 2 = 4', {}, emitter, refiner)
+    const testInstance1 = new Test('2 + 2 = 4', {}, emitter, refiner).tags(['@slow'])
+    const testInstance2 = new Test('2 + 2 = 4', {}, emitter, refiner).pin().tags(['@slow'])
+    const testInstance3 = new Test('3 + 3 = 6', {}, emitter, refiner).pin().tags(['@slow'])
 
-  test('return false when no filters are applied', (assert) => {
-    const refiner = new Refiner({})
-    assert.isFalse(refiner.hasAny('tags', ['@foo', '@bar']))
-    assert.isFalse(refiner.hasAny('tags', ['@foo', '@bar', '@slow']))
-  })
-})
+    refiner.add('tags', ['@slow'])
+    refiner.add('tests', ['2 + 2 = 4'])
 
-test.group('Refiner | hasAll', () => {
-  test('match all values to exists inside applied filters', (assert) => {
-    const refiner = new Refiner({})
-    refiner.add('tags', ['@slow', '@regression'])
-    assert.isFalse(refiner.hasAll('tags', ['@foo', '@bar']))
-    assert.isFalse(refiner.hasAll('tags', ['@foo', '@bar', '@slow']))
-    assert.isTrue(refiner.hasAll('tags', ['@regression', '@slow']))
-  })
-
-  test('return false when no filters are applied', (assert) => {
-    const refiner = new Refiner({})
-    assert.isFalse(refiner.hasAll('tags', ['@foo', '@bar']))
-    assert.isFalse(refiner.hasAll('tags', ['@foo', '@bar', '@slow']))
-  })
-})
-
-test.group('Refiner | get', () => {
-  test('get applied filters', (assert) => {
-    const refiner = new Refiner({})
-    refiner.add('tags', ['@slow', '@regression'])
-    assert.deepEqual(refiner.get('tags'), ['@slow', '@regression'])
-  })
-})
-
-test.group('Refiner | size', () => {
-  test('get size of applied filters', (assert) => {
-    const refiner = new Refiner({})
-    refiner.add('tags', ['@slow', '@regression'])
-    assert.equal(refiner.size('tags'), 2)
+    assert.isFalse(refiner.allows(testInstance))
+    assert.isFalse(refiner.allows(testInstance1))
+    assert.isTrue(refiner.allows(testInstance2))
+    assert.isFalse(refiner.allows(testInstance3))
   })
 })

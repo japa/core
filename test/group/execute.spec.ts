@@ -513,7 +513,7 @@ test.group('execute | refiner', () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    refiner.add('group', ['foo'])
+    refiner.add('groups', ['foo'])
 
     emitter.on('test:end', (event) => {
       events.push(event)
@@ -546,7 +546,7 @@ test.group('execute | refiner', () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    refiner.add('group', ['sample group'])
+    refiner.add('groups', ['sample group'])
 
     emitter.on('test:end', (event) => {
       events.push(event)

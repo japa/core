@@ -1070,7 +1070,7 @@ test.group('execute | refiner', () => {
   test('do not run test when refiner does not allows test title', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
-    refiner.add('test', ['foo'])
+    refiner.add('tests', ['foo'])
 
     emitter.emit = function (event: any) {
       if (event === 'test:start' || event === 'test:end') {
@@ -1110,7 +1110,7 @@ test.group('execute | refiner', () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    refiner.add('test', ['2 + 2 = 4'])
+    refiner.add('tests', ['2 + 2 = 4'])
 
     emitter.on('test:end', (event) => {
       try {
@@ -1210,12 +1210,12 @@ test.group('execute | refiner', () => {
     assert.deepEqual(stack, [])
   })
 
-  test('run test when its not pinned, but test title is allowed by the refiner', async (assert) => {
+  test('do not run pinned test when its title is not allowed by the refiner', async (assert) => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    refiner.add('test', ['new test'])
+    refiner.add('tests', ['new test'])
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -1233,7 +1233,7 @@ test.group('execute | refiner', () => {
     const [event1] = await Promise.all([pEvent(emitter, 'test:end'), testInstance1.exec()])
 
     assert.isNull(event)
-    assert.isNotNull(event1)
-    assert.deepEqual(stack, ['executed1'])
+    assert.isNull(event1)
+    assert.deepEqual(stack, [])
   })
 })

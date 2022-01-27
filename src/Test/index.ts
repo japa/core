@@ -265,33 +265,13 @@ export class Test<
    */
   public async exec() {
     /**
-     * Bail out when refiner does not allow the test title.
-     * Test title filter has priority over pinned tests
-     */
-    if (!this.refiner.allows('test', this.options.title)) {
-      return
-    }
-
-    /**
-     * Bail out when refiner does not allow the test tags
-     * Test tags filter has priority over pinned tests
-     */
-    if (!this.refiner.allows('tags', this.options.tags)) {
-      return
-    }
-
-    /**
      * Return early, if there are pinned test and the current test is not
      * pinned.
      *
      * However, the pinned test check is only applied when there
      * is no filter on the test title.
      */
-    if (
-      !this.refiner.has('test') &&
-      this.refiner.getPinned().size > 0 &&
-      !this.refiner.isPinned(this)
-    ) {
+    if (!this.refiner.allows(this)) {
       return
     }
 
