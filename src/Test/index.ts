@@ -62,7 +62,7 @@ export class Test<
   /**
    * The function for creating the test context
    */
-  private contextAccumlator?: () => Promise<Context> | Context
+  private contextAccumlator?: (test: this) => Promise<Context> | Context
 
   /**
    * The function for computing if test should
@@ -77,7 +77,7 @@ export class Test<
 
   constructor(
     public title: string,
-    context: Context | (() => Context | Promise<Context>),
+    context: Context | ((test: Test<Context, TestData>) => Context | Promise<Context>),
     private emitter: Emitter,
     private refiner: Refiner
   ) {
@@ -128,7 +128,7 @@ export class Test<
    */
   private async computeContext(): Promise<Context> {
     if (typeof this.contextAccumlator === 'function') {
-      this.context = await this.contextAccumlator()
+      this.context = await this.contextAccumlator(this)
     }
 
     return this.context
