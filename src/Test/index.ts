@@ -13,7 +13,7 @@ import { Hooks } from '@poppinss/hooks'
 import { Refiner } from '../Refiner'
 import { Emitter } from '../Emitter'
 import { DummyRunner, TestRunner } from './Runner'
-import { TestExecutor, TestOptions, TestHooksHandler, DataSetNode } from '../Contracts'
+import { TestExecutor, TestOptions, TestHooksHandler, DataSetNode, TestEndNode } from '../Contracts'
 
 /**
  * Test class exposes a self contained API to configure and run
@@ -32,6 +32,15 @@ export class Test<
 > extends Macroable {
   public static macros = {}
   public static getters = {}
+
+  /**
+   * Methods to call before disposing the test
+   */
+  public static disposeCallbacks: ((
+    test: Test<any, any>,
+    hasError: boolean,
+    errors: TestEndNode['errors']
+  ) => void)[] = []
 
   /**
    * Find if the test has already been executed
@@ -82,6 +91,15 @@ export class Test<
     private refiner: Refiner
   ) {
     super()
+
+    /**
+     * Make sure the instantiated class has its own property "disposeCalls"
+     */
+    if (!this.constructor.hasOwnProperty('disposeCallbacks')) {
+      throw new Error(
+        `Define static property "disposeCallbacks = []" on ${this.constructor.name} class`
+      )
+    }
 
     if (typeof context === 'function') {
       this.contextAccumlator = context
@@ -219,6 +237,17 @@ export class Test<
   }
 
   /**
+   * Define a dispose callback.
+   *
+   * Do note: Async methods are not allowed
+   */
+  public static dispose(
+    callback: (test: Test<any, any>, hasError: boolean, errors: TestEndNode['errors']) => void
+  ): void {
+    this.disposeCallbacks.push(callback)
+  }
+
+  /**
    * Define the dataset for the test. The test executor will be invoked
    * for all the items inside the dataset array
    */
@@ -311,7 +340,13 @@ export class Test<
     if (Array.isArray(this.dataset) && this.dataset.length) {
       let index = 0
       for (let [] of this.dataset) {
-        await new TestRunner(this, this.hooks, this.emitter, index).run()
+        await new TestRunner(
+          this,
+          this.hooks,
+          this.emitter,
+          (this.constructor as typeof Test).disposeCallbacks,
+          index
+        ).run()
 
         index++
       }
@@ -321,6 +356,11 @@ export class Test<
     /**
      * Run when no dataset is used
      */
-    await new TestRunner(this, this.hooks, this.emitter).run()
+    await new TestRunner(
+      this,
+      this.hooks,
+      this.emitter,
+      (this.constructor as typeof Test).disposeCallbacks
+    ).run()
   }
 }

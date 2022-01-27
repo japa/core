@@ -79,10 +79,7 @@ export class TestRunner {
   /**
    * Test errors
    */
-  private errors: {
-    phase: 'setup' | 'test' | 'setup:cleanup' | 'teardown' | 'teardown:cleanup'
-    error: Error
-  }[] = []
+  private errors: TestEndNode['errors'] = []
 
   /**
    * Track if test has any errors
@@ -95,6 +92,11 @@ export class TestRunner {
     private test: Test<any, any>,
     private hooks: Hooks,
     private emitter: Emitter,
+    private disposeCalls: ((
+      test: Test<any, any>,
+      hasError: boolean,
+      errors: TestEndNode['errors']
+    ) => void)[],
     private datasetCurrentIndex?: number
   ) {}
 
@@ -309,6 +311,16 @@ export class TestRunner {
       if (this.uncaughtExceptionHandler) {
         process.removeListener('uncaughtException', this.uncaughtExceptionHandler)
       }
+    }
+
+    /**
+     * Run dispose callbacks
+     */
+    try {
+      this.disposeCalls.forEach((callback) => callback(this.test, this.hasError, this.errors))
+    } catch (error) {
+      this.hasError = true
+      this.errors.push({ phase: 'test', error })
     }
 
     /**

@@ -815,6 +815,155 @@ test.group('execute | hooks', () => {
   })
 })
 
+test.group('execute | dispose', (group) => {
+  group.afterEach(() => {
+    Test.disposeCallbacks = []
+  })
+
+  test('define dispose callbacks for the test', async (assert, done) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      try {
+        assert.isFalse(event.hasError)
+        assert.lengthOf(event.errors, 0)
+        assert.deepEqual(stack, ['executed', 'dispose hook'])
+        done()
+      } catch (error) {
+        done(error)
+      }
+    })
+
+    Test.dispose(() => {
+      stack.push('dispose hook')
+    })
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance.run(async () => {
+      stack.push('executed')
+    })
+
+    await testInstance.exec()
+  })
+
+  test('fail test when dispose hook fails', async (assert, done) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      try {
+        assert.isTrue(event.hasError)
+        assert.lengthOf(event.errors, 1)
+        assert.equal(event.errors[0].phase, 'test')
+        assert.equal(event.errors[0].error.message, 'blowup')
+        assert.deepEqual(stack, ['executed'])
+        done()
+      } catch (error) {
+        done(error)
+      }
+    })
+
+    Test.dispose(() => {
+      throw new Error('blowup')
+    })
+
+    const testInstance = new Test(
+      '2 + 2 = 4',
+      async () => {
+        return new TestContext()
+      },
+      emitter,
+      refiner
+    )
+    testInstance.run(async () => {
+      stack.push('executed')
+    })
+
+    await testInstance.exec()
+  })
+
+  test('call dispose hook when test fails', async (assert, done) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      try {
+        assert.isTrue(event.hasError)
+        assert.lengthOf(event.errors, 1)
+        assert.equal(event.errors[0].phase, 'test')
+        assert.equal(event.errors[0].error.message, 'blowup')
+        assert.deepEqual(stack, ['dispose callback'])
+        done()
+      } catch (error) {
+        done(error)
+      }
+    })
+
+    Test.dispose(() => {
+      stack.push('dispose callback')
+    })
+
+    const testInstance = new Test(
+      '2 + 2 = 4',
+      async () => {
+        return new TestContext()
+      },
+      emitter,
+      refiner
+    )
+    testInstance.run(async () => {
+      throw new Error('blowup')
+    })
+
+    await testInstance.exec()
+  })
+
+  test('do not call dispose hooks when setup hook fails', async (assert, done) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      try {
+        assert.isTrue(event.hasError)
+        assert.lengthOf(event.errors, 1)
+        assert.equal(event.errors[0].phase, 'setup')
+        assert.equal(event.errors[0].error.message, 'blowup')
+        assert.deepEqual(stack, [])
+        done()
+      } catch (error) {
+        done(error)
+      }
+    })
+
+    Test.dispose(() => {
+      stack.push('dispose callback')
+    })
+
+    const testInstance = new Test(
+      '2 + 2 = 4',
+      async () => {
+        return new TestContext()
+      },
+      emitter,
+      refiner
+    )
+    testInstance
+      .setup(async () => {
+        throw new Error('blowup')
+      })
+      .run(() => {
+        stack.push('executed')
+      })
+
+    await testInstance.exec()
+  })
+})
+
 test.group('execute | dataset', () => {
   test('run test for all rows inside dataset', async (assert) => {
     const events: TestEndNode[] = []

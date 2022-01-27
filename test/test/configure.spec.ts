@@ -165,4 +165,37 @@ test.group('configure', () => {
       timeout: 2000,
     })
   })
+
+  test('do not mix hooks when a test is extended', async (assert) => {
+    class Test1 extends Test<any, any> {
+      public static disposeCallbacks = []
+    }
+    class Test2 extends Test<any, any> {
+      public static disposeCallbacks = []
+    }
+
+    function disposeCallback() {}
+    Test1.dispose(disposeCallback)
+
+    assert.deepEqual(Test1.disposeCallbacks, [disposeCallback])
+    assert.deepEqual(Test2.disposeCallbacks, [])
+  })
+
+  test('inherit parent dispose calls', async (assert) => {
+    function disposeCallback() {}
+    function disposeCallback1() {}
+    Test.dispose(disposeCallback)
+
+    class Test1 extends Test<any, any> {
+      public static disposeCallbacks = [...Test.disposeCallbacks]
+    }
+    class Test2 extends Test<any, any> {
+      public static disposeCallbacks = [...Test.disposeCallbacks]
+    }
+
+    Test2.dispose(disposeCallback1)
+
+    assert.deepEqual(Test1.disposeCallbacks, [disposeCallback])
+    assert.deepEqual(Test2.disposeCallbacks, [disposeCallback, disposeCallback1])
+  })
 })
