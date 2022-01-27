@@ -1,6 +1,6 @@
 {
   "name": "@japa/core",
-  "version": "5.0.8-0",
+  "version": "5.0.9-0",
   "description": "The core of Japa testing framework",
   "main": "build/index.js",
   "files": [
