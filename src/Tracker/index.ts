@@ -168,13 +168,37 @@ export class Tracker {
      */
     this.aggregates.total++
 
+    /**
+     * Test was skipped
+     */
     if (payload.isSkipped) {
       this.aggregates.skipped++
       return
     }
 
+    /**
+     * Test was a todo
+     */
     if (payload.isTodo) {
       this.aggregates.todo++
+      return
+    }
+
+    /**
+     * Regression test. Mark test as failed, when there is no error
+     * Because, we expect regression tests to have errors.
+     *
+     * However, there is no need to move anything to the failure
+     * tree, since there is no real error
+     */
+    if (payload.isFailing) {
+      if (!payload.hasError) {
+        this.aggregates.failed++
+        this.hasError = true
+      } else {
+        this.aggregates.regression++
+      }
+
       return
     }
 
@@ -186,14 +210,13 @@ export class Tracker {
       return
     }
 
-    /**
-     * Test has error, but is regression test
-     */
-    if (payload.hasError && payload.isFailing) {
-      this.aggregates.regression++
-      return
-    }
+    this.markTestAsFailed(payload)
+  }
 
+  /**
+   * Mark test as failed
+   */
+  private markTestAsFailed(payload: TestEndNode) {
     /**
      * Bump failed count
      */
