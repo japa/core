@@ -193,13 +193,7 @@ export type RunnerStartNode = {}
 /**
  * Data shared with "runner:end" event
  */
-export type RunnerEndNode = {
-  hasError: boolean
-  errors: {
-    phase: 'setup' | 'setup:cleanup' | 'teardown' | 'teardown:cleanup'
-    error: Error
-  }[]
-}
+export type RunnerEndNode = {}
 
 /**
  * Events emitted by the runner emitter. These can be extended as well
