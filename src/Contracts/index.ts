@@ -264,7 +264,6 @@ export type RunnerSummary = {
   skipped: number
   todo: number
   hasError: boolean
-  runnerErrors: RunnerEndNode['errors']
   duration: number
   failureTree: FailureTreeSuiteNode[]
   failedTestsTitles: string[]

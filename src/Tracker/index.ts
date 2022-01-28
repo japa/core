@@ -14,7 +14,6 @@ import {
   SuiteEndNode,
   RunnerEvents,
   RunnerSummary,
-  RunnerEndNode,
   GroupStartNode,
   SuiteStartNode,
   FailureTreeGroupNode,
@@ -45,11 +44,6 @@ export class Tracker {
    * If the entire run cycle has one or more errors
    */
   private hasError: boolean = false
-
-  /**
-   * Reference to the errors on the runner
-   */
-  private runnerErrors: RunnerEndNode['errors'] = []
 
   /**
    * Storing state if current suite and group has errors. These
@@ -144,17 +138,6 @@ export class Tracker {
     if (this.currentGroupHasError) {
       this.currentSuiteHasError = true
       this.currentSuite!.children.push(this.currentGroup!)
-    }
-  }
-
-  /**
-   * Move suite to the failure tree when the suite
-   * has errors
-   */
-  private onRunnerEnd(payload: RunnerEndNode) {
-    if (payload.hasError) {
-      this.hasError = true
-      this.runnerErrors = payload.errors
     }
   }
 
@@ -276,7 +259,6 @@ export class Tracker {
         this.timeTracker = timeSpan()
         break
       case 'runner:end':
-        this.onRunnerEnd(payload as RunnerEndNode)
         this.duration = this.timeTracker.rounded()
         break
     }
@@ -289,7 +271,6 @@ export class Tracker {
     return {
       ...this.aggregates,
       hasError: this.hasError,
-      runnerErrors: this.runnerErrors,
       duration: this.duration,
       failureTree: this.failureTree,
       failedTestsTitles: this.failedTestsTitles,
