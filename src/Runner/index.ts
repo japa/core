@@ -75,6 +75,9 @@ export class Runner extends Macroable {
   private boot() {
     this.tracker = new Tracker()
 
+    this.emitter.on('uncaught:exception', (payload) =>
+      this.tracker.processEvent('uncaught:exception', payload)
+    )
     this.emitter.on('runner:start', (payload) => this.tracker.processEvent('runner:start', payload))
     this.emitter.on('runner:end', (payload) => this.tracker.processEvent('runner:end', payload))
     this.emitter.on('suite:start', (payload) => this.tracker.processEvent('suite:start', payload))
@@ -140,6 +143,25 @@ export class Runner extends Macroable {
      */
     for (let suite of this.suites) {
       await suite.exec()
+    }
+
+    /**
+     * Wait for the nodejs event loop to get empty before
+     * notifying the runner end.
+     *
+     * We only care about the event loop when the uncaught
+     * exceptions are managed by the runner
+     */
+    if (this.uncaughtExceptionHandler) {
+      return new Promise((resolve) => {
+        function beforeExit() {
+          process.removeListener('beforeExit', beforeExit)
+          this.notifyEnd()
+          resolve(this.getSummary())
+        }
+
+        process.on('beforeExit', beforeExit)
+      })
     }
 
     /**

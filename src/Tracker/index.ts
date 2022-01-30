@@ -63,6 +63,7 @@ export class Tracker {
     regression: number
     skipped: number
     todo: number
+    uncaughtExceptions: number
   } = {
     total: 0,
     failed: 0,
@@ -70,6 +71,7 @@ export class Tracker {
     regression: 0,
     skipped: 0,
     todo: 0,
+    uncaughtExceptions: 0,
   }
 
   private duration: number = 0
@@ -233,6 +235,14 @@ export class Tracker {
   }
 
   /**
+   * Increment the count of uncaught exceptions
+   */
+  private onUncaughtException() {
+    this.aggregates.uncaughtExceptions++
+    this.hasError = true
+  }
+
+  /**
    * Process the tests events
    */
   public processEvent<Event extends keyof RunnerEvents>(
@@ -240,6 +250,9 @@ export class Tracker {
     payload: RunnerEvents[Event]
   ) {
     switch (event) {
+      case 'uncaught:exception':
+        this.onUncaughtException()
+        break
       case 'suite:start':
         this.onSuiteStart(payload as SuiteStartNode)
         break
