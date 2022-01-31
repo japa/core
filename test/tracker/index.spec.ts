@@ -10,13 +10,14 @@
 import test from 'japa'
 
 import { Test } from '../../src/Test'
+import { Group } from '../../src/Group'
 import { Suite } from '../../src/Suite'
 import { Runner } from '../../src/Runner'
 import { Refiner } from '../../src/Refiner'
 import { Emitter } from '../../src/Emitter'
 import { Tracker } from '../../src/Tracker'
+
 import { pEvent } from '../../test-helpers'
-import { Group } from '../../src/Group'
 import { TestContext } from '../../src/TestContext'
 
 test.group('Tracker', () => {
@@ -51,12 +52,12 @@ test.group('Tracker', () => {
     await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
     const summary = tracker.getSummary()
     assert.isFalse(summary.hasError)
-    assert.equal(summary.total, 2)
-    assert.equal(summary.passed, 2)
-    assert.equal(summary.failed, 0)
-    assert.equal(summary.skipped, 0)
-    assert.equal(summary.todo, 0)
-    assert.equal(summary.regression, 0)
+    assert.equal(summary.aggregates.total, 2)
+    assert.equal(summary.aggregates.passed, 2)
+    assert.equal(summary.aggregates.failed, 0)
+    assert.equal(summary.aggregates.skipped, 0)
+    assert.equal(summary.aggregates.todo, 0)
+    assert.equal(summary.aggregates.regression, 0)
     assert.lengthOf(summary.failureTree, 0)
     assert.lengthOf(summary.failedTestsTitles, 0)
   })
@@ -95,12 +96,12 @@ test.group('Tracker', () => {
     await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
     const summary = tracker.getSummary()
     assert.isTrue(summary.hasError)
-    assert.equal(summary.total, 2)
-    assert.equal(summary.passed, 1)
-    assert.equal(summary.failed, 1)
-    assert.equal(summary.skipped, 0)
-    assert.equal(summary.todo, 0)
-    assert.equal(summary.regression, 0)
+    assert.equal(summary.aggregates.total, 2)
+    assert.equal(summary.aggregates.passed, 1)
+    assert.equal(summary.aggregates.failed, 1)
+    assert.equal(summary.aggregates.skipped, 0)
+    assert.equal(summary.aggregates.todo, 0)
+    assert.equal(summary.aggregates.regression, 0)
     assert.deepEqual(summary.failureTree, [
       {
         name: 'functional',
@@ -155,12 +156,12 @@ test.group('Tracker', () => {
     await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
     const summary = tracker.getSummary()
     assert.isTrue(summary.hasError)
-    assert.equal(summary.total, 2)
-    assert.equal(summary.passed, 1)
-    assert.equal(summary.failed, 1)
-    assert.equal(summary.skipped, 0)
-    assert.equal(summary.todo, 0)
-    assert.equal(summary.regression, 0)
+    assert.equal(summary.aggregates.total, 2)
+    assert.equal(summary.aggregates.passed, 1)
+    assert.equal(summary.aggregates.failed, 1)
+    assert.equal(summary.aggregates.skipped, 0)
+    assert.equal(summary.aggregates.todo, 0)
+    assert.equal(summary.aggregates.regression, 0)
     assert.deepEqual(summary.failureTree, [
       {
         name: 'unit',
@@ -224,12 +225,12 @@ test.group('Tracker', () => {
     await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
     const summary = tracker.getSummary()
     assert.isFalse(summary.hasError)
-    assert.equal(summary.total, 2)
-    assert.equal(summary.passed, 1)
-    assert.equal(summary.skipped, 0)
-    assert.equal(summary.todo, 0)
-    assert.equal(summary.failed, 0)
-    assert.equal(summary.regression, 1)
+    assert.equal(summary.aggregates.total, 2)
+    assert.equal(summary.aggregates.passed, 1)
+    assert.equal(summary.aggregates.skipped, 0)
+    assert.equal(summary.aggregates.todo, 0)
+    assert.equal(summary.aggregates.failed, 0)
+    assert.equal(summary.aggregates.regression, 1)
     assert.deepEqual(summary.failureTree, [])
     assert.deepEqual(summary.failedTestsTitles, [])
   })
@@ -272,12 +273,12 @@ test.group('Tracker', () => {
     await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
     const summary = tracker.getSummary()
     assert.isTrue(summary.hasError)
-    assert.equal(summary.total, 1)
-    assert.equal(summary.passed, 1)
-    assert.equal(summary.failed, 0)
-    assert.equal(summary.skipped, 0)
-    assert.equal(summary.todo, 0)
-    assert.equal(summary.regression, 0)
+    assert.equal(summary.aggregates.total, 1)
+    assert.equal(summary.aggregates.passed, 1)
+    assert.equal(summary.aggregates.failed, 0)
+    assert.equal(summary.aggregates.skipped, 0)
+    assert.equal(summary.aggregates.todo, 0)
+    assert.equal(summary.aggregates.regression, 0)
     assert.deepEqual(summary.failureTree, [
       {
         name: 'unit',
@@ -335,12 +336,12 @@ test.group('Tracker', () => {
     await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
     const summary = tracker.getSummary()
     assert.isTrue(summary.hasError)
-    assert.equal(summary.total, 1)
-    assert.equal(summary.passed, 1)
-    assert.equal(summary.failed, 0)
-    assert.equal(summary.skipped, 0)
-    assert.equal(summary.todo, 0)
-    assert.equal(summary.regression, 0)
+    assert.equal(summary.aggregates.total, 1)
+    assert.equal(summary.aggregates.passed, 1)
+    assert.equal(summary.aggregates.failed, 0)
+    assert.equal(summary.aggregates.skipped, 0)
+    assert.equal(summary.aggregates.todo, 0)
+    assert.equal(summary.aggregates.regression, 0)
     assert.deepEqual(summary.failureTree, [
       {
         name: 'unit',
@@ -386,12 +387,12 @@ test.group('Tracker', () => {
     await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
     const summary = tracker.getSummary()
     assert.isTrue(summary.hasError)
-    assert.equal(summary.total, 2)
-    assert.equal(summary.passed, 1)
-    assert.equal(summary.skipped, 0)
-    assert.equal(summary.todo, 0)
-    assert.equal(summary.failed, 1)
-    assert.equal(summary.regression, 0)
+    assert.equal(summary.aggregates.total, 2)
+    assert.equal(summary.aggregates.passed, 1)
+    assert.equal(summary.aggregates.skipped, 0)
+    assert.equal(summary.aggregates.todo, 0)
+    assert.equal(summary.aggregates.failed, 1)
+    assert.equal(summary.aggregates.regression, 0)
     assert.deepEqual(summary.failureTree, [])
     assert.deepEqual(summary.failedTestsTitles, [])
   })

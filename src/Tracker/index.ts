@@ -282,7 +282,7 @@ export class Tracker {
    */
   public getSummary(): RunnerSummary {
     return {
-      ...this.aggregates,
+      aggregates: this.aggregates,
       hasError: this.hasError,
       duration: this.duration,
       failureTree: this.failureTree,
