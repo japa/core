@@ -153,11 +153,12 @@ export class Runner extends Macroable {
      * exceptions are managed by the runner
      */
     if (this.uncaughtExceptionHandler) {
-      return new Promise((resolve) => {
+      return new Promise<RunnerSummary>((resolve) => {
+        const self = this
         function beforeExit() {
           process.removeListener('beforeExit', beforeExit)
-          this.notifyEnd()
-          resolve(this.getSummary())
+          self.notifyEnd()
+          resolve(self.getSummary())
         }
 
         process.on('beforeExit', beforeExit)
