@@ -338,7 +338,8 @@ export class Test<
     await this.computeDataset()
     if (Array.isArray(this.dataset) && this.dataset.length) {
       let index = 0
-      for (let [] of this.dataset) {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      for (let _ of this.dataset) {
         await new TestRunner(
           this,
           this.hooks,
