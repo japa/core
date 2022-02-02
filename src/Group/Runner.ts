@@ -46,7 +46,7 @@ export class GroupRunner {
    * Notify the reporter about the group start
    */
   private notifyStart() {
-    const startOptions: GroupStartNode = { title: this.group.title }
+    const startOptions: GroupStartNode = { ...this.group.options }
     this.emitter.emit('group:start', startOptions)
   }
 
@@ -55,7 +55,7 @@ export class GroupRunner {
    */
   private notifyEnd() {
     const endOptions: GroupEndNode = {
-      title: this.group.title,
+      ...this.group.options,
       hasError: this.hasError,
       errors: this.errors,
     }

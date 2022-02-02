@@ -22,6 +22,7 @@ test.group('configure', () => {
       tags: [],
       title: '2 + 2 = 4',
       timeout: 2000,
+      meta: {},
     })
   })
 
@@ -33,6 +34,7 @@ test.group('configure', () => {
       tags: [],
       title: '2 + 2 = 4',
       timeout: 6000,
+      meta: {},
     })
   })
 
@@ -44,6 +46,7 @@ test.group('configure', () => {
       tags: [],
       title: '2 + 2 = 4',
       timeout: 0,
+      meta: {},
     })
   })
 
@@ -56,6 +59,7 @@ test.group('configure', () => {
       title: '2 + 2 = 4',
       timeout: 2000,
       retries: 4,
+      meta: {},
     })
   })
 
@@ -69,6 +73,7 @@ test.group('configure', () => {
       timeout: 2000,
       isSkipped: true,
       skipReason: 'Disabled for now',
+      meta: {},
     })
   })
 
@@ -81,6 +86,7 @@ test.group('configure', () => {
       title: '2 + 2 = 4',
       timeout: 2000,
       skipReason: 'Disabled for now',
+      meta: {},
     })
   })
 
@@ -94,6 +100,7 @@ test.group('configure', () => {
       timeout: 2000,
       isFailing: true,
       failReason: 'Should be 4, but returns 5 right now',
+      meta: {},
     })
   })
 
@@ -105,6 +112,7 @@ test.group('configure', () => {
       tags: ['@slow'],
       title: '2 + 2 = 4',
       timeout: 2000,
+      meta: {},
     })
   })
 
@@ -116,6 +124,7 @@ test.group('configure', () => {
       tags: ['@slow', '@regression'],
       title: '2 + 2 = 4',
       timeout: 2000,
+      meta: {},
     })
   })
 
@@ -127,6 +136,7 @@ test.group('configure', () => {
       tags: ['@regression', '@slow'],
       title: '2 + 2 = 4',
       timeout: 2000,
+      meta: {},
     })
   })
 
@@ -139,6 +149,7 @@ test.group('configure', () => {
       title: '2 + 2 = 4',
       timeout: 2000,
       waitsForDone: true,
+      meta: {},
     })
   })
 
@@ -151,6 +162,7 @@ test.group('configure', () => {
       tags: [],
       title: '2 + 2 = 4',
       timeout: 2000,
+      meta: {},
     })
   })
 
@@ -163,6 +175,7 @@ test.group('configure', () => {
       tags: [],
       title: '2 + 2 = 4',
       timeout: 2000,
+      meta: {},
     })
   })
 

@@ -116,6 +116,7 @@ export type TestOptions = {
   skipReason?: string
   failReason?: string
   retries?: number
+  meta: Record<string, any>
 }
 
 /**
@@ -148,17 +149,22 @@ export type TestEndNode = TestOptions & {
 }
 
 /**
+ * Group options
+ */
+export type GroupOptions = {
+  title: string
+  meta: Record<string, any>
+}
+
+/**
  * Data shared with "group:start" event
  */
-export type GroupStartNode = {
-  title: string
-}
+export type GroupStartNode = GroupOptions
 
 /**
  * Data shared with "group:end" event
  */
-export type GroupEndNode = {
-  title: string
+export type GroupEndNode = GroupOptions & {
   hasError: boolean
   errors: {
     phase: 'setup' | 'setup:cleanup' | 'teardown' | 'teardown:cleanup'

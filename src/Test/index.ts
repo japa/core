@@ -55,7 +55,12 @@ export class Test<
   /**
    * Test options
    */
-  public options: TestOptions
+  public options: TestOptions = {
+    title: this.title,
+    tags: [],
+    timeout: 2000,
+    meta: {},
+  }
 
   /**
    * Reference to the test dataset
@@ -105,12 +110,6 @@ export class Test<
       this.contextAccumlator = context
     } else {
       this.context = context
-    }
-
-    this.options = {
-      title,
-      tags: [],
-      timeout: 2000,
     }
   }
 

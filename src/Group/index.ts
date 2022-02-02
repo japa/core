@@ -14,7 +14,7 @@ import { Test } from '../Test'
 import { Emitter } from '../Emitter'
 import { Refiner } from '../Refiner'
 import { GroupRunner } from './Runner'
-import { GroupHooksHandler, TestHooksHandler } from '../Contracts'
+import { GroupHooksHandler, TestHooksHandler, GroupOptions } from '../Contracts'
 
 /**
  * Group class exposes an API to group multiple tests together
@@ -50,6 +50,11 @@ export class Group<Context> extends Macroable {
   private testsRetries?: number
   private testSetupHooks: TestHooksHandler<Context>[] = []
   private testTeardownHooks: TestHooksHandler<Context>[] = []
+
+  public options: GroupOptions = {
+    title: this.title,
+    meta: {},
+  }
 
   /**
    * An array of tests registered under the given group
