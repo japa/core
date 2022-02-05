@@ -71,4 +71,28 @@ test.group('Refiner', () => {
     assert.isTrue(refiner.allows(testInstance2))
     assert.isFalse(refiner.allows(testInstance3))
   })
+
+  test('disallow test with matching negated tag', (assert) => {
+    const refiner = new Refiner({})
+
+    const emitter = new Emitter()
+    const testInstance = new Test('2 + 2 = 4', {}, emitter, refiner)
+    testInstance.tags(['@fixes: #441', '@network'])
+
+    refiner.add('tags', ['@slow', '@regression'])
+    refiner.add('tags', ['@fixes: #441'])
+    refiner.add('tags', ['!@network'])
+    assert.isFalse(refiner.allows(testInstance))
+  })
+
+  test('allow test with non matching negated tag', (assert) => {
+    const refiner = new Refiner({})
+
+    const emitter = new Emitter()
+    const testInstance = new Test('2 + 2 = 4', {}, emitter, refiner)
+    testInstance.tags(['@fixes: #441'])
+
+    refiner.add('tags', ['!@network'])
+    assert.isTrue(refiner.allows(testInstance))
+  })
 })

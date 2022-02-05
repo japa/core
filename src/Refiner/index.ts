@@ -33,23 +33,24 @@ export class Refiner {
   /**
    * Available filters
    */
-  private filters: Required<FilteringOptions> = {
+  private filters: Required<FilteringOptions> & { negateTags: string[] } = {
     tags: [],
     tests: [],
     groups: [],
+    negateTags: [],
   }
 
   constructor(filters: FilteringOptions = {}) {
     if (filters.tags) {
-      this.filters.tags = [...filters.tags]
+      this.add('tags', filters.tags)
     }
 
     if (filters.tests) {
-      this.filters.tests = [...filters.tests]
+      this.add('tests', filters.tests)
     }
 
     if (filters.groups) {
-      this.filters.groups = [...filters.groups]
+      this.add('groups', filters.groups)
     }
   }
 
@@ -91,15 +92,24 @@ export class Refiner {
     return this.filters.tests.includes(test.title)
   }
 
-  /*
-   * Find if the test is allowed to be executed by checking
-   * for the test tags
+  /**
+   * Find if test is allowed by the negated tags filter
    */
-  private areTestTagsAllowed(test: Test<any, any>): boolean {
+  private allowedByNegatedTags(test: Test<any, any>): boolean {
+    if (!this.filters.negateTags.length) {
+      return true
+    }
+
     /**
-     * All tests are allowed, when no filters are applied
-     * on the test tags
+     * There should be zero matching negated tags
      */
+    return this.filters.negateTags.every((tag) => !test.options.tags.includes(tag))
+  }
+
+  /**
+   * Test if the test is allowed by the tags filter
+   */
+  private allowedByTags(test: Test<any, any>): boolean {
     if (!this.filters.tags.length) {
       return true
     }
@@ -108,6 +118,14 @@ export class Refiner {
      * Find one or more matching tags
      */
     return this.filters.tags.some((tag) => test.options.tags.includes(tag))
+  }
+
+  /*
+   * Find if the test is allowed to be executed by checking
+   * for the test tags
+   */
+  private areTestTagsAllowed(test: Test<any, any>): boolean {
+    return this.allowedByTags(test) && this.allowedByNegatedTags(test)
   }
 
   /*
@@ -129,7 +147,17 @@ export class Refiner {
    * Add a filter
    */
   public add(layer: 'tests' | 'tags' | 'groups', values: string[]): void {
-    this.filters[layer].push(...values)
+    if (layer === 'tags') {
+      values.forEach((tag) => {
+        if (tag.startsWith('!')) {
+          this.filters.negateTags.push(tag.slice(1))
+        } else {
+          this.filters.tags.push(tag)
+        }
+      })
+    } else {
+      this.filters[layer].push(...values)
+    }
   }
 
   /**
