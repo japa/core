@@ -7,6 +7,7 @@
  * file that was distributed with this source code.
  */
 
+import { inspect } from 'util'
 import { Macroable } from 'macroable'
 
 /**
@@ -15,4 +16,8 @@ import { Macroable } from 'macroable'
 export class TestContext extends Macroable {
   public static macros = {}
   public static getters = {}
+
+  public [inspect.custom]() {
+    return inspect(this, { showHidden: false, depth: 1, colors: true, customInspect: false })
+  }
 }
