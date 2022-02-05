@@ -24,14 +24,14 @@ export type DataSetNode = undefined | any[] | (() => any[] | Promise<any[]>)
  */
 export type TestHooksCleanupHandler<Context> = (
   error: null | any,
-  test: Context
+  test: Test<Context, any>
 ) => Promise<any> | any
 
 /**
  * The function that can be registered as a test hook
  */
 export type TestHooksHandler<Context> = (
-  test: Test<any, any>
+  test: Test<Context, any>
 ) =>
   | Promise<any>
   | any
