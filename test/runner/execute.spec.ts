@@ -51,7 +51,14 @@ test.group('execute | suites', () => {
     unit.add(testInstance)
     functional.add(testInstance1)
 
-    const [runnerEndEvent] = await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
+    const [runnerEndEvent] = await Promise.all([
+      pEvent(emitter, 'runner:end'),
+      (async () => {
+        await runner.start()
+        await runner.exec()
+        await runner.end()
+      })(),
+    ])
 
     assert.lengthOf(events, 4)
     assert.equal((events[0] as TestEndNode).title, 'test')
@@ -108,7 +115,14 @@ test.group('execute | reporters', () => {
     unit.add(testInstance)
     functional.add(testInstance1)
 
-    const [runnerEndEvent] = await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
+    const [runnerEndEvent] = await Promise.all([
+      pEvent(emitter, 'runner:end'),
+      (async () => {
+        await runner.start()
+        await runner.exec()
+        await runner.end()
+      })(),
+    ])
 
     assert.lengthOf(events, 4)
     assert.equal((events[0] as TestEndNode).title, 'test')

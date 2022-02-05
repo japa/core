@@ -24,7 +24,7 @@ export type DataSetNode = undefined | any[] | (() => any[] | Promise<any[]>)
  */
 export type TestHooksCleanupHandler<Context> = (
   error: null | any,
-  test: Test<Context, any>
+  test: Context
 ) => Promise<any> | any
 
 /**
@@ -75,18 +75,6 @@ export type SuiteHooksHandler<Context> = (
   | any
   | SuiteHooksCleanupHandler<Context>
   | Promise<SuiteHooksCleanupHandler<Context>>
-
-/**
- * The cleanup function for runner hooks
- */
-export type RunnerHooksCleanupHandler = (error: null | any, runner: Runner) => Promise<any> | any
-
-/**
- * The function that can be registered as a runner hook
- */
-export type RunnerHooksHandler = (
-  runner: Runner
-) => Promise<any> | any | RunnerHooksCleanupHandler | Promise<RunnerHooksCleanupHandler>
 
 /**
  * The function to execute the test

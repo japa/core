@@ -59,14 +59,14 @@ export class Runner extends Macroable {
    * Notify the reporter about the runner start
    */
   private notifyStart() {
-    this.emitter.emit('runner:start', {})
+    return this.emitter.emit('runner:start', {})
   }
 
   /**
    * Notify the reporter about the runner end
    */
   private notifyEnd() {
-    this.emitter.emit('runner:end', {})
+    return this.emitter.emit('runner:end', {})
   }
 
   /**
@@ -124,52 +124,32 @@ export class Runner extends Macroable {
   }
 
   /**
-   * Execute runner suites
+   * Start the test runner process. The method emits
+   * "runner:start" event
    */
-  public async exec() {
+  public async start() {
     this.boot()
 
     for (let reporter of this.reporters) {
       await reporter(this, this.emitter)
     }
 
-    /**
-     * Notify runner start
-     */
-    this.notifyStart()
+    await this.notifyStart()
+  }
 
-    /**
-     * Run the test executor
-     */
+  /**
+   * Execute runner suites
+   */
+  public async exec() {
     for (let suite of this.suites) {
       await suite.exec()
     }
+  }
 
-    /**
-     * Wait for the nodejs event loop to get empty before
-     * notifying the runner end.
-     *
-     * We only care about the event loop when the uncaught
-     * exceptions are managed by the runner
-     */
-    if (this.uncaughtExceptionHandler) {
-      return new Promise<RunnerSummary>((resolve) => {
-        const self = this
-        function beforeExit() {
-          process.removeListener('beforeExit', beforeExit)
-          self.notifyEnd()
-          resolve(self.getSummary())
-        }
-
-        process.on('beforeExit', beforeExit)
-      })
-    }
-
-    /**
-     * Notify runner end
-     */
-    this.notifyEnd()
-
-    return this.getSummary()
+  /**
+   * End the runner process. Emits "runner:end" event
+   */
+  public async end() {
+    await this.notifyEnd()
   }
 }
