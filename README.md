@@ -3,7 +3,9 @@
 
 [![github-actions-image]][github-actions-url] [![npm-image]][npm-url] [![license-image]][license-url] [![typescript-image]][typescript-url]
 
-The documentation is in progress and will be published soon
+This repo contains the code for the core of the japa tests runner. You can use it create your tests runner, just like `@japa/runner`.
+
+You can view the documentation on [https://japa.adonisjs.com/core/api/overview](https://japa.adonisjs.com/core/api/overview)
 
 [github-actions-image]: https://img.shields.io/github/workflow/status/japa/core/test?style=for-the-badge
 
