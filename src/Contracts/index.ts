@@ -216,7 +216,7 @@ export type FilteringOptions = {
 /**
  * Test reporters must adhere to the following contract
  */
-export type ReporterContract = (runner: Runner, emitter: Emitter) => void | Promise<void>
+export type ReporterContract = (runner: Runner<any>, emitter: Emitter) => void | Promise<void>
 
 /**
  * The test node inside the failure tree
