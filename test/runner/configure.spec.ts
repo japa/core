@@ -31,6 +31,21 @@ test.group('configure', () => {
     assert.deepEqual(runner.suites, [unitSuite, functionalSuite])
   })
 
+  test('tap into suites to configure them', async (assert) => {
+    const emitter = new Emitter()
+
+    const runner = new Runner(emitter)
+    runner.onSuite((suite) => (suite.name = `configured:${suite.name}`))
+
+    const unitSuite = new Suite('unit', emitter)
+    const functionalSuite = new Suite('functional', emitter)
+    runner.add(unitSuite).add(functionalSuite)
+
+    assert.deepEqual(runner.suites, [unitSuite, functionalSuite])
+    assert.equal(unitSuite.name, 'configured:unit')
+    assert.equal(functionalSuite.name, 'configured:functional')
+  })
+
   test('register reporters with runner', async (assert) => {
     const emitter = new Emitter()
 

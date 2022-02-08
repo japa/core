@@ -27,9 +27,14 @@ import { ReporterContract, RunnerSummary } from '../Contracts'
  *
  * await runner.exec()
  */
-export class Runner extends Macroable {
+export class Runner<Context> extends Macroable {
   public static macros = {}
   public static getters = {}
+
+  /**
+   * Callbacks to invoke on every suite
+   */
+  private configureSuiteCallbacks: ((suite: Suite<Context>) => void)[] = []
 
   /**
    * Reference to tests tracker
@@ -44,7 +49,7 @@ export class Runner extends Macroable {
   /**
    * A collection of suites
    */
-  public suites: Suite<any>[] = []
+  public suites: Suite<Context>[] = []
 
   /**
    * Registered tests reporter
@@ -91,8 +96,17 @@ export class Runner extends Macroable {
   /**
    * Add a suite to the runner
    */
-  public add(suite: Suite<any>): this {
+  public add(suite: Suite<Context>): this {
+    this.configureSuiteCallbacks.forEach((callback) => callback(suite))
     this.suites.push(suite)
+    return this
+  }
+
+  /**
+   * Tap into each suite and configure it
+   */
+  public onSuite(callback: (suite: Suite<Context>) => void): this {
+    this.configureSuiteCallbacks.push(callback)
     return this
   }
 
