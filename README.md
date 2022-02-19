@@ -9,7 +9,7 @@ You can find the docs for the older version of [here](https://github.com/japa/co
 
 This repo contains the code for the core of the japa tests runner. You can use it create your tests runner, just like `@japa/runner`.
 
-You can view the documentation on [https://japa.adonisjs.com/core/api/overview](https://japa.adonisjs.com/core/api/overview)
+You can view the documentation on [https://docs.adonisjs.com/cookbooks/testing-adonisjs-apps#introducing-japa](https://docs.adonisjs.com/cookbooks/testing-adonisjs-apps#introducing-japa)
 
 [github-actions-image]: https://img.shields.io/github/workflow/status/japa/core/test?style=for-the-badge
 
