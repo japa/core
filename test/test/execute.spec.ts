@@ -502,7 +502,13 @@ test.group('execute | hooks', () => {
       try {
         assert.isFalse(event.hasError)
         assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['setup', 'executed', 'setup cleanup'])
+        assert.deepEqual(stack, [
+          'setup',
+          'setup 2',
+          'executed',
+          'setup cleanup 2',
+          'setup cleanup',
+        ])
         done()
       } catch (error) {
         done(error)
@@ -515,6 +521,14 @@ test.group('execute | hooks', () => {
       stack.push('setup')
       return function () {
         stack.push('setup cleanup')
+      }
+    })
+
+    testInstance.setup(async (t) => {
+      assert.deepEqual(t, testInstance)
+      stack.push('setup 2')
+      return function () {
+        stack.push('setup cleanup 2')
       }
     })
 
