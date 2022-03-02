@@ -1173,6 +1173,33 @@ test.group('execute | skip', () => {
     await testInstance.exec()
   })
 
+  test('skip by default', async (assert, done) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      try {
+        assert.isTrue(event.isSkipped)
+        assert.isFalse(event.hasError)
+        assert.lengthOf(event.errors, 0)
+        assert.deepEqual(stack, [])
+        done()
+      } catch (error) {
+        done(error)
+      }
+    })
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance
+      .run(async () => {
+        stack.push('executed')
+      })
+      .skip()
+
+    await testInstance.exec()
+  })
+
   test('compute skip status lazily', async (assert, done) => {
     const stack: string[] = []
     const emitter = new Emitter()
