@@ -154,7 +154,10 @@ export class Test<
   /**
    * Skip the test conditionally
    */
-  public skip(skip: boolean | (() => Promise<boolean> | boolean), skipReason?: string): this {
+  public skip(
+    skip: boolean | (() => Promise<boolean> | boolean) = true,
+    skipReason?: string
+  ): this {
     if (typeof skip === 'function') {
       this.skipAccumulator = skip
     } else {
