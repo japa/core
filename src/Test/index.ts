@@ -76,7 +76,7 @@ export class Test<
   /**
    * The function for creating the test context
    */
-  private contextAccumlator?: (test: this) => Promise<Context> | Context
+  private contextAccumlator?: (test: this) => Context | Promise<Context>
 
   /**
    * The function for computing if test should
@@ -107,7 +107,9 @@ export class Test<
     }
 
     if (typeof context === 'function') {
-      this.contextAccumlator = context
+      this.contextAccumlator = context as (
+        test: Test<Context, TestData>
+      ) => Context | Promise<Context>
     } else {
       this.context = context
     }
