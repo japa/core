@@ -110,7 +110,12 @@ export type TestOptions = {
 /**
  * Data shared during "test:start" event
  */
-export type TestStartNode = TestOptions & {
+export type TestStartNode = Omit<TestOptions, 'title'> & {
+  title: {
+    original: string
+    expanded: string
+    toString(): string
+  }
   dataset?: {
     size: number
     index: number
@@ -121,7 +126,12 @@ export type TestStartNode = TestOptions & {
 /**
  * Data shared during "test:end" event
  */
-export type TestEndNode = TestOptions & {
+export type TestEndNode = Omit<TestOptions, 'title'> & {
+  title: {
+    original: string
+    expanded: string
+    toString(): string
+  }
   duration: number
   hasError: boolean
   errors: {

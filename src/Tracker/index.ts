@@ -213,7 +213,7 @@ export class Tracker {
      */
     const testPayload = {
       type: 'test' as const,
-      title: payload.title,
+      title: payload.title.expanded,
       errors: payload.errors,
     }
 
@@ -231,7 +231,7 @@ export class Tracker {
     /**
      * Push title to the failedTestsTitles array
      */
-    this.failedTestsTitles.push(payload.title)
+    this.failedTestsTitles.push(payload.title.original)
   }
 
   /**

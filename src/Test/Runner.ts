@@ -13,6 +13,7 @@ import timeSpan, { TimeEndFunction } from 'time-span'
 
 import { Test } from '.'
 import { Emitter } from '../Emitter'
+import { interpolate } from '../Interpolate'
 import { TestEndNode, TestStartNode } from '../Contracts'
 
 /**
@@ -25,7 +26,16 @@ export class DummyRunner {
    * Notify the reporter about the test start
    */
   private notifyStart() {
-    const startOptions: TestStartNode = { ...this.test.options }
+    const startOptions: TestStartNode = {
+      ...this.test.options,
+      title: {
+        original: this.test.options.title,
+        expanded: this.test.options.title,
+        toString() {
+          return this.original
+        },
+      },
+    }
     this.emitter.emit('test:start', startOptions)
   }
 
@@ -35,6 +45,13 @@ export class DummyRunner {
   private notifyEnd() {
     const endOptions: TestEndNode = {
       ...this.test.options,
+      title: {
+        original: this.test.options.title,
+        expanded: this.test.options.title,
+        toString() {
+          return this.original
+        },
+      },
       hasError: false,
       duration: 0,
       errors: [],
@@ -116,11 +133,33 @@ export class TestRunner {
   }
 
   /**
+   * Get the title node for the test
+   */
+  private getTitle(dataset?: { row: any; index: number }) {
+    const title = this.test.options.title
+
+    return {
+      original: title,
+      expanded: dataset ? interpolate(title, dataset.row, dataset.index + 1) : title,
+      toString() {
+        return this.original
+      },
+    }
+  }
+
+  /**
    * Notify the reporter about the test start
    */
   private notifyStart() {
     this.timeTracker = timeSpan()
-    const startOptions: TestStartNode = { ...this.test.options, ...this.getDatasetNode() }
+    const dataset = this.getDatasetNode()
+
+    const startOptions: TestStartNode = {
+      ...this.test.options,
+      ...dataset,
+      title: this.getTitle(dataset ? dataset.dataset : undefined),
+    }
+
     this.emitter.emit('test:start', startOptions)
   }
 
@@ -128,9 +167,12 @@ export class TestRunner {
    * Notify the reporter about the test start
    */
   private notifyEnd() {
+    const dataset = this.getDatasetNode()
+
     const endOptions: TestEndNode = {
       ...this.test.options,
-      ...this.getDatasetNode(),
+      ...dataset,
+      title: this.getTitle(dataset ? dataset.dataset : undefined),
       hasError: this.hasError,
       errors: this.errors,
       retryAttempt: this.retryAttempt,

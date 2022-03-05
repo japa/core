@@ -1120,6 +1120,104 @@ test.group('execute | dataset', () => {
       'dataset must be an array or a function that returns an array'
     )
   })
+
+  test('interpolate test title', async (assert) => {
+    const events: TestEndNode[] = []
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      events.push(event)
+    })
+
+    const testInstance = new Test('{$i} - .add({0}, {1})', new TestContext(), emitter, refiner)
+    testInstance
+      .with([
+        [1, 1, 2],
+        [1, 2, 3],
+        [2, 1, 3],
+      ])
+      .run(async (_, value) => {
+        stack.push(value.join(','))
+      })
+
+    await testInstance.exec()
+
+    assert.deepEqual(stack, ['1,1,2', '1,2,3', '2,1,3'])
+
+    assert.lengthOf(events, 3)
+    assert.equal(events[0].title.expanded, '1 - .add(1, 1)')
+    assert.equal(events[1].title.expanded, '2 - .add(1, 2)')
+    assert.equal(events[2].title.expanded, '3 - .add(2, 1)')
+  })
+
+  test('escape value within curly braces', async (assert) => {
+    const events: TestEndNode[] = []
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      events.push(event)
+    })
+
+    const testInstance = new Test('{$i} - .add(\\{0}, {1})', new TestContext(), emitter, refiner)
+    testInstance
+      .with([
+        [1, 1, 2],
+        [1, 2, 3],
+        [2, 1, 3],
+      ])
+      .run(async (_, value) => {
+        stack.push(value.join(','))
+      })
+
+    await testInstance.exec()
+
+    assert.deepEqual(stack, ['1,1,2', '1,2,3', '2,1,3'])
+
+    assert.lengthOf(events, 3)
+    assert.equal(events[0].title.expanded, '1 - .add({0}, 1)')
+    assert.equal(events[1].title.expanded, '2 - .add({0}, 2)')
+    assert.equal(events[2].title.expanded, '3 - .add({0}, 1)')
+  })
+
+  test('return undefined when value is missing', async (assert) => {
+    const events: TestEndNode[] = []
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      events.push(event)
+    })
+
+    const testInstance = new Test(
+      '{$i} - .add({user.profile.name}, {1})',
+      new TestContext(),
+      emitter,
+      refiner
+    )
+    testInstance
+      .with([
+        [1, 1, 2],
+        [1, 2, 3],
+        [2, 1, 3],
+      ])
+      .run(async (_, value) => {
+        stack.push(value.join(','))
+      })
+
+    await testInstance.exec()
+
+    assert.deepEqual(stack, ['1,1,2', '1,2,3', '2,1,3'])
+
+    assert.lengthOf(events, 3)
+    assert.equal(events[0].title.expanded, '1 - .add(undefined, 1)')
+    assert.equal(events[1].title.expanded, '2 - .add(undefined, 2)')
+    assert.equal(events[2].title.expanded, '3 - .add(undefined, 1)')
+  })
 })
 
 test.group('execute | todo', () => {
