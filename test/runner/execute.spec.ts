@@ -61,13 +61,13 @@ test.group('execute | suites', () => {
     ])
 
     assert.lengthOf(events, 4)
-    assert.equal((events[0] as TestEndNode).title, 'test')
+    assert.equal((events[0] as TestEndNode).title.expanded, 'test')
     assert.isFalse(events[0].hasError)
 
     assert.equal((events[1] as SuiteEndNode).name, 'unit')
     assert.isFalse(events[1].hasError)
 
-    assert.equal((events[2] as TestEndNode).title, 'test 1')
+    assert.equal((events[2] as TestEndNode).title.expanded, 'test 1')
     assert.isFalse(events[2].hasError)
 
     assert.equal((events[3] as SuiteEndNode).name, 'functional')
@@ -125,13 +125,13 @@ test.group('execute | reporters', () => {
     ])
 
     assert.lengthOf(events, 4)
-    assert.equal((events[0] as TestEndNode).title, 'test')
+    assert.equal((events[0] as TestEndNode).title.expanded, 'test')
     assert.isFalse(events[0].hasError)
 
     assert.equal((events[1] as SuiteEndNode).name, 'unit')
     assert.isFalse(events[1].hasError)
 
-    assert.equal((events[2] as TestEndNode).title, 'test 1')
+    assert.equal((events[2] as TestEndNode).title.expanded, 'test 1')
     assert.isFalse(events[2].hasError)
 
     assert.equal((events[3] as SuiteEndNode).name, 'functional')

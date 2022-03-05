@@ -44,10 +44,10 @@ test.group('execute | test', () => {
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
     assert.lengthOf(events, 2)
-    assert.equal(events[0].title, 'test')
+    assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
 
-    assert.equal(events[1].title, 'test 1')
+    assert.equal(events[1].title.expanded, 'test 1')
     assert.isFalse(events[1].hasError)
 
     assert.equal(suiteEndEvent!.name, 'sample suite')
@@ -81,10 +81,10 @@ test.group('execute | test', () => {
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
     assert.lengthOf(events, 2)
-    assert.equal(events[0].title, 'test')
+    assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
 
-    assert.equal(events[1].title, 'test 1')
+    assert.equal(events[1].title.expanded, 'test 1')
     assert.isFalse(events[1].hasError)
 
     assert.equal(suiteEndEvent!.name, 'sample suite')
@@ -122,10 +122,10 @@ test.group('execute | test', () => {
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
     assert.lengthOf(events, 2)
-    assert.equal(events[0].title, 'test')
+    assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
 
-    assert.equal(events[1].title, 'test 1')
+    assert.equal(events[1].title.expanded, 'test 1')
     assert.isFalse(events[1].hasError)
 
     assert.equal(suiteEndEvent!.name, 'sample suite')
@@ -162,10 +162,10 @@ test.group('execute | hooks', () => {
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
     assert.lengthOf(events, 2)
-    assert.equal(events[0].title, 'test')
+    assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
 
-    assert.equal(events[1].title, 'test 1')
+    assert.equal(events[1].title.expanded, 'test 1')
     assert.isFalse(events[1].hasError)
 
     assert.equal(suiteEndEvent!.name, 'sample suite')
@@ -210,10 +210,10 @@ test.group('execute | hooks', () => {
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
     assert.lengthOf(events, 2)
-    assert.equal(events[0].title, 'test')
+    assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
 
-    assert.equal(events[1].title, 'test 1')
+    assert.equal(events[1].title.expanded, 'test 1')
     assert.isFalse(events[1].hasError)
 
     assert.equal(suiteEndEvent!.name, 'sample suite')
