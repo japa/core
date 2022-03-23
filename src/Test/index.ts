@@ -335,8 +335,6 @@ export class Test<
       return
     }
 
-    await this.computeContext()
-
     /**
      * Run for each row inside dataset
      */
@@ -345,6 +343,7 @@ export class Test<
       let index = 0
       // eslint-disable-next-line @typescript-eslint/naming-convention
       for (let _ of this.dataset) {
+        await this.computeContext()
         await new TestRunner(
           this,
           this.hooks,
@@ -361,6 +360,7 @@ export class Test<
     /**
      * Run when no dataset is used
      */
+    await this.computeContext()
     await new TestRunner(
       this,
       this.hooks,

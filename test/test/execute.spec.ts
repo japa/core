@@ -1218,6 +1218,34 @@ test.group('execute | dataset', () => {
     assert.equal(events[1].title.expanded, '2 - .add(undefined, 2)')
     assert.equal(events[2].title.expanded, '3 - .add(undefined, 1)')
   })
+
+  test.only('isolate context between tests', async (assert) => {
+    const events: TestEndNode[] = []
+    const stack: string[] = []
+    const contexts: TestContext[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      events.push(event)
+    })
+
+    const testInstance = new Test('2 + 2 = 4', () => new TestContext(), emitter, refiner)
+    testInstance.with(['foo', 'bar']).run(async (ctx, value) => {
+      contexts.push(ctx)
+      stack.push(value)
+    })
+
+    await testInstance.exec()
+
+    assert.deepEqual(stack, ['foo', 'bar'])
+    assert.lengthOf(contexts, 2)
+    assert.notStrictEqual(contexts[0], contexts[1])
+
+    assert.lengthOf(events, 2)
+    assert.deepEqual(events[0].dataset, { size: 2, row: 'foo', index: 0 })
+    assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
+  })
 })
 
 test.group('execute | todo', () => {
