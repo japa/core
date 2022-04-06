@@ -336,36 +336,19 @@ export class Test<
     }
 
     /**
-     * Run for each row inside dataset
+     * Run the test at least once with the first dataset, with or without any, and rerun for any additional datasets
      */
     await this.computeDataset()
-    if (Array.isArray(this.dataset) && this.dataset.length) {
-      let index = 0
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      for (let _ of this.dataset) {
-        await this.computeContext()
-        await new TestRunner(
-          this,
-          this.hooks,
-          this.emitter,
-          (this.constructor as typeof Test).disposeCallbacks,
-          index
-        ).run()
-
-        index++
-      }
-      return
-    }
-
-    /**
-     * Run when no dataset is used
-     */
-    await this.computeContext()
-    await new TestRunner(
-      this,
-      this.hooks,
-      this.emitter,
-      (this.constructor as typeof Test).disposeCallbacks
-    ).run()
+    let index = 0
+    do {
+      await this.computeContext()
+      await new TestRunner(
+        this,
+        this.hooks,
+        this.emitter,
+        (this.constructor as typeof Test).disposeCallbacks,
+        index
+      ).run()
+    } while (++index < this.dataset!.length)
   }
 }
