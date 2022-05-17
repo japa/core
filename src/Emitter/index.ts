@@ -28,10 +28,11 @@ export class Emitter extends Emittery<RunnerEvents> {
    */
   public async emit<Name extends keyof RunnerEvents>(
     eventName: Name,
-    eventData?: RunnerEvents[Name]
+    eventData?: RunnerEvents[Name],
+    allowMetaEvents?: boolean
   ): Promise<void> {
     try {
-      await super.emit(eventName, eventData!)
+      await (super.emit as any)(eventName, eventData!, allowMetaEvents)
     } catch (error) {
       if (this.errorHandler) {
         await this.errorHandler(error)
