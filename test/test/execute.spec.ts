@@ -1219,7 +1219,7 @@ test.group('execute | dataset', () => {
     assert.equal(events[2].title.expanded, '3 - .add(undefined, 1)')
   })
 
-  test.only('isolate context between tests', async (assert) => {
+  test('isolate context between tests', async (assert) => {
     const events: TestEndNode[] = []
     const stack: string[] = []
     const contexts: TestContext[] = []
