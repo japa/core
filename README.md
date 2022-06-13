@@ -23,3 +23,8 @@ You can view the documentation on [https://japa.dev/core/introduction](https://j
 
 [typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?style=for-the-badge&logo=typescript
 [typescript-url]:  "typescript"
+
+<br />
+<hr>
+
+![](./sponsorkit/sponsors.png)
