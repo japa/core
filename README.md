@@ -27,4 +27,4 @@ You can view the documentation on [https://japa.dev/core/introduction](https://j
 <br />
 <hr>
 
-![](./sponsorkit/sponsors.png)
+![](https://cdn.jsdelivr.net/gh/thetutlage/static/sponsorkit/sponsors.png)
