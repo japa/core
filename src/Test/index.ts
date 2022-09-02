@@ -10,8 +10,9 @@
 import { Macroable } from 'macroable'
 import { Hooks } from '@poppinss/hooks'
 
-import { Refiner } from '../Refiner'
+import { Group } from '../Group'
 import { Emitter } from '../Emitter'
+import { Refiner } from '../Refiner'
 import { DummyRunner, TestRunner } from './Runner'
 import { TestExecutor, TestOptions, TestHooksHandler, DataSetNode, TestEndNode } from '../Contracts'
 
@@ -93,7 +94,8 @@ export class Test<
     public title: string,
     context: Context | ((test: Test<Context, TestData>) => Context | Promise<Context>),
     private emitter: Emitter,
-    private refiner: Refiner
+    private refiner: Refiner,
+    public parent?: Group<Context>
   ) {
     super()
 

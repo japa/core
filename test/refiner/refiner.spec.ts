@@ -95,4 +95,14 @@ test.group('Refiner', () => {
     refiner.add('tags', ['!@network'])
     assert.isTrue(refiner.allows(testInstance))
   })
+
+  test('do not allow lone tests when group filter is applied', (assert) => {
+    const refiner = new Refiner({})
+    const emitter = new Emitter()
+    const groupInstance = new Group('Maths', emitter, refiner)
+    const loneTestInstance = new Test('2 + 2 = 4', {}, emitter, refiner)
+
+    refiner.add('groups', [groupInstance.title])
+    assert.isFalse(refiner.allows(loneTestInstance))
+  })
 })

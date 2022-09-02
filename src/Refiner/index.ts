@@ -170,6 +170,14 @@ export class Refiner {
     }
 
     /**
+     * Do not run lone tests when group filter is applied. It is responsibility
+     * of the runner to attach groups to tests.
+     */
+    if (this.filters.groups.length && !testOrGroup.parent) {
+      return false
+    }
+
+    /**
      * Layer 1
      */
     const isTestTitleAllowed = this.isTestTitleAllowed(testOrGroup)
