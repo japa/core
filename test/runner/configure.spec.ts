@@ -11,10 +11,11 @@ import test from 'japa'
 
 import { Suite } from '../../src/Suite'
 import { Runner } from '../../src/Runner'
+import { Refiner } from '../../src/Refiner'
 import { Emitter } from '../../src/Emitter'
 import { ReporterContract } from '../../src/Contracts'
 
-test.group('configure', () => {
+test.group('configure | runner', () => {
   test('create an instance of runner', async (assert) => {
     const runner = new Runner(new Emitter())
     assert.instanceOf(runner, Runner)
@@ -24,8 +25,9 @@ test.group('configure', () => {
     const emitter = new Emitter()
 
     const runner = new Runner(emitter)
-    const unitSuite = new Suite('unit', emitter)
-    const functionalSuite = new Suite('functional', emitter)
+    const refiner = new Refiner()
+    const unitSuite = new Suite('unit', emitter, refiner)
+    const functionalSuite = new Suite('functional', emitter, refiner)
     runner.add(unitSuite).add(functionalSuite)
 
     assert.deepEqual(runner.suites, [unitSuite, functionalSuite])
@@ -35,10 +37,11 @@ test.group('configure', () => {
     const emitter = new Emitter()
 
     const runner = new Runner(emitter)
+    const refiner = new Refiner()
     runner.onSuite((suite) => (suite.name = `configured:${suite.name}`))
 
-    const unitSuite = new Suite('unit', emitter)
-    const functionalSuite = new Suite('functional', emitter)
+    const unitSuite = new Suite('unit', emitter, refiner)
+    const functionalSuite = new Suite('functional', emitter, refiner)
     runner.add(unitSuite).add(functionalSuite)
 
     assert.deepEqual(runner.suites, [unitSuite, functionalSuite])

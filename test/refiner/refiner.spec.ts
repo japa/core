@@ -41,6 +41,12 @@ test.group('Refiner', () => {
     const emitter = new Emitter()
     const groupInstance = new Group('Maths', emitter, refiner)
 
+    /**
+     * Group must have a test to be allowed by the filtered
+     */
+    const testInstance = new Test('2 + 2 = 4', {}, emitter, refiner, groupInstance)
+    groupInstance.add(testInstance)
+
     refiner.add('groups', [groupInstance.title])
     assert.isTrue(refiner.allows(groupInstance))
   })

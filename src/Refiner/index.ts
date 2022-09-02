@@ -65,15 +65,34 @@ export class Refiner {
    * Find if the group is allowed to execute its tests.
    */
   private isGroupAllowed(group: Group<any>): boolean {
+    const groupFilters = this.filters.groups
+
     /**
-     * All groups are allowed, when no filters are applied
-     * on the group title
+     * Group filters exists and group title is not within the filters
+     * list, then return false right away
      */
-    if (!this.filters.groups.length) {
-      return true
+    if (groupFilters.length && !groupFilters.includes(group.title)) {
+      return false
     }
 
-    return this.filters.groups.includes(group.title)
+    /**
+     * By default the group is not allowed to be executed. However,
+     * we go through all the tests within that group and if
+     * one or more tests are allowed to run, then we will
+     * allow the group to run as well.
+     *
+     * Basically, we are checking the children to find if the group
+     * should run or not.
+     */
+    let allowGroup = false
+    for (let test of group.tests) {
+      allowGroup = this.allows(test)
+      if (allowGroup) {
+        break
+      }
+    }
+
+    return allowGroup
   }
 
   /**

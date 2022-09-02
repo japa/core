@@ -27,8 +27,8 @@ test.group('Tracker', () => {
     const tracker = new Tracker()
 
     const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter)
-    const functional = new Suite('functional', emitter)
+    const unit = new Suite('unit', emitter, refiner)
+    const functional = new Suite('functional', emitter, refiner)
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {})
@@ -68,8 +68,8 @@ test.group('Tracker', () => {
     const tracker = new Tracker()
 
     const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter)
-    const functional = new Suite('functional', emitter)
+    const unit = new Suite('unit', emitter, refiner)
+    const functional = new Suite('functional', emitter, refiner)
     const error = new Error('foo')
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
@@ -125,8 +125,8 @@ test.group('Tracker', () => {
     const tracker = new Tracker()
 
     const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter)
-    const functional = new Suite('functional', emitter)
+    const unit = new Suite('unit', emitter, refiner)
+    const functional = new Suite('functional', emitter, refiner)
     const error = new Error('foo')
 
     const group = new Group('arithmetic', emitter, refiner)
@@ -192,8 +192,8 @@ test.group('Tracker', () => {
     const tracker = new Tracker()
 
     const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter)
-    const functional = new Suite('functional', emitter)
+    const unit = new Suite('unit', emitter, refiner)
+    const functional = new Suite('functional', emitter, refiner)
     const error = new Error('foo')
 
     const group = new Group('arithmetic', emitter, refiner)
@@ -241,8 +241,8 @@ test.group('Tracker', () => {
     const tracker = new Tracker()
 
     const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter)
-    const functional = new Suite('functional', emitter)
+    const unit = new Suite('unit', emitter, refiner)
+    const functional = new Suite('functional', emitter, refiner)
     const error = new Error('foo')
 
     const group = new Group('arithmetic', emitter, refiner)
@@ -303,12 +303,12 @@ test.group('Tracker', () => {
     const tracker = new Tracker()
 
     const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter)
+    const unit = new Suite('unit', emitter, refiner)
     unit.setup(() => {
       throw error
     })
 
-    const functional = new Suite('functional', emitter)
+    const functional = new Suite('functional', emitter, refiner)
     const error = new Error('foo')
 
     const group = new Group('arithmetic', emitter, refiner)
@@ -359,8 +359,8 @@ test.group('Tracker', () => {
     const tracker = new Tracker()
 
     const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter)
-    const functional = new Suite('functional', emitter)
+    const unit = new Suite('unit', emitter, refiner)
+    const functional = new Suite('functional', emitter, refiner)
 
     const group = new Group('arithmetic', emitter, refiner)
     const testInstance = new Test('test', new TestContext(), emitter, refiner)

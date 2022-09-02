@@ -16,6 +16,7 @@ import { Emitter } from '../Emitter'
 
 import { SuiteRunner } from './Runner'
 import { SuiteHooksHandler } from '../Contracts'
+import { Refiner } from '../Refiner'
 
 /**
  * The Suite class exposes the API to run a group of tests
@@ -57,7 +58,7 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
    */
   public stack: (Test<Context, any> | Group<Context>)[] = []
 
-  constructor(public name: string, private emitter: Emitter) {
+  constructor(public name: string, private emitter: Emitter, private refiner: Refiner) {
     super()
   }
 
@@ -113,6 +114,27 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
    * Execute suite groups, tests and hooks
    */
   public async exec() {
+    /**
+     * By default a suite is not allowed to be executed. However, we go
+     * through all the tests/ groups within the suite  and if one
+     * or more tests/groups are allowed to run, then we will
+     * allow the suite to run as well.
+     *
+     * Basically, we are checking the children to find if the suite
+     * should run or not.
+     */
+    let allowSuite = false
+    for (let item of this.stack) {
+      allowSuite = this.refiner.allows(item)
+      if (allowSuite) {
+        break
+      }
+    }
+
+    if (!allowSuite) {
+      return
+    }
+
     await new SuiteRunner(this, this.hooks, this.emitter).run()
   }
 }

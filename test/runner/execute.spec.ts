@@ -18,7 +18,7 @@ import { pEvent } from '../../test-helpers'
 import { TestContext } from '../../src/TestContext'
 import { SuiteEndNode, TestEndNode } from '../../src/Contracts'
 
-test.group('execute | suites', () => {
+test.group('execute | runner', () => {
   test('run all suites tests', async (assert) => {
     const stack: string[] = []
     const events: (TestEndNode | SuiteEndNode)[] = []
@@ -34,8 +34,8 @@ test.group('execute | suites', () => {
     })
 
     const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter)
-    const functional = new Suite('functional', emitter)
+    const unit = new Suite('unit', emitter, refiner)
+    const functional = new Suite('functional', emitter, refiner)
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {
@@ -98,8 +98,8 @@ test.group('execute | reporters', () => {
       stack.push('list reporter open')
     })
 
-    const unit = new Suite('unit', emitter)
-    const functional = new Suite('functional', emitter)
+    const unit = new Suite('unit', emitter, refiner)
+    const functional = new Suite('functional', emitter, refiner)
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {

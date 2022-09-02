@@ -29,12 +29,12 @@ test.group('execute | test', () => {
     })
 
     const group = new Group('sample group', emitter, refiner)
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -64,13 +64,13 @@ test.group('execute | test', () => {
     })
 
     const group = new Group('sample group', emitter, refiner)
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
       throw new Error('blow up')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -107,12 +107,12 @@ test.group('execute | hooks', () => {
     group.setup(() => stack.push('group setup'))
     group.teardown(() => stack.push('group teardown'))
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -155,12 +155,12 @@ test.group('execute | hooks', () => {
       }
     })
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -202,12 +202,12 @@ test.group('execute | hooks', () => {
       throw new Error('blow up')
     })
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -246,12 +246,12 @@ test.group('execute | hooks', () => {
       throw new Error('blow up')
     })
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -290,12 +290,12 @@ test.group('execute | hooks', () => {
       throw new Error('blow up')
     })
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -340,12 +340,12 @@ test.group('execute | hooks', () => {
       throw new Error('blow up')
     })
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -387,12 +387,12 @@ test.group('execute | hooks', () => {
       }
     })
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -428,12 +428,12 @@ test.group('execute | hooks', () => {
       }
     })
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -468,12 +468,12 @@ test.group('execute | each hooks', () => {
     group.each.teardown(() => stack.push('group test teardown'))
     group.each.teardown(() => stack.push('group test teardown 1'))
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -523,12 +523,12 @@ test.group('execute | refiner', () => {
     group.setup(() => stack.push('group setup'))
     group.teardown(() => stack.push('group teardown'))
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
@@ -580,5 +580,117 @@ test.group('execute | refiner', () => {
     assert.isFalse(groupEndEvent!.hasError)
 
     assert.deepEqual(stack, ['group setup', 'test', 'test 1', 'group teardown'])
+  })
+
+  test('do not run hooks when refiner does not allows group title', async (assert) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    refiner.add('groups', ['foo'])
+
+    const group = new Group('sample group', emitter, refiner)
+    group.setup(() => stack.push('group setup'))
+    group.teardown(() => stack.push('group teardown'))
+
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
+    testInstance.run(() => {
+      stack.push('test')
+    })
+
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
+    testInstance1.run(() => {
+      stack.push('test 1')
+    })
+
+    group.add(testInstance).add(testInstance1)
+    const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
+
+    assert.deepEqual(stack, [])
+    assert.isNull(groupEndEvent)
+  })
+
+  test('do not run each hooks when refiner does not allows group title', async (assert) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    refiner.add('groups', ['foo'])
+
+    const group = new Group('sample group', emitter, refiner)
+    group.each.setup(() => stack.push('group each setup'))
+    group.each.teardown(() => stack.push('group each teardown'))
+
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
+    testInstance.run(() => {
+      stack.push('test')
+    })
+
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
+    testInstance1.run(() => {
+      stack.push('test 1')
+    })
+
+    group.add(testInstance).add(testInstance1)
+    const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
+
+    assert.deepEqual(stack, [])
+    assert.isNull(groupEndEvent)
+  })
+
+  test('do not run hooks when all group tests are filtered', async (assert) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    refiner.add('tests', ['test 2'])
+
+    const group = new Group('sample group', emitter, refiner)
+    group.setup(() => stack.push('group setup'))
+    group.teardown(() => stack.push('group teardown'))
+
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
+    testInstance.run(() => {
+      stack.push('test')
+    })
+
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
+    testInstance1.run(() => {
+      stack.push('test 1')
+    })
+
+    group.add(testInstance).add(testInstance1)
+    const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
+
+    assert.deepEqual(stack, [])
+    assert.isNull(groupEndEvent)
+  })
+
+  test('do not run each hooks when all group tests are filtered', async (assert) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    refiner.add('tests', ['test 2'])
+
+    const group = new Group('sample group', emitter, refiner)
+    group.each.setup(() => stack.push('group each setup'))
+    group.each.teardown(() => stack.push('group each teardown'))
+
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
+    testInstance.run(() => {
+      stack.push('test')
+    })
+
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
+    testInstance1.run(() => {
+      stack.push('test 1')
+    })
+
+    group.add(testInstance).add(testInstance1)
+    const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
+
+    assert.deepEqual(stack, [])
+    assert.isNull(groupEndEvent)
   })
 })
