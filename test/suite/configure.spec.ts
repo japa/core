@@ -18,7 +18,7 @@ import { TestContext } from '../../src/TestContext'
 
 test.group('configure', () => {
   test('create an instance of suite', async (assert) => {
-    const suite = new Suite('sample suite', new Emitter())
+    const suite = new Suite('sample suite', new Emitter(), new Refiner())
     assert.instanceOf(suite, Suite)
     assert.equal(suite.name, 'sample suite')
   })
@@ -27,7 +27,7 @@ test.group('configure', () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    const suite = new Suite('sample suite', new Emitter())
+    const suite = new Suite('sample suite', new Emitter(), refiner)
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     suite.add(testInstance)
 
@@ -38,7 +38,7 @@ test.group('configure', () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    const suite = new Suite('sample suite', new Emitter())
+    const suite = new Suite('sample suite', new Emitter(), refiner)
     const group = new Group('sample group', emitter, refiner)
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
 
@@ -52,7 +52,7 @@ test.group('configure', () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    const suite = new Suite('sample suite', new Emitter())
+    const suite = new Suite('sample suite', new Emitter(), refiner)
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
 
     suite.onTest((t) => t.disableTimeout())
@@ -65,7 +65,7 @@ test.group('configure', () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    const suite = new Suite('sample suite', new Emitter())
+    const suite = new Suite('sample suite', new Emitter(), refiner)
     const group = new Group('sample group', emitter, refiner)
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
 
