@@ -46,6 +46,10 @@ export function interpolate(input: string, data: any, index: number) {
       return index
     }
 
+    if (key === '$self') {
+      return data
+    }
+
     return parseProp(data, key)
   })
 }
