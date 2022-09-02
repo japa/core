@@ -37,7 +37,7 @@ import { SuiteHooksHandler } from '../Contracts'
  * // Runs all the tests inside the registered group
  * await suite.exec()
  */
-export class Suite<Context> extends Macroable {
+export class Suite<Context extends Record<any, any>> extends Macroable {
   public static macros = {}
   public static getters = {}
 

@@ -27,7 +27,7 @@ import { ReporterContract, RunnerSummary } from '../Contracts'
  *
  * await runner.exec()
  */
-export class Runner<Context> extends Macroable {
+export class Runner<Context extends Record<any, any>> extends Macroable {
   public static macros = {}
   public static getters = {}
 

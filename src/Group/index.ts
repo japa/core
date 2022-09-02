@@ -29,7 +29,7 @@ import { GroupHooksHandler, TestHooksHandler, GroupOptions } from '../Contracts'
  * group.add(test)
  * await group.exec()
  */
-export class Group<Context> extends Macroable {
+export class Group<Context extends Record<any, any>> extends Macroable {
   public static macros = {}
   public static getters = {}
 

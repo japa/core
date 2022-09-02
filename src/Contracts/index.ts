@@ -22,7 +22,7 @@ export type DataSetNode = undefined | any[] | (() => any[] | Promise<any[]>)
 /**
  * The cleanup function for test hooks
  */
-export type TestHooksCleanupHandler<Context> = (
+export type TestHooksCleanupHandler<Context extends Record<any, any>> = (
   error: null | any,
   test: Test<Context, any>
 ) => Promise<any> | any
@@ -30,7 +30,7 @@ export type TestHooksCleanupHandler<Context> = (
 /**
  * The function that can be registered as a test hook
  */
-export type TestHooksHandler<Context> = (
+export type TestHooksHandler<Context extends Record<any, any>> = (
   test: Test<Context, any>
 ) =>
   | Promise<any>
@@ -41,7 +41,7 @@ export type TestHooksHandler<Context> = (
 /**
  * The cleanup function for group hooks
  */
-export type GroupHooksCleanupHandler<Context> = (
+export type GroupHooksCleanupHandler<Context extends Record<any, any>> = (
   error: null | any,
   group: Group<Context>
 ) => Promise<any> | any
@@ -49,7 +49,7 @@ export type GroupHooksCleanupHandler<Context> = (
 /**
  * The function that can be registered as a group hook
  */
-export type GroupHooksHandler<Context> = (
+export type GroupHooksHandler<Context extends Record<any, any>> = (
   group: Group<Context>
 ) =>
   | Promise<any>
@@ -60,7 +60,7 @@ export type GroupHooksHandler<Context> = (
 /**
  * The cleanup function for suite hooks
  */
-export type SuiteHooksCleanupHandler<Context> = (
+export type SuiteHooksCleanupHandler<Context extends Record<any, any>> = (
   error: null | any,
   suite: Suite<Context>
 ) => Promise<any> | any
@@ -68,7 +68,7 @@ export type SuiteHooksCleanupHandler<Context> = (
 /**
  * The function that can be registered as a suite hook
  */
-export type SuiteHooksHandler<Context> = (
+export type SuiteHooksHandler<Context extends Record<any, any>> = (
   suite: Suite<Context>
 ) =>
   | Promise<any>
