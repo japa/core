@@ -556,12 +556,12 @@ test.group('execute | refiner', () => {
     group.setup(() => stack.push('group setup'))
     group.teardown(() => stack.push('group teardown'))
 
-    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
     })
 
-    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
     testInstance1.run(() => {
       stack.push('test 1')
     })
