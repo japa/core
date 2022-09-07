@@ -1,10 +1,6 @@
 # @japa/core
 > The core of the Japa tests runners
 
-**Looking for the older version of Japa?**
-You can find the docs for the older version of [here](https://github.com/japa/core/tree/v4.0.0). Make sure to install the package with 4.0.0 tag `(npm i japa@4.0.0)`.
-
-
 [![github-actions-image]][github-actions-url] [![npm-image]][npm-url] [![license-image]][license-url] [![typescript-image]][typescript-url]
 
 This repo contains the code for the core of the japa tests runner. You can use it create your tests runner, just like `@japa/runner`.
