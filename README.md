@@ -9,7 +9,7 @@ You can find the docs for the older version of [here](https://github.com/japa/co
 
 This repo contains the code for the core of the japa tests runner. You can use it create your tests runner, just like `@japa/runner`.
 
-You can view the documentation on [https://japa.dev/core/introduction](https://japa.dev/core/introduction)
+You can view the documentation on [https://japa.dev](https://japa.dev)
 
 [github-actions-image]: https://img.shields.io/github/workflow/status/japa/core/test?style=for-the-badge
 
