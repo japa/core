@@ -58,4 +58,17 @@ test.group('configure | runner', () => {
     runner.registerReporter(listReporter)
     assert.deepEqual(runner.reporters, new Set([listReporter]))
   })
+
+  test('register named reporter with runner', async (assert) => {
+    const emitter = new Emitter()
+
+    const runner = new Runner(emitter)
+    const listReporter: ReporterContract = {
+      name: 'list' as const,
+      handler: () => {},
+    }
+
+    runner.registerReporter(listReporter)
+    assert.deepEqual(runner.reporters, new Set([listReporter]))
+  })
 })
