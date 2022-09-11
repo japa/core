@@ -140,4 +140,15 @@ test.group('execute | reporters', () => {
     assert.isNotNull(runnerEndEvent)
     assert.deepEqual(stack, ['list reporter open', 'test', 'test 1'])
   })
+
+  test('call named reporters handlers on start', async (assert) => {
+    assert.plan(1)
+
+    const listReporter = {
+      name: 'list',
+      handler: () => assert.isTrue(true),
+    }
+
+    new Runner(new Emitter()).registerReporter(listReporter).start()
+  })
 })

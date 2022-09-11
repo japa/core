@@ -145,7 +145,11 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
     this.boot()
 
     for (let reporter of this.reporters) {
-      await reporter(this, this.emitter)
+      if (typeof reporter === 'function') {
+        await reporter(this, this.emitter)
+      } else {
+        await reporter.handler(this, this.emitter)
+      }
     }
 
     await this.notifyStart()

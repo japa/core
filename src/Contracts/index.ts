@@ -224,9 +224,25 @@ export type FilteringOptions = {
 }
 
 /**
+ * Type for the reporter handler function
+ */
+export type ReporterHandlerContract = (
+  runner: Runner<any>,
+  emitter: Emitter
+) => void | Promise<void>
+
+/**
+ * Type for a named reporter object.
+ */
+export type NamedReporterContract = {
+  readonly name: string
+  handler: ReporterHandlerContract
+}
+
+/**
  * Test reporters must adhere to the following contract
  */
-export type ReporterContract = (runner: Runner<any>, emitter: Emitter) => void | Promise<void>
+export type ReporterContract = ReporterHandlerContract | NamedReporterContract
 
 /**
  * The test node inside the failure tree
