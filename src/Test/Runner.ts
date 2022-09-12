@@ -207,6 +207,18 @@ export class TestRunner {
   }
 
   /**
+   * Running test cleanup functions
+   */
+  private async runTestCleanupFunctions() {
+    try {
+      await this.hooks.runner('cleanup').run(this.errors.length > 0, this.test)
+    } catch (error) {
+      this.hasError = true
+      this.errors.push({ phase: 'test:cleanup', error })
+    }
+  }
+
+  /**
    * Running setup cleanup functions
    */
   private async runSetupCleanupFunctions() {
@@ -364,6 +376,11 @@ export class TestRunner {
       this.hasError = true
       this.errors.push({ phase: 'test', error })
     }
+
+    /**
+     * Run test cleanup hooks
+     */
+    await this.runTestCleanupFunctions()
 
     /**
      * Cleanup setup hooks

@@ -135,7 +135,7 @@ export type TestEndNode = Omit<TestOptions, 'title'> & {
   duration: number
   hasError: boolean
   errors: {
-    phase: 'setup' | 'test' | 'setup:cleanup' | 'teardown' | 'teardown:cleanup'
+    phase: 'setup' | 'test' | 'setup:cleanup' | 'teardown' | 'teardown:cleanup' | 'test:cleanup'
     error: Error
   }[]
   retryAttempt?: number

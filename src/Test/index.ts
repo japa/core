@@ -14,7 +14,14 @@ import { Group } from '../Group'
 import { Emitter } from '../Emitter'
 import { Refiner } from '../Refiner'
 import { DummyRunner, TestRunner } from './Runner'
-import { TestExecutor, TestOptions, TestHooksHandler, DataSetNode, TestEndNode } from '../Contracts'
+import {
+  DataSetNode,
+  TestEndNode,
+  TestOptions,
+  TestExecutor,
+  TestHooksHandler,
+  TestHooksCleanupHandler,
+} from '../Contracts'
 
 /**
  * Test class exposes a self contained API to configure and run
@@ -292,6 +299,14 @@ export class Test<
    */
   public teardown(handler: TestHooksHandler<Context>): this {
     this.hooks.add('teardown', handler)
+    return this
+  }
+
+  /**
+   * Register a cleanup hook from within the test
+   */
+  public cleanup(handler: TestHooksCleanupHandler<Context>): this {
+    this.hooks.add('cleanup', handler)
     return this
   }
 

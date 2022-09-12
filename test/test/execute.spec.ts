@@ -827,6 +827,98 @@ test.group('execute | hooks', () => {
 
     await testInstance.exec()
   })
+
+  test('execute test cleanup hooks', async (assert, done) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      try {
+        assert.isFalse(event.hasError)
+        assert.lengthOf(event.errors, 0)
+        assert.deepEqual(stack, ['executed', 'test:cleanup'])
+        done()
+      } catch (error) {
+        done(error)
+      }
+    })
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance.run(async () => {
+      testInstance.cleanup(async (hasError, t) => {
+        assert.isFalse(hasError)
+        assert.deepEqual(t, testInstance)
+        stack.push('test:cleanup')
+      })
+
+      stack.push('executed')
+    })
+
+    await testInstance.exec()
+  })
+
+  test('execute test cleanup hooks when test fails', async (assert, done) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      try {
+        assert.isTrue(event.hasError)
+        assert.lengthOf(event.errors, 1)
+        assert.equal(event.errors[0].phase, 'test')
+        assert.deepEqual(stack, ['test:cleanup'])
+        done()
+      } catch (error) {
+        done(error)
+      }
+    })
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance.run(async () => {
+      testInstance.cleanup(async (hasError, t) => {
+        assert.isTrue(hasError)
+        assert.deepEqual(t, testInstance)
+        stack.push('test:cleanup')
+      })
+
+      throw new Error('something went wrong')
+    })
+
+    await testInstance.exec()
+  })
+
+  test('mark test as failed when test cleaup hook fails', async (assert, done) => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      try {
+        assert.isTrue(event.hasError)
+        assert.lengthOf(event.errors, 1)
+        assert.equal(event.errors[0].phase, 'test:cleanup')
+        assert.deepEqual(stack, ['executed'])
+        done()
+      } catch (error) {
+        done(error)
+      }
+    })
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance.run(async () => {
+      testInstance.cleanup(async (hasError, t) => {
+        assert.isFalse(hasError)
+        assert.deepEqual(t, testInstance)
+        throw new Error('something went wrong')
+      })
+
+      stack.push('executed')
+    })
+
+    await testInstance.exec()
+  })
 })
 
 test.group('execute | dispose', (group) => {
