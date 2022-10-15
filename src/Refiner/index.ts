@@ -55,13 +55,6 @@ export class Refiner {
   }
 
   /**
-   * Pin a test to be executed.
-   */
-  public pinTest(test: Test<any, any>): void {
-    this.pinnedTests.add(test)
-  }
-
-  /**
    * Find if the group is allowed to execute its tests.
    */
   private isGroupAllowed(group: Group<any>): boolean {
@@ -159,6 +152,20 @@ export class Refiner {
       return true
     }
 
+    return this.pinnedTests.has(test)
+  }
+
+  /**
+   * Pin a test to be executed.
+   */
+  public pinTest(test: Test<any, any>): void {
+    this.pinnedTests.add(test)
+  }
+
+  /**
+   * Find if a test is pinned
+   */
+  public isPinned(test: Test<any, any>): boolean {
     return this.pinnedTests.has(test)
   }
 

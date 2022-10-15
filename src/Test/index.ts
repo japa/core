@@ -82,6 +82,13 @@ export class Test<
   public context: Context
 
   /**
+   * Find if the test is pinned
+   */
+  public get isPinned() {
+    return this.refiner.isPinned(this)
+  }
+
+  /**
    * The function for creating the test context
    */
   private contextAccumlator?: (test: this) => Context | Promise<Context>

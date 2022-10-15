@@ -116,6 +116,7 @@ export type TestStartNode = Omit<TestOptions, 'title'> & {
     expanded: string
     toString(): string
   }
+  isPinned: boolean
   dataset?: {
     size: number
     index: number
@@ -132,6 +133,7 @@ export type TestEndNode = Omit<TestOptions, 'title'> & {
     expanded: string
     toString(): string
   }
+  isPinned: boolean
   duration: number
   hasError: boolean
   errors: {

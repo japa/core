@@ -1587,6 +1587,7 @@ test.group('execute | refiner', () => {
     const [event1] = await Promise.all([pEvent(emitter, 'test:end'), testInstance1.exec()])
 
     assert.isNotNull(event)
+    assert.isTrue(event?.isPinned)
     assert.isNull(event1)
     assert.deepEqual(stack, ['executed'])
   })

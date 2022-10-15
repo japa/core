@@ -35,6 +35,7 @@ export class DummyRunner {
           return this.original
         },
       },
+      isPinned: this.test.isPinned,
     }
     this.emitter.emit('test:start', startOptions)
   }
@@ -52,6 +53,7 @@ export class DummyRunner {
           return this.original
         },
       },
+      isPinned: this.test.isPinned,
       hasError: false,
       duration: 0,
       errors: [],
@@ -157,6 +159,7 @@ export class TestRunner {
     const startOptions: TestStartNode = {
       ...this.test.options,
       ...dataset,
+      isPinned: this.test.isPinned,
       title: this.getTitle(dataset ? dataset.dataset : undefined),
     }
 
@@ -172,6 +175,7 @@ export class TestRunner {
     const endOptions: TestEndNode = {
       ...this.test.options,
       ...dataset,
+      isPinned: this.test.isPinned,
       title: this.getTitle(dataset ? dataset.dataset : undefined),
       hasError: this.hasError,
       errors: this.errors,
