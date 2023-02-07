@@ -23,4 +23,4 @@ You can view the documentation on [https://japa.dev](https://japa.dev)
 <br />
 <hr>
 
-![](https://cdn.jsdelivr.net/gh/thetutlage/static/sponsorkit/sponsors.png)
+![](https://raw.githubusercontent.com/thetutlage/static/main/sponsorkit/sponsors.png)
