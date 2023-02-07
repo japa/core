@@ -9,13 +9,13 @@
 
 import test from 'japa'
 
-import { Test } from '../../src/Test'
-import { Group } from '../../src/Group'
+import { Test } from '../../src/test/main.js'
+import { Group } from '../../src/group/main.js'
 import { Refiner } from '../../src/Refiner'
 import { Emitter } from '../../src/Emitter'
-import { pEvent } from '../../test-helpers'
-import { TestEndNode } from '../../src/Contracts'
-import { TestContext } from '../../src/TestContext'
+import { pEvent } from '../../test_helpers'
+import { TestEndNode } from '../../src/types.js'
+import { TestContext } from '../../src/test_context.js'
 
 test.group('execute | test', () => {
   test('run all tests inside a group', async (assert) => {

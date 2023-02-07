@@ -9,9 +9,9 @@
 
 import { Hooks } from '@poppinss/hooks'
 
-import { Group } from '.'
-import { Emitter } from '../Emitter'
-import { GroupEndNode, GroupStartNode } from '../Contracts'
+import { Group } from './main.js'
+import { Emitter } from '../emitter.js'
+import { GroupEndNode, GroupStartNode } from '../types.js'
 
 /**
  * Run all tests for a given group

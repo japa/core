@@ -9,16 +9,16 @@
 
 import test from 'japa'
 
-import { Test } from '../../src/Test'
-import { Group } from '../../src/Group'
-import { Suite } from '../../src/Suite'
-import { Runner } from '../../src/Runner'
-import { Refiner } from '../../src/Refiner'
-import { Emitter } from '../../src/Emitter'
-import { Tracker } from '../../src/Tracker'
+import { Test } from '../../src/test/main.js'
+import { Group } from '../../src/group/main.js'
+import { Suite } from '../../src/suite/main.js'
+import { Runner } from '../../src/runner.js'
+import { Refiner } from '../../src/refiner.js'
+import { Emitter } from '../../src/emitter.js'
+import { Tracker } from '../../src/tracker.js'
 
-import { pEvent } from '../../test-helpers'
-import { TestContext } from '../../src/TestContext'
+import { pEvent } from '../../test_helpers/index.js'
+import { TestContext } from '../../src/test_context.js'
 
 test.group('Tracker', () => {
   test('generate summary with multiple suites', async (assert) => {

@@ -18,7 +18,7 @@ import {
   SuiteStartNode,
   FailureTreeGroupNode,
   FailureTreeSuiteNode,
-} from '../Contracts'
+} from './types.js'
 
 /**
  * Tracks the tests events to generate a summary report. Failing tests are further tracked

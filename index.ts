@@ -7,12 +7,12 @@
  * file that was distributed with this source code.
  */
 
-export * from './src/Contracts'
-export { Test } from './src/Test'
-export { Suite } from './src/Suite'
-export { Group } from './src/Group'
-export { Runner } from './src/Runner'
-export { Emitter } from './src/Emitter'
-export { Refiner } from './src/Refiner'
-export { Tracker } from './src/Tracker'
-export { TestContext } from './src/TestContext'
+export * from './src/types.js'
+export { Test } from './src/test/main.js'
+export { Suite } from './src/suite/main.js'
+export { Group } from './src/group/main.js'
+export { Runner } from './src/runner.js'
+export { Emitter } from './src/emitter.js'
+export { Refiner } from './src/refiner.js'
+export { Tracker } from './src/tracker.js'
+export { TestContext } from './src/test_context.js'

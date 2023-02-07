@@ -10,11 +10,11 @@
 import { Macroable } from 'macroable'
 import { Hooks } from '@poppinss/hooks'
 
-import { Test } from '../Test'
-import { Emitter } from '../Emitter'
-import { Refiner } from '../Refiner'
-import { GroupRunner } from './Runner'
-import { GroupHooksHandler, TestHooksHandler, GroupOptions } from '../Contracts'
+import { Test } from '../test/main.js'
+import { Emitter } from '../emitter.js'
+import { Refiner } from '../refiner.js'
+import { GroupRunner } from './runner.js'
+import { GroupHooksHandler, TestHooksHandler, GroupOptions } from '../types.js'
 
 /**
  * Group class exposes an API to group multiple tests together

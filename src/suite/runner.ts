@@ -9,9 +9,9 @@
 
 import { Hooks } from '@poppinss/hooks'
 
-import { Suite } from '.'
-import { Emitter } from '../Emitter'
-import { SuiteEndNode, SuiteStartNode } from '../Contracts'
+import { Suite } from './main.js'
+import { Emitter } from '../emitter.js'
+import { SuiteEndNode, SuiteStartNode } from '../types'
 
 /**
  * Run all groups or tests inside the suite stack
