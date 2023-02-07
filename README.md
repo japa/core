@@ -7,7 +7,7 @@ This repo contains the code for the core of the japa tests runner. You can use i
 
 You can view the documentation on [https://japa.dev](https://japa.dev)
 
-[github-actions-image]: https://img.shields.io/github/workflow/status/japa/core/test?style=for-the-badge
+[github-actions-image]: https://img.shields.io/github/actions/workflow/status/japa/core/test.yml?style=for-the-badge
 
 [github-actions-url]: https://github.com/japa/core/actions/workflows/test.yml "github-actions"
 
