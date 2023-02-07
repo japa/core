@@ -9,10 +9,10 @@
 
 import { Macroable } from 'macroable'
 
-import { Suite } from './suite/main.js'
-import { Emitter } from './emitter.js'
-import { Tracker } from './tracker.js'
-import { ReporterContract, RunnerSummary } from './types.js'
+import { Suite } from './suite/main'
+import { Emitter } from './emitter'
+import { Tracker } from './tracker'
+import { ReporterContract, RunnerSummary } from './types'
 
 /**
  * The Runner class exposes the API to register test suites and execute

@@ -8,10 +8,10 @@
  */
 
 import test from 'japa'
-import { Test } from '../../src/test/main.js'
-import { Group } from '../../src/group/main.js'
-import { Emitter } from '../../src/emitter.js'
-import { Refiner } from '../../src/refiner.js'
+import { Test } from '../../src/test/main'
+import { Group } from '../../src/group/main'
+import { Emitter } from '../../src/emitter'
+import { Refiner } from '../../src/refiner'
 
 test.group('Refiner', () => {
   test('add filter for test title', (assert) => {

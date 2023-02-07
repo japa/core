@@ -7,8 +7,8 @@
  * file that was distributed with this source code.
  */
 
-import { Emitter } from '../src/emitter.js'
-import { RunnerEvents } from '../src/types.js'
+import { Emitter } from '../src/emitter'
+import { RunnerEvents } from '../src/types'
 
 /**
  * Sleep for a while

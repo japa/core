@@ -9,8 +9,8 @@
 
 import { Hooks } from '@poppinss/hooks'
 
-import { Suite } from './main.js'
-import { Emitter } from '../emitter.js'
+import { Suite } from './main'
+import { Emitter } from '../emitter'
 import { SuiteEndNode, SuiteStartNode } from '../types'
 
 /**

@@ -9,12 +9,12 @@
 
 import test from 'japa'
 
-import { Test } from '../../src/test/main.js'
-import { Refiner } from '../../src/refiner.js'
-import { Emitter } from '../../src/emitter.js'
-import { TestEndNode } from '../../src/types.js'
-import { sleep, pEvent } from '../../test_helpers/index.js'
-import { TestContext } from '../../src/test_context.js'
+import { Test } from '../../src/test/main'
+import { Refiner } from '../../src/refiner'
+import { Emitter } from '../../src/emitter'
+import { TestEndNode } from '../../src/types'
+import { TestContext } from '../../src/test_context'
+import { sleep, pEvent } from '../../test_helpers/index'
 
 test.group('execute | async', () => {
   test('execute test executor', async (assert, done) => {

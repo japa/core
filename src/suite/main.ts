@@ -10,12 +10,12 @@
 import { Macroable } from 'macroable'
 import { Hooks } from '@poppinss/hooks'
 
-import { Emitter } from '../emitter.js'
-import { Test } from '../test/main.js'
-import { Refiner } from '../refiner.js'
-import { Group } from '../group/main.js'
-import { SuiteRunner } from './runner.js'
-import { SuiteHooksHandler } from '../types.js'
+import { Emitter } from '../emitter'
+import { Test } from '../test/main'
+import { Refiner } from '../refiner'
+import { Group } from '../group/main'
+import { SuiteRunner } from './runner'
+import { SuiteHooksHandler } from '../types'
 
 /**
  * The Suite class exposes the API to run a group of tests

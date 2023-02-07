@@ -7,11 +7,11 @@
  * file that was distributed with this source code.
  */
 
-import type { Runner } from './runner.js'
-import type { Test } from './test/main.js'
-import type { Emitter } from './emitter.js'
-import type { Group } from './group/main.js'
-import type { Suite } from './suite/main.js'
+import type { Runner } from './runner'
+import type { Test } from './test/main'
+import type { Emitter } from './emitter'
+import type { Group } from './group/main'
+import type { Suite } from './suite/main'
 
 /**
  * Shape of test data set. Should be an array of a function that

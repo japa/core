@@ -9,10 +9,10 @@
 
 import test from 'japa'
 
-import { Test } from '../../src/test/main.js'
-import { Refiner } from '../../src/refiner.js'
-import { Emitter } from '../../src/emitter.js'
-import { TestContext } from '../../src/test_context.js'
+import { Test } from '../../src/test/main'
+import { Refiner } from '../../src/refiner'
+import { Emitter } from '../../src/emitter'
+import { TestContext } from '../../src/test_context'
 
 test.group('configure', () => {
   test('create an instance of test', async (assert) => {

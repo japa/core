@@ -9,11 +9,11 @@
 
 import test from 'japa'
 
-import { Suite } from '../../src/suite/main.js'
-import { Runner } from '../../src/runner.js'
-import { Refiner } from '../../src/refiner.js'
-import { Emitter } from '../../src/emitter.js'
-import { ReporterContract } from '../../src/types.js'
+import { Runner } from '../../src/runner'
+import { Emitter } from '../../src/emitter'
+import { Refiner } from '../../src/refiner'
+import { Suite } from '../../src/suite/main'
+import { ReporterContract } from '../../src/types'
 
 test.group('configure | runner', () => {
   test('create an instance of runner', async (assert) => {

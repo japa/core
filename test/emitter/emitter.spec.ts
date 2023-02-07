@@ -8,7 +8,7 @@
  */
 
 import test from 'japa'
-import { Emitter } from '../../src/emitter.js'
+import { Emitter } from '../../src/emitter'
 
 test.group('emitter', () => {
   test('define an error handler to handle listener errors', async (assert, done) => {

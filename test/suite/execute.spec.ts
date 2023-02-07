@@ -9,14 +9,14 @@
 
 import test from 'japa'
 
-import { Test } from '../../src/test/main.js'
-import { Suite } from '../../src/suite/main.js'
-import { Group } from '../../src/group/main.js'
-import { Refiner } from '../../src/refiner.js'
-import { Emitter } from '../../src/emitter.js'
-import { pEvent } from '../../test_helpers/index.js'
-import { TestEndNode } from '../../src/types.js'
-import { TestContext } from '../../src/test_context.js'
+import { Test } from '../../src/test/main'
+import { Suite } from '../../src/suite/main'
+import { Group } from '../../src/group/main'
+import { Refiner } from '../../src/refiner'
+import { Emitter } from '../../src/emitter'
+import { pEvent } from '../../test_helpers/index'
+import { TestEndNode } from '../../src/types'
+import { TestContext } from '../../src/test_context'
 
 test.group('execute | test', () => {
   test('run all tests inside a suite', async (assert) => {

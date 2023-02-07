@@ -11,10 +11,10 @@ import retry from 'async-retry'
 import { Hooks } from '@poppinss/hooks'
 import timeSpan, { TimeEndFunction } from 'time-span'
 
-import { Test } from './main.js'
-import { Emitter } from '../emitter.js'
-import { interpolate } from '../interpolate.js'
-import { TestEndNode, TestStartNode } from '../types.js'
+import { Test } from './main'
+import { Emitter } from '../emitter'
+import { interpolate } from '../interpolate'
+import { TestEndNode, TestStartNode } from '../types'
 
 /**
  * Dummy test runner that just emits the required events

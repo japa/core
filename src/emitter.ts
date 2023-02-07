@@ -8,7 +8,7 @@
  */
 
 import Emittery from 'emittery'
-import { RunnerEvents } from './types.js'
+import { RunnerEvents } from './types'
 
 /**
  * Runner emitter

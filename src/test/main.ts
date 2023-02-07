@@ -10,10 +10,10 @@
 import { Macroable } from 'macroable'
 import { Hooks } from '@poppinss/hooks'
 
-import { Group } from '../group/main.js'
-import { Emitter } from '../emitter.js'
-import { Refiner } from '../refiner.js'
-import { DummyRunner, TestRunner } from './runner.js'
+import { Group } from '../group/main'
+import { Emitter } from '../emitter'
+import { Refiner } from '../refiner'
+import { DummyRunner, TestRunner } from './runner'
 import {
   DataSetNode,
   TestEndNode,
@@ -21,7 +21,7 @@ import {
   TestExecutor,
   TestHooksHandler,
   TestHooksCleanupHandler,
-} from '../types.js'
+} from '../types'
 
 /**
  * Test class exposes a self contained API to configure and run

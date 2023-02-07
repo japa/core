@@ -8,7 +8,7 @@
  */
 
 import test from 'japa'
-import { interpolate } from '../src/interpolate.js'
+import { interpolate } from '../src/interpolate'
 
 test.group('Interpolate', () => {
   test('interpolate object values inside a string', (assert) => {
