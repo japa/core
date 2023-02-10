@@ -44,7 +44,7 @@
   "devDependencies": {
     "@adonisjs/mrm-preset": "^5.0.3",
     "@adonisjs/require-ts": "^2.0.13",
-    "@types/node": "^18.11.19",
+    "@types/node": "^18.13.0",
     "commitizen": "^4.3.0",
     "cz-conventional-changelog": "^3.3.0",
     "del-cli": "^5.0.0",
@@ -57,7 +57,7 @@
     "mrm": "^4.1.13",
     "np": "^7.6.3",
     "nyc": "^15.1.0",
-    "prettier": "^2.8.3",
+    "prettier": "^2.8.4",
     "typescript": "^4.9.5"
   },
   "mrmConfig": {
