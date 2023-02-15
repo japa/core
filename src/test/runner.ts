@@ -76,11 +76,6 @@ export class DummyRunner {
  */
 export class TestRunner {
   /**
-   * The current retry attempt (exists only when retries are enabled)
-   */
-  private retryAttempt?: number
-
-  /**
    * Time tracker to find test duration
    */
   private timeTracker: TimeEndFunction
@@ -179,7 +174,7 @@ export class TestRunner {
       title: this.getTitle(dataset ? dataset.dataset : undefined),
       hasError: this.hasError,
       errors: this.errors,
-      retryAttempt: this.retryAttempt,
+      retryAttempt: this.test.options.retryAttempt,
       duration: this.timeTracker.rounded(),
     }
 
@@ -333,7 +328,7 @@ export class TestRunner {
 
     return retry(
       (_: unknown, attempt: number) => {
-        this.retryAttempt = attempt
+        this.test.options.retryAttempt = attempt
         return this.wrapTestInTimeout()
       },
       { retries: this.test.options.retries, factor: 1 }

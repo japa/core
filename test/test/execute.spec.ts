@@ -148,6 +148,7 @@ test.group('execute | async', () => {
       .retry(3)
 
     await testInstance.exec()
+    assert.equal(testInstance.options.retryAttempt, 2)
   }).timeout(0)
 
   test('mark as failed when retries are busted', async (assert, done) => {
@@ -180,6 +181,7 @@ test.group('execute | async', () => {
       .retry(2)
 
     await testInstance.exec()
+    assert.equal(testInstance.options.retryAttempt, 3)
   }).timeout(0)
 
   test('timeout test when takes too long', async (assert, done) => {
@@ -362,6 +364,7 @@ test.group('execute | waitForDone', () => {
       .retry(3)
 
     await testInstance.exec()
+    assert.equal(testInstance.options.retryAttempt, 2)
   }).timeout(0)
 
   test('mark as failed when retries are busted', async (assert, done) => {
@@ -397,6 +400,7 @@ test.group('execute | waitForDone', () => {
       .retry(2)
 
     await testInstance.exec()
+    assert.equal(testInstance.options.retryAttempt, 3)
   }).timeout(0)
 
   test('timeout test when takes too long', async (assert, done) => {

@@ -104,6 +104,7 @@ export type TestOptions = {
   skipReason?: string
   failReason?: string
   retries?: number
+  retryAttempt?: number
   meta: Record<string, any>
 }
 
