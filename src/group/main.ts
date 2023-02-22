@@ -10,6 +10,7 @@
 import { Macroable } from 'macroable'
 import { Hooks } from '@poppinss/hooks'
 
+import debug from '../debug'
 import { Test } from '../test/main'
 import { Emitter } from '../emitter'
 import { Refiner } from '../refiner'
@@ -116,6 +117,8 @@ export class Group<Context extends Record<any, any>> extends Macroable {
    * mutates the test properties
    */
   public add(test: Test<Context, any>): this {
+    debug('adding "%s" test to "%s" group', test.title, this.title)
+
     /**
      * Bulk configure
      */
@@ -153,6 +156,7 @@ export class Group<Context extends Record<any, any>> extends Macroable {
    * Define setup hook for the group
    */
   public setup(handler: GroupHooksHandler<Context>): this {
+    debug('registering "%s" group setup hook %s', this.title, handler)
     this.hooks.add('setup', handler)
     return this
   }
@@ -161,6 +165,7 @@ export class Group<Context extends Record<any, any>> extends Macroable {
    * Define teardown hook for the group
    */
   public teardown(handler: GroupHooksHandler<Context>): this {
+    debug('registering "%s" group teardown hook %s', this.title, handler)
     this.hooks.add('teardown', handler)
     return this
   }
@@ -170,6 +175,7 @@ export class Group<Context extends Record<any, any>> extends Macroable {
    */
   public async exec() {
     if (!this.refiner.allows(this)) {
+      debug('group skipped by refined %s', this.title)
       return
     }
 

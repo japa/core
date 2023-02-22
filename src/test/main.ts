@@ -10,6 +10,7 @@
 import { Macroable } from 'macroable'
 import { Hooks } from '@poppinss/hooks'
 
+import debug from '../debug'
 import { Group } from '../group/main'
 import { Emitter } from '../emitter'
 import { Refiner } from '../refiner'
@@ -297,6 +298,7 @@ export class Test<
    * Register a test setup function
    */
   public setup(handler: TestHooksHandler<Context>): this {
+    debug('registering "%s" test setup hook %s', this.title, handler)
     this.hooks.add('setup', handler)
     return this
   }
@@ -305,6 +307,7 @@ export class Test<
    * Register a test teardown function
    */
   public teardown(handler: TestHooksHandler<Context>): this {
+    debug('registering "%s" test teardown hook %s', this.title, handler)
     this.hooks.add('teardown', handler)
     return this
   }
@@ -313,6 +316,7 @@ export class Test<
    * Register a cleanup hook from within the test
    */
   public cleanup(handler: TestHooksCleanupHandler<Context>): this {
+    debug('registering "%s" test cleanup function %s', this.title, handler)
     this.hooks.add('cleanup', handler)
     return this
   }
@@ -329,6 +333,7 @@ export class Test<
      * is no filter on the test title.
      */
     if (!this.refiner.allows(this)) {
+      debug('test "%s" skipped by refiner', this.title)
       return
     }
 
@@ -346,6 +351,7 @@ export class Test<
      */
     this.computeisTodo()
     if (this.options.isTodo) {
+      debug('skipping todo test "%s"', this.title)
       new DummyRunner(this, this.emitter).run()
       return
     }
@@ -355,6 +361,11 @@ export class Test<
      */
     await this.computeShouldSkip()
     if (this.options.isSkipped) {
+      debug(
+        'skipping test "%s", reason (%s)',
+        this.title,
+        this.options.skipReason || 'Skipped using .skip method'
+      )
       new DummyRunner(this, this.emitter).run()
       return
     }

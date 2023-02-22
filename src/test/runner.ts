@@ -11,6 +11,7 @@ import retry from 'async-retry'
 import { Hooks } from '@poppinss/hooks'
 import timeSpan, { TimeEndFunction } from 'time-span'
 
+import debug from '../debug'
 import { Test } from './main'
 import { Emitter } from '../emitter'
 import { interpolate } from '../interpolate'
@@ -186,8 +187,10 @@ export class TestRunner {
    */
   private async runSetupHooks() {
     try {
+      debug('running "%s" test setup hooks', this.test.title)
       await this.setupRunner.run(this.test)
     } catch (error) {
+      debug('test setup hooks failed, test: %s, error: %O', this.test.title, error)
       this.hasError = true
       this.errors.push({ phase: 'setup', error })
     }
@@ -198,8 +201,10 @@ export class TestRunner {
    */
   private async runTeardownHooks() {
     try {
+      debug('running "%s" test teardown hooks', this.test.title)
       await this.teardownRunner.run(this.test)
     } catch (error) {
+      debug('test teardown hooks failed, test: %s, error: %O', this.test.title, error)
       this.hasError = true
       this.errors.push({ phase: 'teardown', error })
     }
@@ -210,8 +215,10 @@ export class TestRunner {
    */
   private async runTestCleanupFunctions() {
     try {
+      debug('running "%s" test cleanup functions', this.test.title)
       await this.hooks.runner('cleanup').run(this.errors.length > 0, this.test)
     } catch (error) {
+      debug('test cleanup functions failed, test: %s, error: %O', this.test.title, error)
       this.hasError = true
       this.errors.push({ phase: 'test:cleanup', error })
     }
@@ -222,8 +229,10 @@ export class TestRunner {
    */
   private async runSetupCleanupFunctions() {
     try {
+      debug('running "%s" test setup cleanup functions', this.test.title)
       await this.setupRunner.cleanup(this.errors.length > 0, this.test)
     } catch (error) {
+      debug('test setup cleanup functions failed, test: %s, error: %O', this.test.title, error)
       this.hasError = true
       this.errors.push({ phase: 'setup:cleanup', error })
     }
@@ -234,8 +243,10 @@ export class TestRunner {
    */
   private async runTeardownCleanupFunctions() {
     try {
+      debug('running "%s" test teardown cleanup functions', this.test.title)
       await this.teardownRunner.cleanup(this.errors.length > 0, this.test)
     } catch (error) {
+      debug('test teardown cleanup functions failed, test: %s, error: %O', this.test.title, error)
       this.hasError = true
       this.errors.push({ phase: 'teardown:cleanup', error })
     }
@@ -282,6 +293,7 @@ export class TestRunner {
         process.on('uncaughtException', this.uncaughtExceptionHandler)
       }
 
+      debug('running test "%s" and waiting for done method call', this.test.title)
       this.runTest(done).catch(reject)
     })
   }
@@ -339,6 +351,7 @@ export class TestRunner {
    * Run the test
    */
   public async run() {
+    debug('starting to run "%s" test', this.test.title)
     this.notifyStart()
 
     /**

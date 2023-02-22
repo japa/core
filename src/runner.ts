@@ -9,6 +9,7 @@
 
 import { Macroable } from 'macroable'
 
+import debug from './debug'
 import { Suite } from './suite/main'
 import { Emitter } from './emitter'
 import { Tracker } from './tracker'
@@ -99,6 +100,7 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
   public add(suite: Suite<Context>): this {
     this.configureSuiteCallbacks.forEach((callback) => callback(suite))
     this.suites.push(suite)
+    debug('registering suite %s', suite.name)
     return this
   }
 
@@ -143,6 +145,7 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
    */
   public async start() {
     this.boot()
+    debug('starting to run tests')
 
     for (let reporter of this.reporters) {
       if (typeof reporter === 'function') {

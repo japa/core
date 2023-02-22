@@ -14,7 +14,7 @@
   "scripts": {
     "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
-    "test": "nyc --reporter html node .bin/test.js",
+    "test": "NODE_DEBUG=japa:core nyc --reporter html node .bin/test.js",
     "clean": "del build",
     "compile": "npm run lint && npm run clean && tsc",
     "build": "npm run compile",

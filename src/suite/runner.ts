@@ -9,6 +9,7 @@
 
 import { Hooks } from '@poppinss/hooks'
 
+import debug from '../debug'
 import { Suite } from './main'
 import { Emitter } from '../emitter'
 import { SuiteEndNode, SuiteStartNode } from '../types'
@@ -67,9 +68,11 @@ export class SuiteRunner {
    * Running setup hooks
    */
   private async runSetupHooks() {
+    debug('running "%s" suite setup hooks', this.suite.name)
     try {
       await this.setupRunner.run(this.suite)
     } catch (error) {
+      debug('suite setup hooks failed, suite: %s, error: %O', this.suite.name, error)
       this.hasError = true
       this.errors.push({ phase: 'setup', error })
     }
@@ -79,9 +82,11 @@ export class SuiteRunner {
    * Running teardown hooks
    */
   private async runTeardownHooks() {
+    debug('running "%s" suite teardown hooks', this.suite.name)
     try {
       await this.teardownRunner.run(this.suite)
     } catch (error) {
+      debug('suite teardown hooks failed, suite: %s, error: %O', this.suite.name, error)
       this.hasError = true
       this.errors.push({ phase: 'teardown', error })
     }
@@ -91,9 +96,11 @@ export class SuiteRunner {
    * Running setup cleanup functions
    */
   private async runSetupCleanupFunctions() {
+    debug('running "%s" suite setup cleanup functions', this.suite.name)
     try {
       await this.setupRunner.cleanup(this.hasError, this.suite)
     } catch (error) {
+      debug('suite setup cleanup functions failed, suite: %s, error: %O', this.suite.name, error)
       this.hasError = true
       this.errors.push({ phase: 'setup:cleanup', error })
     }
@@ -103,9 +110,11 @@ export class SuiteRunner {
    * Running teardown cleanup functions
    */
   private async runTeardownCleanupFunctions() {
+    debug('running "%s" suite teardown cleanup functions', this.suite.name)
     try {
       await this.teardownRunner.cleanup(this.hasError, this.suite)
     } catch (error) {
+      debug('suite teardown cleanup functions failed, suite: %s, error: %O', this.suite.name, error)
       this.hasError = true
       this.errors.push({ phase: 'teardown:cleanup', error })
     }
@@ -115,6 +124,7 @@ export class SuiteRunner {
    * Run the test
    */
   public async run() {
+    debug('starting to run "%s" suite', this.suite.name)
     this.notifyStart()
 
     /**

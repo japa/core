@@ -9,6 +9,7 @@
 
 import { Hooks } from '@poppinss/hooks'
 
+import debug from '../debug'
 import { Group } from './main'
 import { Emitter } from '../emitter'
 import { GroupEndNode, GroupStartNode } from '../types'
@@ -68,8 +69,10 @@ export class GroupRunner {
    */
   private async runSetupHooks() {
     try {
+      debug('running "%s" group setup hooks', this.group.title)
       await this.setupRunner.run(this.group)
     } catch (error) {
+      debug('group setup hooks failed, group: %s, error: %O', this.group.title, error)
       this.hasError = true
       this.errors.push({ phase: 'setup', error })
     }
@@ -80,8 +83,10 @@ export class GroupRunner {
    */
   private async runTeardownHooks() {
     try {
+      debug('running "%s" group teardown hooks', this.group.title)
       await this.teardownRunner.run(this.group)
     } catch (error) {
+      debug('group teardown hooks failed, group: %s, error: %O', this.group.title, error)
       this.hasError = true
       this.errors.push({ phase: 'teardown', error })
     }
@@ -92,8 +97,10 @@ export class GroupRunner {
    */
   private async runSetupCleanupFunctions() {
     try {
+      debug('running "%s" group setup cleanup functions', this.group.title)
       await this.setupRunner.cleanup(this.hasError, this.group)
     } catch (error) {
+      debug('group setup cleanup function failed, group: %s, error: %O', this.group.title, error)
       this.hasError = true
       this.errors.push({ phase: 'setup:cleanup', error })
     }
@@ -104,8 +111,10 @@ export class GroupRunner {
    */
   private async runTeardownCleanupFunctions() {
     try {
+      debug('running "%s" group teardown cleanup functions', this.group.title)
       await this.teardownRunner.cleanup(this.hasError, this.group)
     } catch (error) {
+      debug('group teardown cleanup function failed, group: %s, error: %O', this.group.title, error)
       this.hasError = true
       this.errors.push({ phase: 'teardown:cleanup', error })
     }
@@ -115,6 +124,7 @@ export class GroupRunner {
    * Run the test
    */
   public async run() {
+    debug('starting to run "%s" group', this.group.title)
     this.notifyStart()
 
     /**

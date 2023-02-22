@@ -10,6 +10,7 @@
 import { Macroable } from 'macroable'
 import { Hooks } from '@poppinss/hooks'
 
+import debug from '../debug'
 import { Emitter } from '../emitter'
 import { Test } from '../test/main'
 import { Refiner } from '../refiner'
@@ -97,6 +98,7 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
    * Register a test setup function
    */
   public setup(handler: SuiteHooksHandler<Context>): this {
+    debug('registering suite setup hook %s', handler)
     this.hooks.add('setup', handler)
     return this
   }
@@ -105,6 +107,7 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
    * Register a test teardown function
    */
   public teardown(handler: SuiteHooksHandler<Context>): this {
+    debug('registering suite teardown hook %s', handler)
     this.hooks.add('teardown', handler)
     return this
   }
@@ -131,6 +134,7 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
     }
 
     if (!allowSuite) {
+      debug('suite disabled by refiner %s', this.name)
       return
     }
 
