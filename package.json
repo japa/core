@@ -9,7 +9,8 @@
     "build/index.js"
   ],
   "exports": {
-    ".": "./build/index.js"
+    ".": "./build/index.js",
+    "./types": "./build/src/types.js"
   },
   "scripts": {
     "mrm": "mrm --preset=@adonisjs/mrm-preset",
