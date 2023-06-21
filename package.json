@@ -1,8 +1,9 @@
 {
   "name": "@japa/core",
   "version": "7.3.3",
-  "description": "The core of Japa testing framework",
+  "description": "Implementation of core APIs for the Japa tests runner",
   "main": "build/index.js",
+  "type": "module",
   "files": [
     "build/src",
     "build/index.d.ts",
@@ -13,23 +14,17 @@
     "./types": "./build/src/types.js"
   },
   "scripts": {
-    "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
-    "test": "cross-env NODE_DEBUG=japa:core nyc --reporter html node .bin/test.js",
+    "test": "c8 npm run vscode:test",
     "clean": "del build",
     "compile": "npm run lint && npm run clean && tsc",
     "build": "npm run compile",
+    "release": "np",
+    "version": "npm run build",
     "prepublishOnly": "npm run build",
     "lint": "eslint . --ext=.ts",
     "format": "prettier --write .",
-    "commit": "git-cz",
-    "release": "np --message=\"chore(release): %s\"",
-    "version": "npm run build",
-    "sync-labels": "npx github-label-sync --labels ./node_modules/@adonisjs/mrm-preset/gh-labels.json thetutlage/japa"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/thetutlage/japa.git"
+    "sync-labels": "github-label-sync --labels .github/labels.json japa/core"
   },
   "keywords": [
     "japa",
@@ -38,97 +33,65 @@
   ],
   "author": "virk,japa",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/thetutlage/japa/issues"
-  },
-  "homepage": "https://github.com/thetutlage/japa#readme",
   "devDependencies": {
-    "@adonisjs/mrm-preset": "^5.0.3",
-    "@adonisjs/require-ts": "^2.0.13",
+    "@adonisjs/eslint-config": "^1.1.5",
+    "@adonisjs/prettier-config": "^1.1.5",
+    "@adonisjs/tsconfig": "^1.1.5",
+    "@commitlint/cli": "^17.6.5",
+    "@commitlint/config-conventional": "^17.6.5",
+    "@swc/core": "^1.3.66",
     "@types/node": "^20.3.1",
-    "commitizen": "^4.3.0",
+    "c8": "^8.0.0",
     "cross-env": "^7.0.3",
-    "cz-conventional-changelog": "^3.3.0",
-    "del-cli": "^5.0.0",
     "eslint": "^8.43.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-adonis": "^2.1.1",
-    "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.3",
     "japa": "^4.0.0",
-    "mrm": "^4.1.14",
     "np": "^8.0.4",
-    "nyc": "^15.1.0",
     "prettier": "^2.8.8",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.3"
   },
-  "mrmConfig": {
-    "core": false,
-    "license": "MIT",
-    "services": [
-      "github-actions"
-    ],
-    "minNodeVersion": "16.13.1",
-    "probotApps": [
-      "stale",
-      "lock"
-    ],
-    "runGhActionsOnWindows": true
-  },
-  "eslintConfig": {
-    "extends": [
-      "plugin:adonis/typescriptPackage",
-      "prettier"
-    ],
-    "plugins": [
-      "prettier"
-    ],
-    "rules": {
-      "prettier/prettier": [
-        "error",
-        {
-          "endOfLine": "auto"
-        }
-      ]
-    }
-  },
-  "eslintIgnore": [
-    "build"
-  ],
-  "prettier": {
-    "trailingComma": "es5",
-    "semi": false,
-    "singleQuote": true,
-    "useTabs": false,
-    "quoteProps": "consistent",
-    "bracketSpacing": true,
-    "arrowParens": "always",
-    "printWidth": 100
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
-  "np": {
-    "contents": ".",
-    "anyBranch": false
-  },
   "dependencies": {
-    "@poppinss/hooks": "^6.0.2-0",
+    "@poppinss/hooks": "^7.1.1-2",
     "async-retry": "^1.3.3",
     "emittery": "^1.0.1",
     "macroable": "^7.0.2",
     "time-span": "^5.1.0"
   },
-  "nyc": {
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/japa/core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/japa/core/issues"
+  },
+  "homepage": "https://github.com/japa/core#readme",
+  "c8": {
+    "reporter": [
+      "text",
+      "html"
+    ],
     "exclude": [
-      "test",
-      "test-helpers"
+      "tests/**"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
     ]
   },
   "publishConfig": {
     "access": "public",
-    "tag": "latest"
+    "tag": "next"
+  },
+  "np": {
+    "message": "chore(release): %s",
+    "tag": "next",
+    "branch": "main",
+    "anyBranch": false
+  },
+  "prettier": "@adonisjs/prettier-config",
+  "eslintConfig": {
+    "extends": "@adonisjs/eslint-config/package"
   }
 }
