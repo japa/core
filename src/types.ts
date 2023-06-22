@@ -1,17 +1,19 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import type { Runner } from './runner'
-import type { Test } from './test/main'
-import type { Emitter } from './emitter'
-import type { Group } from './group/main'
-import type { Suite } from './suite/main'
+import type { CleanupHandler, HookHandler } from '@poppinss/hooks/types'
+
+import type { Runner } from './runner.js'
+import type { Test } from './test/main.js'
+import type { Emitter } from './emitter.js'
+import type { Group } from './group/main.js'
+import type { Suite } from './suite/main.js'
 
 /**
  * Shape of test data set. Should be an array of a function that
@@ -20,61 +22,88 @@ import type { Suite } from './suite/main'
 export type DataSetNode = undefined | any[] | (() => any[] | Promise<any[]>)
 
 /**
- * The cleanup function for test hooks
+ * The data given to the setup and the teardown test
+ * hooks
  */
-export type TestHooksCleanupHandler<Context extends Record<any, any>> = (
-  error: null | any,
-  test: Test<Context, any>
-) => Promise<any> | any
+export type TestHooksData<Context extends Record<any, any>> = [
+  [test: Test<Context, any>],
+  [hasError: boolean, test: Test<Context, any>]
+]
 
 /**
  * The function that can be registered as a test hook
  */
-export type TestHooksHandler<Context extends Record<any, any>> = (
-  test: Test<Context, any>
-) =>
-  | Promise<any>
-  | any
-  | TestHooksCleanupHandler<Context>
-  | Promise<TestHooksCleanupHandler<Context>>
+export type TestHooksHandler<Context extends Record<any, any>> = HookHandler<
+  TestHooksData<Context>[0],
+  TestHooksData<Context>[1]
+>
 
 /**
- * The cleanup function for group hooks
+ * The function that can be registered as a cleanup handler
  */
-export type GroupHooksCleanupHandler<Context extends Record<any, any>> = (
-  error: null | any,
-  group: Group<Context>
-) => Promise<any> | any
+export type TestHooksCleanupHandler<Context extends Record<any, any>> = CleanupHandler<
+  TestHooksData<Context>[1]
+>
 
 /**
- * The function that can be registered as a group hook
+ * Hooks available on a test
  */
-export type GroupHooksHandler<Context extends Record<any, any>> = (
-  group: Group<Context>
-) =>
-  | Promise<any>
-  | any
-  | GroupHooksCleanupHandler<Context>
-  | Promise<GroupHooksCleanupHandler<Context>>
+export type TestHooks<Context extends Record<any, any>> = {
+  setup: TestHooksData<Context>
+  teardown: TestHooksData<Context>
+  cleanup: [TestHooksData<Context>[1], [void]]
+}
 
 /**
- * The cleanup function for suite hooks
+ * The data given to the setup and the teardown group
+ * hooks
  */
-export type SuiteHooksCleanupHandler<Context extends Record<any, any>> = (
-  error: null | any,
-  suite: Suite<Context>
-) => Promise<any> | any
+export type GroupHooksData<Context extends Record<any, any>> = [
+  [group: Group<Context>],
+  [hasError: boolean, group: Group<Context>]
+]
+
+/**
+ * The callback function given to the "setup" and the "teardown"
+ * methods on a group
+ */
+export type GroupHooksHandler<Context extends Record<any, any>> = HookHandler<
+  GroupHooksData<Context>[0],
+  GroupHooksData<Context>[1]
+>
+
+/**
+ * Hooks available on a group
+ */
+export type GroupHooks<Context extends Record<any, any>> = {
+  setup: GroupHooksData<Context>
+  teardown: GroupHooksData<Context>
+}
+
+/**
+ * The data given to the setup and the teardown suite
+ * hooks
+ */
+export type SuiteHooksData<Context extends Record<any, any>> = [
+  [suite: Suite<Context>],
+  [hasError: boolean, suite: Suite<Context>]
+]
 
 /**
  * The function that can be registered as a suite hook
  */
-export type SuiteHooksHandler<Context extends Record<any, any>> = (
-  suite: Suite<Context>
-) =>
-  | Promise<any>
-  | any
-  | SuiteHooksCleanupHandler<Context>
-  | Promise<SuiteHooksCleanupHandler<Context>>
+export type SuiteHooksHandler<Context extends Record<any, any>> = HookHandler<
+  SuiteHooksData<Context>[0],
+  SuiteHooksData<Context>[1]
+>
+
+/**
+ * Hooks available on a suite
+ */
+export type SuiteHooks<Context extends Record<any, any>> = {
+  setup: SuiteHooksData<Context>
+  teardown: SuiteHooksData<Context>
+}
 
 /**
  * The function to execute the test

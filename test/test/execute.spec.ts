@@ -1,61 +1,43 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
+import test from 'node:test'
+import { assert } from 'chai'
 
-import { Test } from '../../src/test/main'
-import { Refiner } from '../../src/refiner'
-import { Emitter } from '../../src/emitter'
-import { TestEndNode } from '../../src/types'
-import { TestContext } from '../../src/test_context'
-import { sleep, pEvent } from '../../test_helpers/index'
+import { Test } from '../../src/test/main.js'
+import { Refiner } from '../../src/refiner.js'
+import { Emitter } from '../../src/emitter.js'
+import { TestContext } from '../../src/test_context.js'
+import { sleep, pEvent, pEventTimes } from '../../test_helpers/index.js'
 
-test.group('execute | async', () => {
-  test('execute test executor', async (assert, done) => {
+test.describe('execute | async', () => {
+  test('execute test executor', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(async () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
+    assert.isDefined(event)
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed'])
   })
 
-  test('compute test context using a function', async (assert, done) => {
+  test('compute test context using a function', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test(
       '2 + 2 = 4',
@@ -69,10 +51,14 @@ test.group('execute | async', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
+    assert.isDefined(event)
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed'])
   })
 
-  test('multiple calls to exec should result in a noop', async (assert) => {
+  test('multiple calls to exec should result in a noop', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
@@ -91,24 +77,10 @@ test.group('execute | async', () => {
     assert.isNull(endEvent1)
   })
 
-  test('fail test when executor raises an exception', async (assert, done) => {
+  test('fail test when executor raises an exception', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(async () => {
@@ -116,25 +88,20 @@ test.group('execute | async', () => {
       throw new Error('blow up')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
+    assert.isDefined(event)
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.deepEqual(stack, ['executed'])
   })
 
-  test('retry test before marking it as failed', async (assert, done) => {
+  test('retry test before marking it as failed', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.equal(event.retryAttempt, 2)
-        assert.deepEqual(stack, ['executed', 'executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -147,29 +114,18 @@ test.group('execute | async', () => {
       .timeout(0)
       .retry(3)
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.equal(event!.retryAttempt, 2)
+    assert.deepEqual(stack, ['executed', 'executed'])
     assert.equal(testInstance.options.retryAttempt, 2)
-  }).timeout(0)
+  })
 
-  test('mark as failed when retries are busted', async (assert, done) => {
+  test('mark as failed when retries are busted', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.equal(event.retryAttempt, 3)
-        assert.deepEqual(stack, ['executed', 'executed', 'executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -180,28 +136,21 @@ test.group('execute | async', () => {
       .timeout(0)
       .retry(2)
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.equal(event!.retryAttempt, 3)
+    assert.deepEqual(stack, ['executed', 'executed', 'executed'])
     assert.equal(testInstance.options.retryAttempt, 3)
-  }).timeout(0)
+  })
 
-  test('timeout test when takes too long', async (assert, done) => {
+  test('timeout test when takes too long', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'Test timeout')
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(async () => {
@@ -209,24 +158,19 @@ test.group('execute | async', () => {
       await sleep(4000)
     })
 
-    await testInstance.exec()
-  }).timeout(0)
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 5000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'Test timeout')
+    assert.deepEqual(stack, ['executed'])
+  })
 
-  test('increase test timeout', async (assert, done) => {
+  test('increase test timeout', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -236,86 +180,59 @@ test.group('execute | async', () => {
       })
       .timeout(5000)
 
-    await testInstance.exec()
-  }).timeout(0)
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 6000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed'])
+  })
 })
 
-test.group('execute | waitForDone', () => {
-  test('execute test executor', async (assert, done) => {
+test.describe('execute | waitForDone', () => {
+  test('execute test executor', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
-
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
-      .run(async (_, d) => {
+      .run(async (__, d) => {
         stack.push('executed')
         setTimeout(() => d(), 100)
       })
       .waitForDone()
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed'])
   })
 
-  test('fail test when error is passed to done', async (assert, done) => {
+  test('fail test when error is passed to done', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
-
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
-      .run(async (_, d) => {
+      .run(async (__, d) => {
         stack.push('executed')
         setTimeout(() => d(new Error('blow up')), 100)
       })
       .waitForDone()
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.deepEqual(stack, ['executed'])
   })
 
-  test('fail test when executor raises an exception', async (assert, done) => {
+  test('fail test when executor raises an exception', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -326,30 +243,24 @@ test.group('execute | waitForDone', () => {
       })
       .waitForDone()
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.deepEqual(stack, ['executed'])
   })
 
-  test('retry test before marking it as failed', async (assert, done) => {
+  test('retry test before marking it as failed', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.equal(event.retryAttempt, 2)
-        assert.deepEqual(stack, ['executed', 'executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
-
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
 
     testInstance
-      .run(async (_, d) => {
+      .run(async (__, d) => {
         stack.push('executed')
         setTimeout(() => {
           if (stack.length < 2) {
@@ -363,33 +274,22 @@ test.group('execute | waitForDone', () => {
       .timeout(0)
       .retry(3)
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.equal(event!.retryAttempt, 2)
+    assert.deepEqual(stack, ['executed', 'executed'])
     assert.equal(testInstance.options.retryAttempt, 2)
-  }).timeout(0)
+  })
 
-  test('mark as failed when retries are busted', async (assert, done) => {
+  test('mark as failed when retries are busted', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.equal(event.retryAttempt, 3)
-        assert.deepEqual(stack, ['executed', 'executed', 'executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
-
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
-      .run(async (_, d) => {
+      .run(async (__, d) => {
         stack.push('executed')
         setTimeout(() => {
           d(new Error('blow up'))
@@ -399,32 +299,25 @@ test.group('execute | waitForDone', () => {
       .timeout(0)
       .retry(2)
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.equal(event!.retryAttempt, 3)
+    assert.deepEqual(stack, ['executed', 'executed', 'executed'])
     assert.equal(testInstance.options.retryAttempt, 3)
-  }).timeout(0)
+  })
 
-  test('timeout test when takes too long', async (assert, done) => {
+  test('timeout test when takes too long', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'Test timeout')
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
-
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
-      .run(async (_, d) => {
+      .run(async (__, d) => {
         stack.push('executed')
         setTimeout(() => {
           d()
@@ -432,27 +325,21 @@ test.group('execute | waitForDone', () => {
       })
       .waitForDone()
 
-    await testInstance.exec()
-  }).timeout(0)
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'Test timeout')
+    assert.deepEqual(stack, ['executed'])
+  })
 
-  test('increase test timeout', async (assert, done) => {
+  test('increase test timeout', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
-
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
-    testInstance
     testInstance
       .run(async (_, d) => {
         stack.push('executed')
@@ -463,26 +350,18 @@ test.group('execute | waitForDone', () => {
       .waitForDone()
       .timeout(5000)
 
-    await testInstance.exec()
-  }).timeout(0)
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed'])
+  })
 })
 
-test.group('execute | hooks', () => {
-  test('execute setup hooks', async (assert, done) => {
+test.describe('execute | hooks', () => {
+  test('execute setup hooks', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['setup', 'executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.setup(async (t) => {
@@ -494,30 +373,16 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['setup', 'executed'])
   })
 
-  test('execute setup cleanup function', async (assert, done) => {
+  test('execute setup cleanup function', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, [
-          'setup',
-          'setup 2',
-          'executed',
-          'setup cleanup 2',
-          'setup cleanup',
-        ])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.setup(async (t) => {
@@ -540,27 +405,16 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['setup', 'setup 2', 'executed', 'setup cleanup 2', 'setup cleanup'])
   })
 
-  test('do not run test when setup hook fails', async (assert, done) => {
+  test('do not run test when setup hook fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'setup')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.deepEqual(stack, ['setup'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.setup(async (t) => {
@@ -573,27 +427,19 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'setup')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.deepEqual(stack, ['setup'])
   })
 
-  test('call setup cleanup when one of the setup hooks fails', async (assert, done) => {
+  test('call setup cleanup when one of the setup hooks fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'setup')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.deepEqual(stack, ['setup', 'setup 1', 'setup cleanup'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -614,24 +460,19 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'setup')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.deepEqual(stack, ['setup', 'setup 1', 'setup cleanup'])
   })
 
-  test('execute teardown hooks', async (assert, done) => {
+  test('execute teardown hooks', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['setup', 'executed', 'teardown'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -648,24 +489,16 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['setup', 'executed', 'teardown'])
   })
 
-  test('execute teardown cleanup function', async (assert, done) => {
+  test('execute teardown cleanup function', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['setup', 'executed', 'teardown', 'teardown cleanup'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -685,27 +518,16 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['setup', 'executed', 'teardown', 'teardown cleanup'])
   })
 
-  test('mark test failed when teardown hook fails', async (assert, done) => {
+  test('mark test failed when teardown hook fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'teardown')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.deepEqual(stack, ['setup', 'executed', 'teardown'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -723,27 +545,19 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'teardown')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.deepEqual(stack, ['setup', 'executed', 'teardown'])
   })
 
-  test('call teardown hooks when test fails', async (assert, done) => {
+  test('call teardown hooks when test fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.deepEqual(stack, ['setup', 'executed', 'teardown'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -761,27 +575,19 @@ test.group('execute | hooks', () => {
       throw new Error('blow up')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.deepEqual(stack, ['setup', 'executed', 'teardown'])
   })
 
-  test('fail when setup cleanup function fails', async (assert, done) => {
+  test('fail when setup cleanup function fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'setup:cleanup')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.deepEqual(stack, ['setup', 'executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.setup(async () => {
@@ -795,27 +601,19 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'setup:cleanup')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.deepEqual(stack, ['setup', 'executed'])
   })
 
-  test('fail when teardown cleanup function fails', async (assert, done) => {
+  test('fail when teardown cleanup function fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'teardown:cleanup')
-        assert.instanceOf(event.errors[0].error, Error)
-        assert.equal(event.errors[0].error.message, 'blow up')
-        assert.deepEqual(stack, ['executed', 'teardown'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.teardown(async () => {
@@ -829,24 +627,19 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'teardown:cleanup')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.equal(event!.errors[0].error.message, 'blow up')
+    assert.deepEqual(stack, ['executed', 'teardown'])
   })
 
-  test('execute test cleanup hooks', async (assert, done) => {
+  test('execute test cleanup hooks', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['executed', 'test:cleanup'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(async () => {
@@ -859,25 +652,16 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed', 'test:cleanup'])
   })
 
-  test('execute test cleanup hooks when test fails', async (assert, done) => {
+  test('execute test cleanup hooks when test fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.deepEqual(stack, ['test:cleanup'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(async () => {
@@ -890,25 +674,17 @@ test.group('execute | hooks', () => {
       throw new Error('something went wrong')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.deepEqual(stack, ['test:cleanup'])
   })
 
-  test('mark test as failed when test cleaup hook fails', async (assert, done) => {
+  test('mark test as failed when test cleaup hook fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test:cleanup')
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(async () => {
@@ -921,30 +697,23 @@ test.group('execute | hooks', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test:cleanup')
+    assert.deepEqual(stack, ['executed'])
   })
 })
 
-test.group('execute | dispose', (group) => {
-  group.afterEach(() => {
+test.describe('execute | dispose', () => {
+  test.afterEach(() => {
     Test.disposeCallbacks = []
   })
 
-  test('define dispose callbacks for the test', async (assert, done) => {
+  test('define dispose callbacks for the test', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['executed', 'dispose hook'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     Test.dispose(() => {
       stack.push('dispose hook')
@@ -955,26 +724,16 @@ test.group('execute | dispose', (group) => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed', 'dispose hook'])
   })
 
-  test('fail test when dispose hook fails', async (assert, done) => {
+  test('fail test when dispose hook fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.equal(event.errors[0].error.message, 'blowup')
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     Test.dispose(() => {
       throw new Error('blowup')
@@ -992,26 +751,18 @@ test.group('execute | dispose', (group) => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.equal(event!.errors[0].error.message, 'blowup')
+    assert.deepEqual(stack, ['executed'])
   })
 
-  test('call dispose hook when test fails', async (assert, done) => {
+  test('call dispose hook when test fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'test')
-        assert.equal(event.errors[0].error.message, 'blowup')
-        assert.deepEqual(stack, ['dispose callback'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     Test.dispose(() => {
       stack.push('dispose callback')
@@ -1029,26 +780,18 @@ test.group('execute | dispose', (group) => {
       throw new Error('blowup')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.equal(event!.errors[0].error.message, 'blowup')
+    assert.deepEqual(stack, ['dispose callback'])
   })
 
-  test('do not call dispose hooks when setup hook fails', async (assert, done) => {
+  test('do not call dispose hooks when setup hook fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.hasError)
-        assert.lengthOf(event.errors, 1)
-        assert.equal(event.errors[0].phase, 'setup')
-        assert.equal(event.errors[0].error.message, 'blowup')
-        assert.deepEqual(stack, [])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     Test.dispose(() => {
       stack.push('dispose callback')
@@ -1070,44 +813,41 @@ test.group('execute | dispose', (group) => {
         stack.push('executed')
       })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'setup')
+    assert.equal(event!.errors[0].error.message, 'blowup')
+    assert.deepEqual(stack, [])
   })
 })
 
-test.group('execute | dataset', () => {
-  test('run test for all rows inside dataset', async (assert) => {
-    const events: TestEndNode[] = []
+test.describe('execute | dataset', () => {
+  test('run test for all rows inside dataset', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      events.push(event)
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.with(['foo', 'bar']).run(async (_, value) => {
       stack.push(value)
     })
 
-    await testInstance.exec()
+    const [, events] = await Promise.all([
+      testInstance.exec(),
+      pEventTimes(emitter, 'test:end', 2, 8000),
+    ])
 
     assert.deepEqual(stack, ['foo', 'bar'])
-
     assert.lengthOf(events, 2)
     assert.deepEqual(events[0].dataset, { size: 2, row: 'foo', index: 0 })
     assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
   })
 
-  test('tests inside dataset should not fail each other', async (assert) => {
-    const events: TestEndNode[] = []
+  test('tests inside dataset should not fail each other', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      events.push(event)
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.with(['foo', 'bar']).run(async (_, value) => {
@@ -1117,7 +857,10 @@ test.group('execute | dataset', () => {
       }
     })
 
-    await testInstance.exec()
+    const [, events] = await Promise.all([
+      testInstance.exec(),
+      pEventTimes(emitter, 'test:end', 2, 8000),
+    ])
     assert.deepEqual(stack, ['foo', 'bar'])
 
     assert.lengthOf(events, 2)
@@ -1129,18 +872,13 @@ test.group('execute | dataset', () => {
     assert.isFalse(events[1].hasError)
   })
 
-  test('run hooks for each row inside dataset', async (assert) => {
-    const events: TestEndNode[] = []
+  test('run hooks for each row inside dataset', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
     let setupIndex = 0
     let teardownIndex = 0
-
-    emitter.on('test:end', (event) => {
-      events.push(event)
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -1155,7 +893,10 @@ test.group('execute | dataset', () => {
         stack.push(`teardown ${t.dataset![teardownIndex++]}`)
       })
 
-    await testInstance.exec()
+    const [, events] = await Promise.all([
+      testInstance.exec(),
+      pEventTimes(emitter, 'test:end', 2, 8000),
+    ])
     assert.deepEqual(stack, [
       'setup foo',
       'foo',
@@ -1173,15 +914,10 @@ test.group('execute | dataset', () => {
     assert.isFalse(events[1].hasError)
   })
 
-  test('compute dataset lazily', async (assert) => {
-    const events: TestEndNode[] = []
+  test('compute dataset lazily', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      events.push(event)
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -1192,8 +928,10 @@ test.group('execute | dataset', () => {
         stack.push(value)
       })
 
-    await testInstance.exec()
-
+    const [, events] = await Promise.all([
+      testInstance.exec(),
+      pEventTimes(emitter, 'test:end', 2, 8000),
+    ])
     assert.deepEqual(stack, ['foo', 'bar'])
 
     assert.lengthOf(events, 2)
@@ -1201,14 +939,9 @@ test.group('execute | dataset', () => {
     assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
   })
 
-  test('fail when dataset is not an array or a function', async (assert) => {
-    const events: TestEndNode[] = []
+  test('fail when dataset is not an array or a function', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      events.push(event)
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     assert.throw(
@@ -1217,15 +950,10 @@ test.group('execute | dataset', () => {
     )
   })
 
-  test('interpolate test title', async (assert) => {
-    const events: TestEndNode[] = []
+  test('interpolate test title', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      events.push(event)
-    })
 
     const testInstance = new Test('{$i} - .add({0}, {1})', new TestContext(), emitter, refiner)
     testInstance
@@ -1238,8 +966,10 @@ test.group('execute | dataset', () => {
         stack.push(value.join(','))
       })
 
-    await testInstance.exec()
-
+    const [, events] = await Promise.all([
+      testInstance.exec(),
+      pEventTimes(emitter, 'test:end', 3, 8000),
+    ])
     assert.deepEqual(stack, ['1,1,2', '1,2,3', '2,1,3'])
 
     assert.lengthOf(events, 3)
@@ -1248,15 +978,10 @@ test.group('execute | dataset', () => {
     assert.equal(events[2].title.expanded, '3 - .add(2, 1)')
   })
 
-  test('escape value within curly braces', async (assert) => {
-    const events: TestEndNode[] = []
+  test('escape value within curly braces', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      events.push(event)
-    })
 
     const testInstance = new Test('{$i} - .add(\\{0}, {1})', new TestContext(), emitter, refiner)
     testInstance
@@ -1269,7 +994,10 @@ test.group('execute | dataset', () => {
         stack.push(value.join(','))
       })
 
-    await testInstance.exec()
+    const [, events] = await Promise.all([
+      testInstance.exec(),
+      pEventTimes(emitter, 'test:end', 3, 8000),
+    ])
 
     assert.deepEqual(stack, ['1,1,2', '1,2,3', '2,1,3'])
 
@@ -1279,15 +1007,10 @@ test.group('execute | dataset', () => {
     assert.equal(events[2].title.expanded, '3 - .add({0}, 1)')
   })
 
-  test('return undefined when value is missing', async (assert) => {
-    const events: TestEndNode[] = []
+  test('return undefined when value is missing', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      events.push(event)
-    })
 
     const testInstance = new Test(
       '{$i} - .add({user.profile.name}, {1})',
@@ -1305,7 +1028,10 @@ test.group('execute | dataset', () => {
         stack.push(value.join(','))
       })
 
-    await testInstance.exec()
+    const [, events] = await Promise.all([
+      testInstance.exec(),
+      pEventTimes(emitter, 'test:end', 3, 8000),
+    ])
 
     assert.deepEqual(stack, ['1,1,2', '1,2,3', '2,1,3'])
 
@@ -1315,16 +1041,11 @@ test.group('execute | dataset', () => {
     assert.equal(events[2].title.expanded, '3 - .add(undefined, 1)')
   })
 
-  test('isolate context between tests', async (assert) => {
-    const events: TestEndNode[] = []
+  test('isolate context between tests', async () => {
     const stack: string[] = []
     const contexts: TestContext[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      events.push(event)
-    })
 
     const testInstance = new Test('2 + 2 = 4', () => new TestContext(), emitter, refiner)
     testInstance.with(['foo', 'bar']).run(async (ctx, value) => {
@@ -1332,7 +1053,10 @@ test.group('execute | dataset', () => {
       stack.push(value)
     })
 
-    await testInstance.exec()
+    const [, events] = await Promise.all([
+      testInstance.exec(),
+      pEventTimes(emitter, 'test:end', 2, 8000),
+    ])
 
     assert.deepEqual(stack, ['foo', 'bar'])
     assert.lengthOf(contexts, 2)
@@ -1344,46 +1068,23 @@ test.group('execute | dataset', () => {
   })
 })
 
-test.group('execute | todo', () => {
-  test('do not run test when no executor is defined', async (assert, done) => {
-    const stack: string[] = []
+test.describe('execute | todo', () => {
+  test('do not run test when no executor is defined', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.isTodo)
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, [])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
-
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 1000)])
+
+    assert.isNull(event!)
   })
 })
 
-test.group('execute | skip', () => {
-  test('do not run test when test is skipped', async (assert, done) => {
+test.describe('execute | skip', () => {
+  test('do not run test when test is skipped', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.isSkipped)
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, [])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -1392,25 +1093,17 @@ test.group('execute | skip', () => {
       })
       .skip(true)
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.isSkipped)
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, [])
   })
 
-  test('skip by default', async (assert, done) => {
+  test('skip by default', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.isSkipped)
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, [])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -1419,25 +1112,17 @@ test.group('execute | skip', () => {
       })
       .skip()
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.isSkipped)
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, [])
   })
 
-  test('compute skip status lazily', async (assert, done) => {
+  test('compute skip status lazily', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.isSkipped)
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, [])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -1446,26 +1131,17 @@ test.group('execute | skip', () => {
       })
       .skip(async () => true)
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.isSkipped)
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, [])
   })
 
-  test('specify skip reason', async (assert, done) => {
+  test('specify skip reason', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isTrue(event.isSkipped)
-        assert.equal(event.skipReason, 'Do not run in CI')
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, [])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance
@@ -1474,11 +1150,16 @@ test.group('execute | skip', () => {
       })
       .skip(async () => true, 'Do not run in CI')
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.isSkipped)
+    assert.equal(event!.skipReason, 'Do not run in CI')
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, [])
   })
 })
 
-test.group('execute | refiner', () => {
+test.describe('execute | refiner', () => {
   test('do not run test when refiner does not allows test title', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
@@ -1488,13 +1169,11 @@ test.group('execute | refiner', () => {
       if (event === 'test:start' || event === 'test:end') {
         throw new Error('Never expected to reach here')
       }
-
       return Promise.resolve()
     }
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(() => {})
-
     await testInstance.exec()
   })
 
@@ -1513,53 +1192,33 @@ test.group('execute | refiner', () => {
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(() => {})
-
     await testInstance.exec()
   })
 
-  test('run test when its title is allowed by the refiner', async (assert, done) => {
+  test('run test when its title is allowed by the refiner', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
     refiner.add('tests', ['2 + 2 = 4'])
 
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
-
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(async () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed'])
   })
 
-  test('run test when its tags are allowed by the refiner', async (assert, done) => {
+  test('run test when its tags are allowed by the refiner', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
     refiner.add('tags', ['@slow', '@regression'])
-
-    emitter.on('test:end', (event) => {
-      try {
-        assert.isFalse(event.hasError)
-        assert.lengthOf(event.errors, 0)
-        assert.deepEqual(stack, ['executed'])
-        done()
-      } catch (error) {
-        done(error)
-      }
-    })
 
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.tags(['@regression'])
@@ -1567,10 +1226,13 @@ test.group('execute | refiner', () => {
       stack.push('executed')
     })
 
-    await testInstance.exec()
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed'])
   })
 
-  test('do not run test when there are pinned tests and the current one is not pinned', async (assert) => {
+  test('do not run test when there are pinned tests and the current one is not pinned', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
@@ -1596,7 +1258,7 @@ test.group('execute | refiner', () => {
     assert.deepEqual(stack, ['executed'])
   })
 
-  test('do not run pinned test when its tags are not allowed by the refiner', async (assert) => {
+  test('do not run pinned test when its tags are not allowed by the refiner', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
@@ -1623,7 +1285,7 @@ test.group('execute | refiner', () => {
     assert.deepEqual(stack, [])
   })
 
-  test('do not run pinned test when its title is not allowed by the refiner', async (assert) => {
+  test('do not run pinned test when its title is not allowed by the refiner', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})

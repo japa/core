@@ -1,20 +1,22 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
-import { Test } from '../../src/test/main'
-import { Group } from '../../src/group/main'
-import { Emitter } from '../../src/emitter'
-import { Refiner } from '../../src/refiner'
+import test from 'node:test'
+import { assert } from 'chai'
 
-test.group('Refiner', () => {
-  test('add filter for test title', (assert) => {
+import { Test } from '../../src/test/main.js'
+import { Group } from '../../src/group/main.js'
+import { Emitter } from '../../src/emitter.js'
+import { Refiner } from '../../src/refiner.js'
+
+test.describe('Refiner', () => {
+  test('add filter for test title', () => {
     const refiner = new Refiner({})
 
     const emitter = new Emitter()
@@ -24,7 +26,7 @@ test.group('Refiner', () => {
     assert.isTrue(refiner.allows(testInstance))
   })
 
-  test('add filter for test tags', (assert) => {
+  test('add filter for test tags', () => {
     const refiner = new Refiner({})
 
     const emitter = new Emitter()
@@ -36,7 +38,7 @@ test.group('Refiner', () => {
     assert.isTrue(refiner.allows(testInstance))
   })
 
-  test('add filter for group title', (assert) => {
+  test('add filter for group title', () => {
     const refiner = new Refiner({})
     const emitter = new Emitter()
     const groupInstance = new Group('Maths', emitter, refiner)
@@ -51,7 +53,7 @@ test.group('Refiner', () => {
     assert.isTrue(refiner.allows(groupInstance))
   })
 
-  test('pin test', (assert) => {
+  test('pin test', () => {
     const refiner = new Refiner({})
     const emitter = new Emitter()
     const testInstance = new Test('2 + 2 = 4', {}, emitter, refiner)
@@ -60,7 +62,7 @@ test.group('Refiner', () => {
     assert.isTrue(refiner.allows(testInstance))
   })
 
-  test('apply layers of filters on a test', (assert) => {
+  test('apply layers of filters on a test', () => {
     const refiner = new Refiner({})
     const emitter = new Emitter()
 
@@ -78,7 +80,7 @@ test.group('Refiner', () => {
     assert.isFalse(refiner.allows(testInstance3))
   })
 
-  test('disallow test with matching negated tag', (assert) => {
+  test('disallow test with matching negated tag', () => {
     const refiner = new Refiner({})
 
     const emitter = new Emitter()
@@ -91,7 +93,7 @@ test.group('Refiner', () => {
     assert.isFalse(refiner.allows(testInstance))
   })
 
-  test('allow test with non matching negated tag', (assert) => {
+  test('allow test with non matching negated tag', () => {
     const refiner = new Refiner({})
 
     const emitter = new Emitter()
@@ -102,7 +104,7 @@ test.group('Refiner', () => {
     assert.isTrue(refiner.allows(testInstance))
   })
 
-  test('do not allow lone tests when group filter is applied', (assert) => {
+  test('do not allow lone tests when group filter is applied', () => {
     const refiner = new Refiner({})
     const emitter = new Emitter()
     const groupInstance = new Group('Maths', emitter, refiner)

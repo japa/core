@@ -1,25 +1,26 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
+import test from 'node:test'
+import { assert } from 'chai'
 
-import { Runner } from '../../src/runner'
-import { Test } from '../../src/test/main'
-import { Emitter } from '../../src/emitter'
-import { Refiner } from '../../src/refiner'
-import { Suite } from '../../src/suite/main'
-import { pEvent } from '../../test_helpers/index'
-import { TestContext } from '../../src/test_context'
-import { SuiteEndNode, TestEndNode } from '../../src/types'
+import { Runner } from '../../src/runner.js'
+import { Test } from '../../src/test/main.js'
+import { Emitter } from '../../src/emitter.js'
+import { Refiner } from '../../src/refiner.js'
+import { Suite } from '../../src/suite/main.js'
+import { pEvent } from '../../test_helpers/index.js'
+import { TestContext } from '../../src/test_context.js'
+import { SuiteEndNode, TestEndNode } from '../../src/types.js'
 
-test.group('execute | runner', () => {
-  test('run all suites tests', async (assert) => {
+test.describe('execute | runner', () => {
+  test('run all suites tests', async () => {
     const stack: string[] = []
     const events: (TestEndNode | SuiteEndNode)[] = []
     const emitter = new Emitter()
@@ -33,9 +34,9 @@ test.group('execute | runner', () => {
       events.push(event)
     })
 
-    const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter, refiner)
-    const functional = new Suite('functional', emitter, refiner)
+    const runner = new Runner<TestContext>(emitter)
+    const unit = new Suite<TestContext>('unit', emitter, refiner)
+    const functional = new Suite<TestContext>('functional', emitter, refiner)
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {
@@ -78,8 +79,8 @@ test.group('execute | runner', () => {
   })
 })
 
-test.group('execute | reporters', () => {
-  test('run reporters lifecycle methods', async (assert) => {
+test.describe('execute | reporters', () => {
+  test('run reporters lifecycle methods', async () => {
     const stack: string[] = []
     const events: (TestEndNode | SuiteEndNode)[] = []
     const emitter = new Emitter()
@@ -93,13 +94,13 @@ test.group('execute | reporters', () => {
       events.push(event)
     })
 
-    const runner = new Runner(emitter)
+    const runner = new Runner<TestContext>(emitter)
     runner.registerReporter(() => {
       stack.push('list reporter open')
     })
 
-    const unit = new Suite('unit', emitter, refiner)
-    const functional = new Suite('functional', emitter, refiner)
+    const unit = new Suite<TestContext>('unit', emitter, refiner)
+    const functional = new Suite<TestContext>('functional', emitter, refiner)
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {
@@ -141,14 +142,15 @@ test.group('execute | reporters', () => {
     assert.deepEqual(stack, ['list reporter open', 'test', 'test 1'])
   })
 
-  test('call named reporters handlers on start', async (assert) => {
-    assert.plan(1)
-
+  test('call named reporters handlers on start', async (t) => {
     const listReporter = {
       name: 'list',
-      handler: () => assert.isTrue(true),
+      handler: () => {},
     }
 
-    new Runner(new Emitter()).registerReporter(listReporter).start()
+    const mock = t.mock.method(listReporter, 'handler')
+    await new Runner(new Emitter()).registerReporter(listReporter).start()
+
+    assert.equal(mock.mock.calls.length, 1)
   })
 })

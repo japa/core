@@ -1,25 +1,26 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
+import test from 'node:test'
+import { assert } from 'chai'
 
-import { Test } from '../../src/test/main'
-import { Suite } from '../../src/suite/main'
-import { Group } from '../../src/group/main'
-import { Refiner } from '../../src/refiner'
-import { Emitter } from '../../src/emitter'
-import { pEvent } from '../../test_helpers/index'
-import { TestEndNode } from '../../src/types'
-import { TestContext } from '../../src/test_context'
+import { Test } from '../../src/test/main.js'
+import { Suite } from '../../src/suite/main.js'
+import { Group } from '../../src/group/main.js'
+import { Refiner } from '../../src/refiner.js'
+import { Emitter } from '../../src/emitter.js'
+import { pEvent } from '../../test_helpers/index.js'
+import { TestEndNode } from '../../src/types.js'
+import { TestContext } from '../../src/test_context.js'
 
-test.group('execute | test', () => {
-  test('run all tests inside a suite', async (assert) => {
+test.describe('execute | test', () => {
+  test('run all tests inside a suite', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -29,7 +30,7 @@ test.group('execute | test', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {
       stack.push('test')
@@ -54,7 +55,7 @@ test.group('execute | test', () => {
     assert.deepEqual(stack, ['test', 'test 1'])
   })
 
-  test('run all tests inside a suite group', async (assert) => {
+  test('run all tests inside a suite group', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -64,8 +65,8 @@ test.group('execute | test', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
-    const group = new Group('sample group', emitter, refiner)
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
+    const group = new Group<TestContext>('sample group', emitter, refiner)
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
       stack.push('test')
@@ -91,7 +92,7 @@ test.group('execute | test', () => {
     assert.deepEqual(stack, ['test', 'test 1'])
   })
 
-  test('run tests and groups as siblings', async (assert) => {
+  test('run tests and groups as siblings', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -101,8 +102,8 @@ test.group('execute | test', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
-    const group = new Group('sample group', emitter, refiner)
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
+    const group = new Group<TestContext>('sample group', emitter, refiner)
     group.each.setup(() => {
       stack.push('group test setup')
     })
@@ -133,8 +134,8 @@ test.group('execute | test', () => {
   })
 })
 
-test.group('execute | hooks', () => {
-  test('run suite setup and teardown hooks', async (assert) => {
+test.describe('execute | hooks', () => {
+  test('run suite setup and teardown hooks', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -144,9 +145,13 @@ test.group('execute | hooks', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
-    suite.setup(() => stack.push('suite setup'))
-    suite.teardown(() => stack.push('suite teardown'))
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
+    suite.setup(() => {
+      stack.push('suite setup')
+    })
+    suite.teardown(() => {
+      stack.push('suite teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {
@@ -172,7 +177,7 @@ test.group('execute | hooks', () => {
     assert.deepEqual(stack, ['suite setup', 'test', 'test 1', 'suite teardown'])
   })
 
-  test('run hooks cleanup functions', async (assert) => {
+  test('run hooks cleanup functions', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -182,7 +187,7 @@ test.group('execute | hooks', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
     suite.setup(() => {
       stack.push('suite setup')
       return () => {
@@ -227,7 +232,7 @@ test.group('execute | hooks', () => {
     ])
   })
 
-  test('do not run tests when setup hook fails', async (assert) => {
+  test('do not run tests when setup hook fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -237,7 +242,7 @@ test.group('execute | hooks', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
     suite.setup(() => {
       stack.push('suite setup')
       throw new Error('blow up')
@@ -265,7 +270,7 @@ test.group('execute | hooks', () => {
     assert.deepEqual(stack, ['suite setup'])
   })
 
-  test('run cleanup hooks when setup hook fails', async (assert) => {
+  test('run cleanup hooks when setup hook fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -275,7 +280,7 @@ test.group('execute | hooks', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
     suite.setup(() => {
       stack.push('suite setup')
       return function () {
@@ -309,7 +314,7 @@ test.group('execute | hooks', () => {
     assert.deepEqual(stack, ['suite setup', 'suite setup 1', 'suite setup cleanup'])
   })
 
-  test('mark suite as failed when teardown hook fails', async (assert) => {
+  test('mark suite as failed when teardown hook fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -319,7 +324,7 @@ test.group('execute | hooks', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
     suite.setup(() => {
       stack.push('suite setup')
       return function () {
@@ -359,7 +364,7 @@ test.group('execute | hooks', () => {
     ])
   })
 
-  test('call teardown cleanup functions when teardown hook files', async (assert) => {
+  test('call teardown cleanup functions when teardown hook files', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -369,7 +374,7 @@ test.group('execute | hooks', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
     suite.teardown(() => {
       stack.push('suite teardown')
       return function () {
@@ -409,7 +414,7 @@ test.group('execute | hooks', () => {
     ])
   })
 
-  test('fail when setup cleanup function fails', async (assert) => {
+  test('fail when setup cleanup function fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -419,7 +424,7 @@ test.group('execute | hooks', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
     suite.setup(() => {
       stack.push('suite setup')
       return function () {
@@ -450,7 +455,7 @@ test.group('execute | hooks', () => {
     assert.deepEqual(stack, ['suite setup', 'test', 'test 1', 'suite setup cleanup'])
   })
 
-  test('fail when teardown cleanup function fails', async (assert) => {
+  test('fail when teardown cleanup function fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -460,7 +465,7 @@ test.group('execute | hooks', () => {
       events.push(event)
     })
 
-    const suite = new Suite('sample suite', emitter, refiner)
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
     suite.teardown(() => {
       stack.push('suite teardown')
       return function () {
@@ -492,18 +497,22 @@ test.group('execute | hooks', () => {
   })
 })
 
-test.group('execute | refiner', () => {
-  test('do not run hooks when refiner filters out the group title', async (assert) => {
+test.describe('execute | refiner', () => {
+  test('do not run hooks when refiner filters out the group title', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
     refiner.add('groups', ['foo'])
 
-    const suite = new Suite('sample suite', emitter, refiner)
-    const group = new Group('sample group', emitter, refiner)
-    suite.setup(() => stack.push('suite setup'))
-    suite.teardown(() => stack.push('suite teardown'))
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
+    const group = new Group<TestContext>('sample group', emitter, refiner)
+    suite.setup(() => {
+      stack.push('suite setup')
+    })
+    suite.teardown(() => {
+      stack.push('suite teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
@@ -523,17 +532,21 @@ test.group('execute | refiner', () => {
     assert.isNull(suiteEndEvent)
   })
 
-  test('do not run hooks when refiner filters out all the group tests', async (assert) => {
+  test('do not run hooks when refiner filters out all the group tests', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
     refiner.add('tests', ['test 2'])
 
-    const suite = new Suite('sample suite', emitter, refiner)
-    const group = new Group('sample group', emitter, refiner)
-    suite.setup(() => stack.push('suite setup'))
-    suite.teardown(() => stack.push('suite teardown'))
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
+    const group = new Group<TestContext>('sample group', emitter, refiner)
+    suite.setup(() => {
+      stack.push('suite setup')
+    })
+    suite.teardown(() => {
+      stack.push('suite teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
@@ -553,17 +566,21 @@ test.group('execute | refiner', () => {
     assert.isNull(suiteEndEvent)
   })
 
-  test('run hooks when one of the tests inside the group is allowed', async (assert) => {
+  test('run hooks when one of the tests inside the group is allowed', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
     refiner.add('tests', ['test 1'])
 
-    const suite = new Suite('sample suite', emitter, refiner)
-    const group = new Group('sample group', emitter, refiner)
-    suite.setup(() => stack.push('suite setup'))
-    suite.teardown(() => stack.push('suite teardown'))
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
+    const group = new Group<TestContext>('sample group', emitter, refiner)
+    suite.setup(() => {
+      stack.push('suite setup')
+    })
+    suite.teardown(() => {
+      stack.push('suite teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
@@ -583,17 +600,21 @@ test.group('execute | refiner', () => {
     assert.deepEqual(stack, ['suite setup', 'test 1', 'suite teardown'])
   })
 
-  test('run hooks when group is allowed by the refiner', async (assert) => {
+  test('run hooks when group is allowed by the refiner', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
     refiner.add('groups', ['sample group'])
 
-    const suite = new Suite('sample suite', emitter, refiner)
-    const group = new Group('sample group', emitter, refiner)
-    suite.setup(() => stack.push('suite setup'))
-    suite.teardown(() => stack.push('suite teardown'))
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
+    const group = new Group<TestContext>('sample group', emitter, refiner)
+    suite.setup(() => {
+      stack.push('suite setup')
+    })
+    suite.teardown(() => {
+      stack.push('suite teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {

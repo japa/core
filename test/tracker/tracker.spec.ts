@@ -1,33 +1,34 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
+import test from 'node:test'
+import { assert } from 'chai'
 
-import { Runner } from '../../src/runner'
-import { Test } from '../../src/test/main'
-import { Group } from '../../src/group/main'
-import { Suite } from '../../src/suite/main'
-import { Refiner } from '../../src/refiner'
-import { Emitter } from '../../src/emitter'
-import { Tracker } from '../../src/tracker'
-import { pEvent } from '../../test_helpers/index'
-import { TestContext } from '../../src/test_context'
+import { Runner } from '../../src/runner.js'
+import { Test } from '../../src/test/main.js'
+import { Group } from '../../src/group/main.js'
+import { Suite } from '../../src/suite/main.js'
+import { Refiner } from '../../src/refiner.js'
+import { Emitter } from '../../src/emitter.js'
+import { Tracker } from '../../src/tracker.js'
+import { pEvent } from '../../test_helpers/index.js'
+import { TestContext } from '../../src/test_context.js'
 
-test.group('Tracker', () => {
-  test('generate summary with multiple suites', async (assert) => {
+test.describe('Tracker', () => {
+  test('generate summary with multiple suites', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
     const tracker = new Tracker()
 
-    const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter, refiner)
-    const functional = new Suite('functional', emitter, refiner)
+    const runner = new Runner<TestContext>(emitter)
+    const unit = new Suite<TestContext>('unit', emitter, refiner)
+    const functional = new Suite<TestContext>('functional', emitter, refiner)
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {})
@@ -61,14 +62,14 @@ test.group('Tracker', () => {
     assert.lengthOf(summary.failedTestsTitles, 0)
   })
 
-  test('track failed tests', async (assert) => {
+  test('track failed tests', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
     const tracker = new Tracker()
 
-    const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter, refiner)
-    const functional = new Suite('functional', emitter, refiner)
+    const runner = new Runner<TestContext>(emitter)
+    const unit = new Suite<TestContext>('unit', emitter, refiner)
+    const functional = new Suite<TestContext>('functional', emitter, refiner)
     const error = new Error('foo')
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
@@ -118,17 +119,17 @@ test.group('Tracker', () => {
     assert.deepEqual(summary.failedTestsTitles, ['test 1'])
   })
 
-  test('track failed tests inside a group', async (assert) => {
+  test('track failed tests inside a group', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
     const tracker = new Tracker()
 
-    const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter, refiner)
-    const functional = new Suite('functional', emitter, refiner)
+    const runner = new Runner<TestContext>(emitter)
+    const unit = new Suite<TestContext>('unit', emitter, refiner)
+    const functional = new Suite<TestContext>('functional', emitter, refiner)
     const error = new Error('foo')
 
-    const group = new Group('arithmetic', emitter, refiner)
+    const group = new Group<TestContext>('arithmetic', emitter, refiner)
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {})
 
@@ -185,17 +186,17 @@ test.group('Tracker', () => {
     assert.deepEqual(summary.failedTestsTitles, ['test 1'])
   })
 
-  test('track regression failures', async (assert) => {
+  test('track regression failures', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
     const tracker = new Tracker()
 
-    const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter, refiner)
-    const functional = new Suite('functional', emitter, refiner)
+    const runner = new Runner<TestContext>(emitter)
+    const unit = new Suite<TestContext>('unit', emitter, refiner)
+    const functional = new Suite<TestContext>('functional', emitter, refiner)
     const error = new Error('foo')
 
-    const group = new Group('arithmetic', emitter, refiner)
+    const group = new Group<TestContext>('arithmetic', emitter, refiner)
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {})
 
@@ -234,17 +235,17 @@ test.group('Tracker', () => {
     assert.deepEqual(summary.failedTestsTitles, [])
   })
 
-  test('track group hooks failure', async (assert) => {
+  test('track group hooks failure', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
     const tracker = new Tracker()
 
-    const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter, refiner)
-    const functional = new Suite('functional', emitter, refiner)
+    const runner = new Runner<TestContext>(emitter)
+    const unit = new Suite<TestContext>('unit', emitter, refiner)
+    const functional = new Suite<TestContext>('functional', emitter, refiner)
     const error = new Error('foo')
 
-    const group = new Group('arithmetic', emitter, refiner)
+    const group = new Group<TestContext>('arithmetic', emitter, refiner)
     group.setup(() => {
       throw error
     })
@@ -296,21 +297,21 @@ test.group('Tracker', () => {
     assert.deepEqual(summary.failedTestsTitles, [])
   })
 
-  test('track suite hooks failure', async (assert) => {
+  test('track suite hooks failure', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
     const tracker = new Tracker()
 
-    const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter, refiner)
+    const runner = new Runner<TestContext>(emitter)
+    const unit = new Suite<TestContext>('unit', emitter, refiner)
     unit.setup(() => {
       throw error
     })
 
-    const functional = new Suite('functional', emitter, refiner)
+    const functional = new Suite<TestContext>('functional', emitter, refiner)
     const error = new Error('foo')
 
-    const group = new Group('arithmetic', emitter, refiner)
+    const group = new Group<TestContext>('arithmetic', emitter, refiner)
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {})
 
@@ -352,16 +353,16 @@ test.group('Tracker', () => {
     assert.deepEqual(summary.failedTestsTitles, [])
   })
 
-  test('mark test as failed when regression test passes', async (assert) => {
+  test('mark test as failed when regression test passes', async () => {
     const emitter = new Emitter()
     const refiner = new Refiner({})
     const tracker = new Tracker()
 
-    const runner = new Runner(emitter)
-    const unit = new Suite('unit', emitter, refiner)
-    const functional = new Suite('functional', emitter, refiner)
+    const runner = new Runner<TestContext>(emitter)
+    const unit = new Suite<TestContext>('unit', emitter, refiner)
+    const functional = new Suite<TestContext>('functional', emitter, refiner)
 
-    const group = new Group('arithmetic', emitter, refiner)
+    const group = new Group<TestContext>('arithmetic', emitter, refiner)
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {})
 

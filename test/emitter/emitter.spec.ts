@@ -1,17 +1,18 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
-import { Emitter } from '../../src/emitter'
+import test from 'node:test'
+import { assert } from 'chai'
+import { Emitter } from '../../src/emitter.js'
 
-test.group('emitter', () => {
-  test('define an error handler to handle listener errors', async (assert, done) => {
+test.describe('emitter', () => {
+  test('define an error handler to handle listener errors', (_, done) => {
     const emitter = new Emitter()
     emitter.on('test:end', async () => {
       throw new Error('Unable to handle')
@@ -22,20 +23,18 @@ test.group('emitter', () => {
       done()
     })
 
-    await emitter.emit('test:end')
+    emitter.emit('test:end')
   })
 
-  test('raise exception when no error handler is defined', async (assert, done) => {
+  test('raise exception when no error handler is defined', (_, done) => {
     const emitter = new Emitter()
     emitter.on('test:end', async () => {
       throw new Error('Unable to handle')
     })
 
-    try {
-      await emitter.emit('test:end')
-    } catch (error) {
+    emitter.emit('test:end').catch((error) => {
       assert.equal(error.message, 'Unable to handle')
       done()
-    }
+    })
   })
 })

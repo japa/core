@@ -1,21 +1,22 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
+import test from 'node:test'
+import { assert } from 'chai'
 
-import { Test } from '../../src/test/main'
-import { Refiner } from '../../src/refiner'
-import { Emitter } from '../../src/emitter'
-import { TestContext } from '../../src/test_context'
+import { Test } from '../../src/test/main.js'
+import { Refiner } from '../../src/refiner.js'
+import { Emitter } from '../../src/emitter.js'
+import { TestContext } from '../../src/test_context.js'
 
-test.group('configure', () => {
-  test('create an instance of test', async (assert) => {
+test.describe('configure', () => {
+  test('create an instance of test', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     assert.instanceOf(testInstance, Test)
     assert.deepEqual(testInstance.options, {
@@ -26,7 +27,7 @@ test.group('configure', () => {
     })
   })
 
-  test('define timeout for the test', async (assert) => {
+  test('define timeout for the test', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.timeout(6000)
 
@@ -38,7 +39,7 @@ test.group('configure', () => {
     })
   })
 
-  test('disable timeout for the test', async (assert) => {
+  test('disable timeout for the test', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.disableTimeout()
 
@@ -50,7 +51,7 @@ test.group('configure', () => {
     })
   })
 
-  test('define test retries', async (assert) => {
+  test('define test retries', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.retry(4)
 
@@ -63,7 +64,7 @@ test.group('configure', () => {
     })
   })
 
-  test('mark test to be skipped', async (assert) => {
+  test('mark test to be skipped', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.skip(true, 'Disabled for now')
 
@@ -77,7 +78,7 @@ test.group('configure', () => {
     })
   })
 
-  test('compute skip lazily using a callback', async (assert) => {
+  test('compute skip lazily using a callback', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.skip(() => true, 'Disabled for now')
 
@@ -90,7 +91,7 @@ test.group('configure', () => {
     })
   })
 
-  test('mark test as failing', async (assert) => {
+  test('mark test as failing', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.fails('Should be 4, but returns 5 right now')
 
@@ -104,7 +105,7 @@ test.group('configure', () => {
     })
   })
 
-  test('define tags', async (assert) => {
+  test('define tags', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.tags(['@slow'])
 
@@ -116,7 +117,7 @@ test.group('configure', () => {
     })
   })
 
-  test('append tags', async (assert) => {
+  test('append tags', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.tags(['@slow']).tags(['@regression'], 'append')
 
@@ -128,7 +129,7 @@ test.group('configure', () => {
     })
   })
 
-  test('prepend tags', async (assert) => {
+  test('prepend tags', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.tags(['@slow']).tags(['@regression'], 'prepend')
 
@@ -140,7 +141,7 @@ test.group('configure', () => {
     })
   })
 
-  test('inform runner to waitForDone', async (assert) => {
+  test('inform runner to waitForDone', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.waitForDone()
 
@@ -153,7 +154,7 @@ test.group('configure', () => {
     })
   })
 
-  test('define dataset for the test', async (assert) => {
+  test('define dataset for the test', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.with(['foo', 'bar'])
 
@@ -166,7 +167,7 @@ test.group('configure', () => {
     })
   })
 
-  test('compute dataset lazily', async (assert) => {
+  test('compute dataset lazily', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.with(() => ['foo', 'bar'])
 
@@ -179,12 +180,12 @@ test.group('configure', () => {
     })
   })
 
-  test('do not mix hooks when a test is extended', async (assert) => {
+  test('do not mix hooks when a test is extended', async () => {
     class Test1 extends Test<any, any> {
-      public static disposeCallbacks = []
+      static disposeCallbacks = []
     }
     class Test2 extends Test<any, any> {
-      public static disposeCallbacks = []
+      static disposeCallbacks = []
     }
 
     function disposeCallback() {}
@@ -194,16 +195,16 @@ test.group('configure', () => {
     assert.deepEqual(Test2.disposeCallbacks, [])
   })
 
-  test('inherit parent dispose calls', async (assert) => {
+  test('inherit parent dispose calls', async () => {
     function disposeCallback() {}
     function disposeCallback1() {}
     Test.dispose(disposeCallback)
 
     class Test1 extends Test<any, any> {
-      public static disposeCallbacks = [...Test.disposeCallbacks]
+      static disposeCallbacks = [...Test.disposeCallbacks]
     }
     class Test2 extends Test<any, any> {
-      public static disposeCallbacks = [...Test.disposeCallbacks]
+      static disposeCallbacks = [...Test.disposeCallbacks]
     }
 
     Test2.dispose(disposeCallback1)

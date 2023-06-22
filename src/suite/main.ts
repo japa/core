@@ -1,22 +1,22 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import { Macroable } from 'macroable'
-import { Hooks } from '@poppinss/hooks'
+import Hooks from '@poppinss/hooks'
+import Macroable from '@poppinss/macroable'
 
-import debug from '../debug'
-import { Emitter } from '../emitter'
-import { Test } from '../test/main'
-import { Refiner } from '../refiner'
-import { Group } from '../group/main'
-import { SuiteRunner } from './runner'
-import { SuiteHooksHandler } from '../types'
+import debug from '../debug.js'
+import { Test } from '../test/main.js'
+import { Emitter } from '../emitter.js'
+import { Refiner } from '../refiner.js'
+import { Group } from '../group/main.js'
+import { SuiteRunner } from './runner.js'
+import type { SuiteHooks, SuiteHooksHandler } from '../types.js'
 
 /**
  * The Suite class exposes the API to run a group of tests
@@ -39,39 +39,41 @@ import { SuiteHooksHandler } from '../types'
  * await suite.exec()
  */
 export class Suite<Context extends Record<any, any>> extends Macroable {
-  public static macros = {}
-  public static getters = {}
+  #refiner: Refiner
+  #emitter: Emitter
 
   /**
    * Reference to registered hooks
    */
-  private hooks = new Hooks()
+  #hooks = new Hooks<SuiteHooks<Context>>()
 
   /**
    * Callbacks to invoke on each test and group
    */
-  private configureTestCallbacks: ((test: Test<Context, any>) => void)[] = []
-  private configureGroupCallbacks: ((group: Group<Context>) => void)[] = []
+  #configureTestCallbacks: ((test: Test<Context, any>) => void)[] = []
+  #configureGroupCallbacks: ((group: Group<Context>) => void)[] = []
 
   /**
    * A collection of tests and groups both
    */
-  public stack: (Test<Context, any> | Group<Context>)[] = []
+  stack: (Test<Context, any> | Group<Context>)[] = []
 
-  constructor(public name: string, private emitter: Emitter, private refiner: Refiner) {
+  constructor(public name: string, emitter: Emitter, refiner: Refiner) {
     super()
+    this.#emitter = emitter
+    this.#refiner = refiner
   }
 
   /**
    * Add a test or a group to the execution stack
    */
-  public add(testOrGroup: Test<Context, any> | Group<Context>): this {
+  add(testOrGroup: Test<Context, any> | Group<Context>): this {
     if (testOrGroup instanceof Group) {
-      this.configureGroupCallbacks.forEach((callback) => callback(testOrGroup))
+      this.#configureGroupCallbacks.forEach((callback) => callback(testOrGroup))
     }
 
     if (testOrGroup instanceof Test) {
-      this.configureTestCallbacks.forEach((callback) => callback(testOrGroup))
+      this.#configureTestCallbacks.forEach((callback) => callback(testOrGroup))
     }
 
     this.stack.push(testOrGroup)
@@ -81,41 +83,41 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
   /**
    * Tap into each test and configure it
    */
-  public onTest(callback: (test: Test<Context, any>) => void): this {
-    this.configureTestCallbacks.push(callback)
+  onTest(callback: (test: Test<Context, any>) => void): this {
+    this.#configureTestCallbacks.push(callback)
     return this
   }
 
   /**
    * Tap into each group and configure it
    */
-  public onGroup(callback: (group: Group<Context>) => void): this {
-    this.configureGroupCallbacks.push(callback)
+  onGroup(callback: (group: Group<Context>) => void): this {
+    this.#configureGroupCallbacks.push(callback)
     return this
   }
 
   /**
    * Register a test setup function
    */
-  public setup(handler: SuiteHooksHandler<Context>): this {
+  setup(handler: SuiteHooksHandler<Context>): this {
     debug('registering suite setup hook %s', handler)
-    this.hooks.add('setup', handler)
+    this.#hooks.add('setup', handler)
     return this
   }
 
   /**
    * Register a test teardown function
    */
-  public teardown(handler: SuiteHooksHandler<Context>): this {
+  teardown(handler: SuiteHooksHandler<Context>): this {
     debug('registering suite teardown hook %s', handler)
-    this.hooks.add('teardown', handler)
+    this.#hooks.add('teardown', handler)
     return this
   }
 
   /**
    * Execute suite groups, tests and hooks
    */
-  public async exec() {
+  async exec() {
     /**
      * By default a suite is not allowed to be executed. However, we go
      * through all the tests/ groups within the suite  and if one
@@ -127,7 +129,7 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
      */
     let allowSuite = false
     for (let item of this.stack) {
-      allowSuite = this.refiner.allows(item)
+      allowSuite = this.#refiner.allows(item)
       if (allowSuite) {
         break
       }
@@ -138,6 +140,6 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
       return
     }
 
-    await new SuiteRunner(this, this.hooks, this.emitter).run()
+    await new SuiteRunner(this, this.#hooks, this.#emitter).run()
   }
 }

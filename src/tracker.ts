@@ -1,14 +1,14 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 import timeSpan, { TimeEndFunction } from 'time-span'
-import {
+import type {
   TestEndNode,
   GroupEndNode,
   SuiteEndNode,
@@ -18,7 +18,7 @@ import {
   SuiteStartNode,
   FailureTreeGroupNode,
   FailureTreeSuiteNode,
-} from './types'
+} from './types.js'
 
 /**
  * Tracks the tests events to generate a summary report. Failing tests are further tracked
@@ -28,22 +28,22 @@ export class Tracker {
   /**
    * Time tracker to find runner duration
    */
-  private timeTracker: TimeEndFunction
+  #timeTracker?: TimeEndFunction
 
   /**
    * Currently active suite
    */
-  private currentSuite?: FailureTreeSuiteNode
+  #currentSuite?: FailureTreeSuiteNode
 
   /**
    * Currently active group
    */
-  private currentGroup?: FailureTreeGroupNode
+  #currentGroup?: FailureTreeGroupNode
 
   /**
    * If the entire run cycle has one or more errors
    */
-  private hasError: boolean = false
+  #hasError: boolean = false
 
   /**
    * Storing state if current suite and group has errors. These
@@ -53,10 +53,10 @@ export class Tracker {
    * For example: If a test fails, it marks both current group
    * and suite has errors.
    */
-  private currentSuiteHasError = false
-  private currentGroupHasError = false
+  #currentSuiteHasError = false
+  #currentGroupHasError = false
 
-  private aggregates: {
+  #aggregates: {
     total: number
     failed: number
     passed: number
@@ -74,23 +74,23 @@ export class Tracker {
     uncaughtExceptions: 0,
   }
 
-  private duration: number = 0
+  #duration: number = 0
 
   /**
    * A tree of suites/groups and tests that have failed. They are always nested inside
    * other unless the test groups where used, then suites contains a list of tests
    * directly.
    */
-  private failureTree: FailureTreeSuiteNode[] = []
-  private failedTestsTitles: string[] = []
+  #failureTree: FailureTreeSuiteNode[] = []
+  #failedTestsTitles: string[] = []
 
   /**
    * Set reference for the current suite
    */
-  private onSuiteStart(payload: SuiteStartNode) {
-    this.currentSuiteHasError = false
-    this.currentSuite = {
-      name: (payload as SuiteStartNode).name,
+  #onSuiteStart(payload: SuiteStartNode) {
+    this.#currentSuiteHasError = false
+    this.#currentSuite = {
+      name: payload.name,
       type: 'suite',
       errors: [],
       children: [],
@@ -101,24 +101,24 @@ export class Tracker {
    * Move suite to the failure tree when the suite
    * has errors
    */
-  private onSuiteEnd(payload: SuiteEndNode) {
+  #onSuiteEnd(payload: SuiteEndNode) {
     if (payload.hasError) {
-      this.hasError = true
-      this.currentSuiteHasError = true
-      this.currentSuite!.errors = payload.errors
+      this.#hasError = true
+      this.#currentSuiteHasError = true
+      this.#currentSuite!.errors = payload.errors
     }
 
-    if (this.currentSuiteHasError) {
-      this.failureTree.push(this.currentSuite!)
+    if (this.#currentSuiteHasError) {
+      this.#failureTree.push(this.#currentSuite!)
     }
   }
 
   /**
    * Set reference for the current group
    */
-  private onGroupStart(payload: GroupStartNode) {
-    this.currentGroupHasError = false
-    this.currentGroup = {
+  #onGroupStart(payload: GroupStartNode) {
+    this.#currentGroupHasError = false
+    this.#currentGroup = {
       name: payload.title,
       type: 'group',
       errors: [],
@@ -130,16 +130,16 @@ export class Tracker {
    * Move suite to the failure tree when the suite
    * has errors
    */
-  private onGroupEnd(payload: GroupEndNode) {
+  #onGroupEnd(payload: GroupEndNode) {
     if (payload.hasError) {
-      this.hasError = true
-      this.currentGroupHasError = true
-      this.currentGroup!.errors = payload.errors
+      this.#hasError = true
+      this.#currentGroupHasError = true
+      this.#currentGroup!.errors = payload.errors
     }
 
-    if (this.currentGroupHasError) {
-      this.currentSuiteHasError = true
-      this.currentSuite!.children.push(this.currentGroup!)
+    if (this.#currentGroupHasError) {
+      this.#currentSuiteHasError = true
+      this.#currentSuite!.children.push(this.#currentGroup!)
     }
   }
 
@@ -147,17 +147,17 @@ export class Tracker {
    * In case of failure, track the test inside the current group
    * or the current suite.
    */
-  private onTestEnd(payload: TestEndNode) {
+  #onTestEnd(payload: TestEndNode) {
     /**
      * Bumping aggregates
      */
-    this.aggregates.total++
+    this.#aggregates.total++
 
     /**
      * Test was skipped
      */
     if (payload.isSkipped) {
-      this.aggregates.skipped++
+      this.#aggregates.skipped++
       return
     }
 
@@ -165,7 +165,7 @@ export class Tracker {
      * Test was a todo
      */
     if (payload.isTodo) {
-      this.aggregates.todo++
+      this.#aggregates.todo++
       return
     }
 
@@ -178,10 +178,10 @@ export class Tracker {
      */
     if (payload.isFailing) {
       if (!payload.hasError) {
-        this.aggregates.failed++
-        this.hasError = true
+        this.#aggregates.failed++
+        this.#hasError = true
       } else {
-        this.aggregates.regression++
+        this.#aggregates.regression++
       }
 
       return
@@ -191,22 +191,22 @@ export class Tracker {
      * Test completed successfully
      */
     if (!payload.hasError) {
-      this.aggregates.passed++
+      this.#aggregates.passed++
       return
     }
 
-    this.markTestAsFailed(payload)
+    this.#markTestAsFailed(payload)
   }
 
   /**
    * Mark test as failed
    */
-  private markTestAsFailed(payload: TestEndNode) {
+  #markTestAsFailed(payload: TestEndNode) {
     /**
      * Bump failed count
      */
-    this.aggregates.failed++
-    this.hasError = true
+    this.#aggregates.failed++
+    this.#hasError = true
 
     /**
      * Test payload
@@ -220,59 +220,59 @@ export class Tracker {
     /**
      * Track test inside the current group or suite
      */
-    if (this.currentGroup) {
-      this.currentGroupHasError = true
-      this.currentGroup.children.push(testPayload)
-    } else if (this.currentSuite) {
-      this.currentSuiteHasError = true
-      this.currentSuite.children.push(testPayload)
+    if (this.#currentGroup) {
+      this.#currentGroupHasError = true
+      this.#currentGroup.children.push(testPayload)
+    } else if (this.#currentSuite) {
+      this.#currentSuiteHasError = true
+      this.#currentSuite.children.push(testPayload)
     }
 
     /**
      * Push title to the failedTestsTitles array
      */
-    this.failedTestsTitles.push(payload.title.original)
+    this.#failedTestsTitles.push(payload.title.original)
   }
 
   /**
    * Increment the count of uncaught exceptions
    */
-  private onUncaughtException() {
-    this.aggregates.uncaughtExceptions++
-    this.hasError = true
+  #onUncaughtException() {
+    this.#aggregates.uncaughtExceptions++
+    this.#hasError = true
   }
 
   /**
    * Process the tests events
    */
-  public processEvent<Event extends keyof RunnerEvents>(
+  processEvent<Event extends keyof RunnerEvents>(
     event: keyof RunnerEvents,
     payload: RunnerEvents[Event]
   ) {
     switch (event) {
       case 'uncaught:exception':
-        this.onUncaughtException()
+        this.#onUncaughtException()
         break
       case 'suite:start':
-        this.onSuiteStart(payload as SuiteStartNode)
+        this.#onSuiteStart(payload as SuiteStartNode)
         break
       case 'suite:end':
-        this.onSuiteEnd(payload as SuiteEndNode)
+        this.#onSuiteEnd(payload as SuiteEndNode)
         break
       case 'group:start':
-        this.onGroupStart(payload as GroupStartNode)
+        this.#onGroupStart(payload as GroupStartNode)
         break
       case 'group:end':
-        this.onGroupEnd(payload as GroupEndNode)
+        this.#onGroupEnd(payload as GroupEndNode)
         break
       case 'test:end':
-        this.onTestEnd(payload as TestEndNode)
+        this.#onTestEnd(payload as TestEndNode)
         break
       case 'runner:start':
-        this.timeTracker = timeSpan()
+        this.#timeTracker = timeSpan()
         break
       case 'runner:end':
-        this.duration = this.timeTracker.rounded()
+        this.#duration = this.#timeTracker?.rounded() ?? 0
         break
     }
   }
@@ -280,13 +280,13 @@ export class Tracker {
   /**
    * Returns the tests runner summary
    */
-  public getSummary(): RunnerSummary {
+  getSummary(): RunnerSummary {
     return {
-      aggregates: this.aggregates,
-      hasError: this.hasError,
-      duration: this.duration,
-      failureTree: this.failureTree,
-      failedTestsTitles: this.failedTestsTitles,
+      aggregates: this.#aggregates,
+      hasError: this.#hasError,
+      duration: this.#duration,
+      failureTree: this.#failureTree,
+      failedTestsTitles: this.#failedTestsTitles,
     }
   }
 }

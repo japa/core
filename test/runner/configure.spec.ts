@@ -1,27 +1,28 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
+import test from 'node:test'
+import { assert } from 'chai'
 
-import { Runner } from '../../src/runner'
-import { Emitter } from '../../src/emitter'
-import { Refiner } from '../../src/refiner'
-import { Suite } from '../../src/suite/main'
-import { ReporterContract } from '../../src/types'
+import { Runner } from '../../src/runner.js'
+import { Emitter } from '../../src/emitter.js'
+import { Refiner } from '../../src/refiner.js'
+import { Suite } from '../../src/suite/main.js'
+import { ReporterContract } from '../../src/types.js'
 
-test.group('configure | runner', () => {
-  test('create an instance of runner', async (assert) => {
+test.describe('configure | runner', () => {
+  test('create an instance of runner', async () => {
     const runner = new Runner(new Emitter())
     assert.instanceOf(runner, Runner)
   })
 
-  test('register suites with runner', async (assert) => {
+  test('register suites with runner', async () => {
     const emitter = new Emitter()
 
     const runner = new Runner(emitter)
@@ -33,7 +34,7 @@ test.group('configure | runner', () => {
     assert.deepEqual(runner.suites, [unitSuite, functionalSuite])
   })
 
-  test('tap into suites to configure them', async (assert) => {
+  test('tap into suites to configure them', async () => {
     const emitter = new Emitter()
 
     const runner = new Runner(emitter)
@@ -49,7 +50,7 @@ test.group('configure | runner', () => {
     assert.equal(functionalSuite.name, 'configured:functional')
   })
 
-  test('register reporters with runner', async (assert) => {
+  test('register reporters with runner', async () => {
     const emitter = new Emitter()
 
     const runner = new Runner(emitter)
@@ -59,7 +60,7 @@ test.group('configure | runner', () => {
     assert.deepEqual(runner.reporters, new Set([listReporter]))
   })
 
-  test('register named reporter with runner', async (assert) => {
+  test('register named reporter with runner', async () => {
     const emitter = new Emitter()
 
     const runner = new Runner(emitter)

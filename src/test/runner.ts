@@ -1,74 +1,81 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 import retry from 'async-retry'
-import { Hooks } from '@poppinss/hooks'
+import Hooks from '@poppinss/hooks'
 import timeSpan, { TimeEndFunction } from 'time-span'
 
-import debug from '../debug'
-import { Test } from './main'
-import { Emitter } from '../emitter'
-import { interpolate } from '../interpolate'
-import { TestEndNode, TestStartNode } from '../types'
+import debug from '../debug.js'
+import { Test } from './main.js'
+import { Emitter } from '../emitter.js'
+import { interpolate } from '../interpolate.js'
+import type { TestEndNode, TestHooks, TestHooksData, TestStartNode } from '../types.js'
+import { Runner } from '@poppinss/hooks/types'
 
 /**
  * Dummy test runner that just emits the required events
  */
 export class DummyRunner {
-  constructor(private test: Test<any, any>, private emitter: Emitter) {}
+  #test: Test<any, any>
+  #emitter: Emitter
 
-  /**
-   * Notify the reporter about the test start
-   */
-  private notifyStart() {
-    const startOptions: TestStartNode = {
-      ...this.test.options,
-      title: {
-        original: this.test.options.title,
-        expanded: this.test.options.title,
-        toString() {
-          return this.original
-        },
-      },
-      isPinned: this.test.isPinned,
-    }
-    this.emitter.emit('test:start', startOptions)
+  constructor(test: Test<any, any>, emitter: Emitter) {
+    this.#test = test
+    this.#emitter = emitter
   }
 
   /**
    * Notify the reporter about the test start
    */
-  private notifyEnd() {
-    const endOptions: TestEndNode = {
-      ...this.test.options,
+  #notifyStart() {
+    const startOptions: TestStartNode = {
+      ...this.#test.options,
       title: {
-        original: this.test.options.title,
-        expanded: this.test.options.title,
+        original: this.#test.options.title,
+        expanded: this.#test.options.title,
         toString() {
           return this.original
         },
       },
-      isPinned: this.test.isPinned,
+      isPinned: this.#test.isPinned,
+    }
+    this.#emitter.emit('test:start', startOptions)
+  }
+
+  /**
+   * Notify the reporter about the test start
+   */
+  #notifyEnd() {
+    const endOptions: TestEndNode = {
+      ...this.#test.options,
+      title: {
+        original: this.#test.options.title,
+        expanded: this.#test.options.title,
+        toString() {
+          return this.original
+        },
+      },
+      isPinned: this.#test.isPinned,
       hasError: false,
       duration: 0,
       errors: [],
     }
 
-    this.emitter.emit('test:end', endOptions)
+    this.#emitter.emit('test:end', endOptions)
   }
 
   /**
    * Run test
    */
-  public run() {
-    this.notifyStart()
-    this.notifyEnd()
+  run() {
+    this.#notifyStart()
+    this.#notifyEnd()
   }
 }
 
@@ -76,55 +83,98 @@ export class DummyRunner {
  * Run an instance of test
  */
 export class TestRunner {
+  #emitter: Emitter
+
   /**
    * Time tracker to find test duration
    */
-  private timeTracker: TimeEndFunction
+  #timeTracker?: TimeEndFunction
 
   /**
    * Reference to the startup runner
    */
-  private setupRunner = this.hooks.runner('setup')
+  #setupRunner: Runner<TestHooksData<Record<any, any>>[0], TestHooksData<Record<any, any>>[1]>
 
   /**
    * Reference to the cleanup runner
    */
-  private teardownRunner = this.hooks.runner('teardown')
+  #teardownRunner: Runner<TestHooksData<Record<any, any>>[0], TestHooksData<Record<any, any>>[1]>
 
   /**
    * Test errors
    */
-  private errors: TestEndNode['errors'] = []
+  #errors: TestEndNode['errors'] = []
 
   /**
    * Track if test has any errors
    */
-  private hasError: boolean = false
+  #hasError: boolean = false
 
-  private uncaughtExceptionHandler?: NodeJS.UncaughtExceptionListener
+  /**
+   * Handler to capture uncaught exception while in the scope of the
+   * test
+   */
+  #uncaughtExceptionHandler?: NodeJS.UncaughtExceptionListener
+
+  /**
+   * Current dataset index for which executing the test
+   */
+  #datasetCurrentIndex: number | undefined
+
+  /**
+   * Synchronous methods to execute to dispose the test. These methods
+   * can change the status of a test from passing to failing
+   */
+  #disposeCalls: ((
+    test: Test<any, any>,
+    hasError: boolean,
+    errors: TestEndNode['errors']
+  ) => void)[]
+
+  /**
+   * Reference to parent test
+   */
+  #test: Test<any, any>
+
+  /**
+   * Need access to hooks so that we can grab an instance of
+   * "cleanup" runner.
+   *
+   * The cleanup runner should be fetched post running the test callback,
+   * since that callback can push hooks to the cleanup event.
+   */
+  #hooks: Hooks<TestHooks<Record<any, any>>>
 
   constructor(
-    private test: Test<any, any>,
-    private hooks: Hooks,
-    private emitter: Emitter,
-    private disposeCalls: ((
+    test: Test<any, any>,
+    hooks: Hooks<TestHooks<Record<any, any>>>,
+    emitter: Emitter,
+    disposeCalls: ((
       test: Test<any, any>,
       hasError: boolean,
       errors: TestEndNode['errors']
     ) => void)[],
-    private datasetCurrentIndex?: number
-  ) {}
+    datasetCurrentIndex?: number
+  ) {
+    this.#test = test
+    this.#hooks = hooks
+    this.#emitter = emitter
+    this.#disposeCalls = disposeCalls
+    this.#datasetCurrentIndex = datasetCurrentIndex
+    this.#setupRunner = hooks.runner('setup')
+    this.#teardownRunner = hooks.runner('teardown')
+  }
 
   /**
    * Returns the dataset node for the test events
    */
-  private getDatasetNode() {
-    if (this.datasetCurrentIndex !== undefined && this.test.dataset) {
+  #getDatasetNode() {
+    if (this.#datasetCurrentIndex !== undefined && this.#test.dataset) {
       return {
         dataset: {
-          row: this.test.dataset[this.datasetCurrentIndex],
-          index: this.datasetCurrentIndex,
-          size: this.test.dataset.length,
+          row: this.#test.dataset[this.#datasetCurrentIndex],
+          index: this.#datasetCurrentIndex,
+          size: this.#test.dataset.length,
         },
       }
     }
@@ -133,8 +183,8 @@ export class TestRunner {
   /**
    * Get the title node for the test
    */
-  private getTitle(dataset?: { row: any; index: number }) {
-    const title = this.test.options.title
+  #getTitle(dataset?: { row: any; index: number }) {
+    const title = this.#test.options.title
 
     return {
       original: title,
@@ -148,107 +198,107 @@ export class TestRunner {
   /**
    * Notify the reporter about the test start
    */
-  private notifyStart() {
-    this.timeTracker = timeSpan()
-    const dataset = this.getDatasetNode()
+  #notifyStart() {
+    this.#timeTracker = timeSpan()
+    const dataset = this.#getDatasetNode()
 
     const startOptions: TestStartNode = {
-      ...this.test.options,
+      ...this.#test.options,
       ...dataset,
-      isPinned: this.test.isPinned,
-      title: this.getTitle(dataset ? dataset.dataset : undefined),
+      isPinned: this.#test.isPinned,
+      title: this.#getTitle(dataset ? dataset.dataset : undefined),
     }
 
-    this.emitter.emit('test:start', startOptions)
+    this.#emitter.emit('test:start', startOptions)
   }
 
   /**
    * Notify the reporter about the test start
    */
-  private notifyEnd() {
-    const dataset = this.getDatasetNode()
+  #notifyEnd() {
+    const dataset = this.#getDatasetNode()
 
     const endOptions: TestEndNode = {
-      ...this.test.options,
+      ...this.#test.options,
       ...dataset,
-      isPinned: this.test.isPinned,
-      title: this.getTitle(dataset ? dataset.dataset : undefined),
-      hasError: this.hasError,
-      errors: this.errors,
-      retryAttempt: this.test.options.retryAttempt,
-      duration: this.timeTracker.rounded(),
+      isPinned: this.#test.isPinned,
+      title: this.#getTitle(dataset ? dataset.dataset : undefined),
+      hasError: this.#hasError,
+      errors: this.#errors,
+      retryAttempt: this.#test.options.retryAttempt,
+      duration: this.#timeTracker?.rounded() ?? 0,
     }
 
-    this.emitter.emit('test:end', endOptions)
+    this.#emitter.emit('test:end', endOptions)
   }
 
   /**
    * Running setup hooks
    */
-  private async runSetupHooks() {
+  async #runSetupHooks() {
     try {
-      debug('running "%s" test setup hooks', this.test.title)
-      await this.setupRunner.run(this.test)
+      debug('running "%s" test setup hooks', this.#test.title)
+      await this.#setupRunner.run(this.#test)
     } catch (error) {
-      debug('test setup hooks failed, test: %s, error: %O', this.test.title, error)
-      this.hasError = true
-      this.errors.push({ phase: 'setup', error })
+      debug('test setup hooks failed, test: %s, error: %O', this.#test.title, error)
+      this.#hasError = true
+      this.#errors.push({ phase: 'setup', error })
     }
   }
 
   /**
    * Running teardown hooks
    */
-  private async runTeardownHooks() {
+  async #runTeardownHooks() {
     try {
-      debug('running "%s" test teardown hooks', this.test.title)
-      await this.teardownRunner.run(this.test)
+      debug('running "%s" test teardown hooks', this.#test.title)
+      await this.#teardownRunner.run(this.#test)
     } catch (error) {
-      debug('test teardown hooks failed, test: %s, error: %O', this.test.title, error)
-      this.hasError = true
-      this.errors.push({ phase: 'teardown', error })
+      debug('test teardown hooks failed, test: %s, error: %O', this.#test.title, error)
+      this.#hasError = true
+      this.#errors.push({ phase: 'teardown', error })
     }
   }
 
   /**
    * Running test cleanup functions
    */
-  private async runTestCleanupFunctions() {
+  async #runTestCleanupFunctions() {
     try {
-      debug('running "%s" test cleanup functions', this.test.title)
-      await this.hooks.runner('cleanup').run(this.errors.length > 0, this.test)
+      debug('running "%s" test cleanup functions', this.#test.title)
+      await this.#hooks.runner('cleanup').run(this.#hasError, this.#test)
     } catch (error) {
-      debug('test cleanup functions failed, test: %s, error: %O', this.test.title, error)
-      this.hasError = true
-      this.errors.push({ phase: 'test:cleanup', error })
+      debug('test cleanup functions failed, test: %s, error: %O', this.#test.title, error)
+      this.#hasError = true
+      this.#errors.push({ phase: 'test:cleanup', error })
     }
   }
 
   /**
    * Running setup cleanup functions
    */
-  private async runSetupCleanupFunctions() {
+  async #runSetupCleanupFunctions() {
     try {
-      debug('running "%s" test setup cleanup functions', this.test.title)
-      await this.setupRunner.cleanup(this.errors.length > 0, this.test)
+      debug('running "%s" test setup cleanup functions', this.#test.title)
+      await this.#setupRunner.cleanup(this.#hasError, this.#test)
     } catch (error) {
-      debug('test setup cleanup functions failed, test: %s, error: %O', this.test.title, error)
-      this.hasError = true
-      this.errors.push({ phase: 'setup:cleanup', error })
+      debug('test setup cleanup functions failed, test: %s, error: %O', this.#test.title, error)
+      this.#hasError = true
+      this.#errors.push({ phase: 'setup:cleanup', error })
     }
   }
 
   /**
    * Running teardown cleanup functions
    */
-  private async runTeardownCleanupFunctions() {
+  async #runTeardownCleanupFunctions() {
     try {
-      debug('running "%s" test teardown cleanup functions', this.test.title)
-      await this.teardownRunner.cleanup(this.errors.length > 0, this.test)
+      debug('running "%s" test teardown cleanup functions', this.#test.title)
+      await this.#teardownRunner.cleanup(this.#hasError, this.#test)
     } catch (error) {
-      debug('test teardown cleanup functions failed, test: %s, error: %O', this.test.title, error)
-      this.hasError = true
-      this.errors.push({ phase: 'teardown:cleanup', error })
+      debug('test teardown cleanup functions failed, test: %s, error: %O', this.#test.title, error)
+      this.#hasError = true
+      this.#errors.push({ phase: 'teardown:cleanup', error })
     }
   }
 
@@ -256,22 +306,22 @@ export class TestRunner {
    * Run the test executor. The method takes care of passing
    * dataset row to the test method
    */
-  private async runTest(done?: (error?: any) => void) {
+  async #runTest(done?: (error?: any) => void) {
     const datasetRow =
-      this.datasetCurrentIndex !== undefined && this.test.dataset
-        ? this.test.dataset[this.datasetCurrentIndex]
+      this.#datasetCurrentIndex !== undefined && this.#test.dataset
+        ? this.#test.dataset[this.#datasetCurrentIndex]
         : undefined
 
     return datasetRow !== undefined
-      ? (this.test.options.executor as any)(this.test.context, datasetRow, done)
-      : (this.test.options.executor as any)(this.test.context, done)
+      ? (this.#test.options.executor as any)(this.#test.context, datasetRow, done)
+      : (this.#test.options.executor as any)(this.#test.context, done)
   }
 
   /**
    * Run the test executor that relies on the done method. The test will
    * timeout if done isn't called.
    */
-  private runTestWithDone() {
+  #runTestWithDone() {
     return new Promise<void>((resolve, reject) => {
       const done = (error?: any) => {
         if (error) {
@@ -283,18 +333,18 @@ export class TestRunner {
 
       /**
        * Done style tests the primary source of uncaught exceptions. Hence
-       * we make an extra efforts to related uncaught exceptions with
+       * we make an extra efforts to catch uncaught exceptions with
        * them
        */
-      if (!this.uncaughtExceptionHandler) {
-        this.uncaughtExceptionHandler = (error) => {
+      if (!this.#uncaughtExceptionHandler) {
+        this.#uncaughtExceptionHandler = (error) => {
           reject(error)
         }
-        process.on('uncaughtException', this.uncaughtExceptionHandler)
+        process.on('uncaughtException', this.#uncaughtExceptionHandler)
       }
 
-      debug('running test "%s" and waiting for done method call', this.test.title)
-      this.runTest(done).catch(reject)
+      debug('running test "%s" and waiting for done method call', this.#test.title)
+      this.#runTest(done).catch(reject)
     })
   }
 
@@ -302,9 +352,9 @@ export class TestRunner {
    * Run the test executor and make sure it times out after the configured
    * timeout.
    */
-  private async wrapTestInTimeout() {
-    if (!this.test.options.timeout) {
-      return this.test.options.waitsForDone ? this.runTestWithDone() : this.runTest()
+  async #wrapTestInTimeout() {
+    if (!this.#test.options.timeout) {
+      return this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest()
     }
 
     let timeoutTimer: null | NodeJS.Timeout = null
@@ -313,14 +363,14 @@ export class TestRunner {
       return new Promise((_, reject) => {
         timeoutTimer = setTimeout(
           () => reject(new Error('Test timeout')),
-          this.test.options.timeout
+          this.#test.options.timeout
         )
       })
     }
 
     try {
       await Promise.race([
-        this.test.options.waitsForDone ? this.runTestWithDone() : this.runTest(),
+        this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest(),
         timeout(),
       ])
     } finally {
@@ -333,35 +383,35 @@ export class TestRunner {
   /**
    * Runs the test with retries in place
    */
-  private wrapTestInRetries() {
-    if (!this.test.options.retries) {
-      return this.wrapTestInTimeout()
+  #wrapTestInRetries() {
+    if (!this.#test.options.retries) {
+      return this.#wrapTestInTimeout()
     }
 
     return retry(
       (_: unknown, attempt: number) => {
-        this.test.options.retryAttempt = attempt
-        return this.wrapTestInTimeout()
+        this.#test.options.retryAttempt = attempt
+        return this.#wrapTestInTimeout()
       },
-      { retries: this.test.options.retries, factor: 1 }
+      { retries: this.#test.options.retries, factor: 1 }
     )
   }
 
   /**
    * Run the test
    */
-  public async run() {
-    debug('starting to run "%s" test', this.test.title)
-    this.notifyStart()
+  async run() {
+    debug('starting to run "%s" test', this.#test.title)
+    this.#notifyStart()
 
     /**
      * Run setup hooks and exit early when one of the hooks
      * fails
      */
-    await this.runSetupHooks()
-    if (this.hasError) {
-      await this.runSetupCleanupFunctions()
-      this.notifyEnd()
+    await this.#runSetupHooks()
+    if (this.#hasError) {
+      await this.#runSetupCleanupFunctions()
+      this.#notifyEnd()
       return
     }
 
@@ -369,13 +419,13 @@ export class TestRunner {
      * Run the test executor
      */
     try {
-      await this.wrapTestInRetries()
+      await this.#wrapTestInRetries()
     } catch (error) {
-      this.hasError = true
-      this.errors.push({ phase: 'test', error })
+      this.#hasError = true
+      this.#errors.push({ phase: 'test', error })
     } finally {
-      if (this.uncaughtExceptionHandler) {
-        process.removeListener('uncaughtException', this.uncaughtExceptionHandler)
+      if (this.#uncaughtExceptionHandler) {
+        process.removeListener('uncaughtException', this.#uncaughtExceptionHandler)
       }
     }
 
@@ -383,31 +433,31 @@ export class TestRunner {
      * Run dispose callbacks
      */
     try {
-      this.disposeCalls.forEach((callback) => callback(this.test, this.hasError, this.errors))
+      this.#disposeCalls.forEach((callback) => callback(this.#test, this.#hasError, this.#errors))
     } catch (error) {
-      this.hasError = true
-      this.errors.push({ phase: 'test', error })
+      this.#hasError = true
+      this.#errors.push({ phase: 'test', error })
     }
 
     /**
      * Run test cleanup hooks
      */
-    await this.runTestCleanupFunctions()
+    await this.#runTestCleanupFunctions()
 
     /**
      * Cleanup setup hooks
      */
-    await this.runSetupCleanupFunctions()
+    await this.#runSetupCleanupFunctions()
 
     /**
      * Run + cleanup teardown hooks
      */
-    await this.runTeardownHooks()
-    await this.runTeardownCleanupFunctions()
+    await this.#runTeardownHooks()
+    await this.#runTeardownCleanupFunctions()
 
     /**
      * Notify test end
      */
-    this.notifyEnd()
+    this.#notifyEnd()
   }
 }

@@ -1,24 +1,25 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
+import test from 'node:test'
+import { assert } from 'chai'
 
-import { Test } from '../../src/test/main'
-import { Refiner } from '../../src/refiner'
-import { Emitter } from '../../src/emitter'
-import { Group } from '../../src/group/main'
-import { TestEndNode } from '../../src/types'
-import { pEvent } from '../../test_helpers/index'
-import { TestContext } from '../../src/test_context'
+import { Test } from '../../src/test/main.js'
+import { Refiner } from '../../src/refiner.js'
+import { Emitter } from '../../src/emitter.js'
+import { Group } from '../../src/group/main.js'
+import { TestEndNode } from '../../src/types.js'
+import { pEvent } from '../../test_helpers/index.js'
+import { TestContext } from '../../src/test_context.js'
 
-test.group('execute | test', () => {
-  test('run all tests inside a group', async (assert) => {
+test.describe('execute | test', () => {
+  test('run all tests inside a group', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -53,7 +54,7 @@ test.group('execute | test', () => {
     assert.deepEqual(stack, ['test', 'test 1'])
   })
 
-  test('do not interupt sibling tests when one test fails', async (assert) => {
+  test('do not interupt sibling tests when one test fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -92,8 +93,8 @@ test.group('execute | test', () => {
   })
 })
 
-test.group('execute | hooks', () => {
-  test('run group setup and teardown hooks', async (assert) => {
+test.describe('execute | hooks', () => {
+  test('run group setup and teardown hooks', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -104,8 +105,12 @@ test.group('execute | hooks', () => {
     })
 
     const group = new Group('sample group', emitter, refiner)
-    group.setup(() => stack.push('group setup'))
-    group.teardown(() => stack.push('group teardown'))
+    group.setup(() => {
+      stack.push('group setup')
+    })
+    group.teardown(() => {
+      stack.push('group teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
@@ -131,7 +136,7 @@ test.group('execute | hooks', () => {
     assert.deepEqual(stack, ['group setup', 'test', 'test 1', 'group teardown'])
   })
 
-  test('run hooks cleanup functions', async (assert) => {
+  test('run hooks cleanup functions', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -186,7 +191,7 @@ test.group('execute | hooks', () => {
     ])
   })
 
-  test('do not run tests when setup hook fails', async (assert) => {
+  test('do not run tests when setup hook fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -224,7 +229,7 @@ test.group('execute | hooks', () => {
     assert.deepEqual(stack, ['group setup'])
   })
 
-  test('run cleanup hooks when setup hook fails', async (assert) => {
+  test('run cleanup hooks when setup hook fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -268,7 +273,7 @@ test.group('execute | hooks', () => {
     assert.deepEqual(stack, ['group setup', 'group setup 1', 'group setup cleanup'])
   })
 
-  test('mark group as failed when teardown hook fails', async (assert) => {
+  test('mark group as failed when teardown hook fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -318,7 +323,7 @@ test.group('execute | hooks', () => {
     ])
   })
 
-  test('call teardown cleanup functions when teardown hook files', async (assert) => {
+  test('call teardown cleanup functions when teardown hook files', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -368,7 +373,7 @@ test.group('execute | hooks', () => {
     ])
   })
 
-  test('fail when setup cleanup function fails', async (assert) => {
+  test('fail when setup cleanup function fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -409,7 +414,7 @@ test.group('execute | hooks', () => {
     assert.deepEqual(stack, ['group setup', 'test', 'test 1', 'group setup cleanup'])
   })
 
-  test('fail when teardown cleanup function fails', async (assert) => {
+  test('fail when teardown cleanup function fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -451,8 +456,8 @@ test.group('execute | hooks', () => {
   })
 })
 
-test.group('execute | each hooks', () => {
-  test('register hooks for every test inside a group', async (assert) => {
+test.describe('execute | each hooks', () => {
+  test('register hooks for every test inside a group', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -463,10 +468,18 @@ test.group('execute | each hooks', () => {
     })
 
     const group = new Group('sample group', emitter, refiner)
-    group.each.setup(() => stack.push('group test setup'))
-    group.each.setup(() => stack.push('group test setup 1'))
-    group.each.teardown(() => stack.push('group test teardown'))
-    group.each.teardown(() => stack.push('group test teardown 1'))
+    group.each.setup(() => {
+      stack.push('group test setup')
+    })
+    group.each.setup(() => {
+      stack.push('group test setup 1')
+    })
+    group.each.teardown(() => {
+      stack.push('group test teardown')
+    })
+    group.each.teardown(() => {
+      stack.push('group test teardown 1')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
@@ -506,8 +519,8 @@ test.group('execute | each hooks', () => {
   })
 })
 
-test.group('execute | refiner', () => {
-  test('do not run tests when refiner does not allows group title', async (assert) => {
+test.describe('execute | refiner', () => {
+  test('do not run tests when refiner does not allows group title', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -520,8 +533,12 @@ test.group('execute | refiner', () => {
     })
 
     const group = new Group('sample group', emitter, refiner)
-    group.setup(() => stack.push('group setup'))
-    group.teardown(() => stack.push('group teardown'))
+    group.setup(() => {
+      stack.push('group setup')
+    })
+    group.teardown(() => {
+      stack.push('group teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
@@ -540,7 +557,7 @@ test.group('execute | refiner', () => {
     assert.isNull(groupEndEvent)
   })
 
-  test('run tests when refiner allows group title', async (assert) => {
+  test('run tests when refiner allows group title', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -553,8 +570,12 @@ test.group('execute | refiner', () => {
     })
 
     const group = new Group('sample group', emitter, refiner)
-    group.setup(() => stack.push('group setup'))
-    group.teardown(() => stack.push('group teardown'))
+    group.setup(() => {
+      stack.push('group setup')
+    })
+    group.teardown(() => {
+      stack.push('group teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
@@ -582,7 +603,7 @@ test.group('execute | refiner', () => {
     assert.deepEqual(stack, ['group setup', 'test', 'test 1', 'group teardown'])
   })
 
-  test('do not run hooks when refiner does not allows group title', async (assert) => {
+  test('do not run hooks when refiner does not allows group title', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
@@ -590,8 +611,12 @@ test.group('execute | refiner', () => {
     refiner.add('groups', ['foo'])
 
     const group = new Group('sample group', emitter, refiner)
-    group.setup(() => stack.push('group setup'))
-    group.teardown(() => stack.push('group teardown'))
+    group.setup(() => {
+      stack.push('group setup')
+    })
+    group.teardown(() => {
+      stack.push('group teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
@@ -610,7 +635,7 @@ test.group('execute | refiner', () => {
     assert.isNull(groupEndEvent)
   })
 
-  test('do not run each hooks when refiner does not allows group title', async (assert) => {
+  test('do not run each hooks when refiner does not allows group title', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
@@ -618,8 +643,12 @@ test.group('execute | refiner', () => {
     refiner.add('groups', ['foo'])
 
     const group = new Group('sample group', emitter, refiner)
-    group.each.setup(() => stack.push('group each setup'))
-    group.each.teardown(() => stack.push('group each teardown'))
+    group.each.setup(() => {
+      stack.push('group each setup')
+    })
+    group.each.teardown(() => {
+      stack.push('group each teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
@@ -638,7 +667,7 @@ test.group('execute | refiner', () => {
     assert.isNull(groupEndEvent)
   })
 
-  test('do not run hooks when all group tests are filtered', async (assert) => {
+  test('do not run hooks when all group tests are filtered', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
@@ -646,8 +675,12 @@ test.group('execute | refiner', () => {
     refiner.add('tests', ['test 2'])
 
     const group = new Group('sample group', emitter, refiner)
-    group.setup(() => stack.push('group setup'))
-    group.teardown(() => stack.push('group teardown'))
+    group.setup(() => {
+      stack.push('group setup')
+    })
+    group.teardown(() => {
+      stack.push('group teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {
@@ -666,7 +699,7 @@ test.group('execute | refiner', () => {
     assert.isNull(groupEndEvent)
   })
 
-  test('do not run each hooks when all group tests are filtered', async (assert) => {
+  test('do not run each hooks when all group tests are filtered', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
@@ -674,8 +707,12 @@ test.group('execute | refiner', () => {
     refiner.add('tests', ['test 2'])
 
     const group = new Group('sample group', emitter, refiner)
-    group.each.setup(() => stack.push('group each setup'))
-    group.each.teardown(() => stack.push('group each teardown'))
+    group.each.setup(() => {
+      stack.push('group each setup')
+    })
+    group.each.teardown(() => {
+      stack.push('group each teardown')
+    })
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
     testInstance.run(() => {

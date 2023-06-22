@@ -1,28 +1,29 @@
 /*
  * @japa/core
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Japa
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-import { Macroable } from 'macroable'
-import { Hooks } from '@poppinss/hooks'
+import Hooks from '@poppinss/hooks'
+import Macroable from '@poppinss/macroable'
 
-import debug from '../debug'
-import { Group } from '../group/main'
-import { Emitter } from '../emitter'
-import { Refiner } from '../refiner'
-import { DummyRunner, TestRunner } from './runner'
-import {
+import debug from '../debug.js'
+import { Group } from '../group/main.js'
+import { Emitter } from '../emitter.js'
+import { Refiner } from '../refiner.js'
+import { DummyRunner, TestRunner } from './runner.js'
+import type {
+  TestHooks,
   DataSetNode,
   TestEndNode,
   TestOptions,
   TestExecutor,
   TestHooksHandler,
   TestHooksCleanupHandler,
-} from '../types'
+} from '../types.js'
 
 /**
  * Test class exposes a self contained API to configure and run
@@ -39,80 +40,95 @@ export class Test<
   Context extends Record<any, any>,
   TestData extends DataSetNode = undefined
 > extends Macroable {
-  public static macros = {}
-  public static getters = {}
-
   /**
    * Methods to call before disposing the test
    */
-  public static disposeCallbacks: ((
+  static disposeCallbacks: ((
     test: Test<any, any>,
     hasError: boolean,
     errors: TestEndNode['errors']
   ) => void)[] = []
 
   /**
+   * Define a dispose callback.
+   *
+   * Do note: Async methods are not allowed
+   */
+  static dispose(
+    callback: (test: Test<any, any>, hasError: boolean, errors: TestEndNode['errors']) => void
+  ): void {
+    this.disposeCallbacks.push(callback)
+  }
+
+  #refiner: Refiner
+  #emitter: Emitter
+
+  /**
    * Find if the test has already been executed
    */
-  private executed: boolean = false
+  #executed: boolean = false
 
   /**
    * Reference to registered hooks
    */
-  private hooks = new Hooks()
-
-  /**
-   * Test options
-   */
-  public options: TestOptions = {
-    title: this.title,
-    tags: [],
-    timeout: 2000,
-    meta: {},
-  }
-
-  /**
-   * Reference to the test dataset
-   */
-  public dataset?: any[]
-
-  /**
-   * Reference to the test context. Available at the time
-   * of running the test
-   */
-  public context: Context
-
-  /**
-   * Find if the test is pinned
-   */
-  public get isPinned() {
-    return this.refiner.isPinned(this)
-  }
+  #hooks = new Hooks<TestHooks<Context>>()
 
   /**
    * The function for creating the test context
    */
-  private contextAccumlator?: (test: this) => Context | Promise<Context>
+  #contextAccumlator?: (test: this) => Context | Promise<Context>
 
   /**
    * The function for computing if test should
    * be skipped or not
    */
-  private skipAccumulator?: () => Promise<boolean> | boolean
+  #skipAccumulator?: () => Promise<boolean> | boolean
 
   /**
    * The function that returns the test data set
    */
-  private datasetAccumlator?: () => Promise<any[]> | any[]
+  #datasetAccumlator?: () => Promise<any[]> | any[]
+
+  /**
+   * Test options
+   */
+  options: TestOptions
+
+  /**
+   * Reference to the test dataset
+   */
+  dataset?: any[]
+
+  /**
+   * Reference to the test context. Available at the time
+   * of running the test
+   */
+  context?: Context
+
+  /**
+   * Find if the test is pinned
+   */
+  get isPinned() {
+    return this.#refiner.isPinned(this)
+  }
 
   constructor(
     public title: string,
     context: Context | ((test: Test<Context, TestData>) => Context | Promise<Context>),
-    private emitter: Emitter,
-    private refiner: Refiner,
+    emitter: Emitter,
+    refiner: Refiner,
     public parent?: Group<Context>
   ) {
     super()
+
+    this.#emitter = emitter
+    this.#refiner = refiner
+    this.options = {
+      title: this.title,
+      tags: [],
+      timeout: 2000,
+      meta: {},
+    }
 
     /**
      * Make sure the instantiated class has its own property "disposeCalls"
@@ -124,7 +140,7 @@ export class Test<
     }
 
     if (typeof context === 'function') {
-      this.contextAccumlator = context as (
+      this.#contextAccumlator = context as (
         test: Test<Context, TestData>
       ) => Context | Promise<Context>
     } else {
@@ -135,25 +151,25 @@ export class Test<
   /**
    * Find if test should be skipped
    */
-  private async computeShouldSkip() {
-    if (this.skipAccumulator) {
-      this.options.isSkipped = await this.skipAccumulator()
+  async #computeShouldSkip() {
+    if (this.#skipAccumulator) {
+      this.options.isSkipped = await this.#skipAccumulator()
     }
   }
 
   /**
    * Find if test is a todo
    */
-  private computeisTodo() {
+  #computeisTodo() {
     this.options.isTodo = !this.options.executor
   }
 
   /**
    * Returns the dataset array or undefined
    */
-  private async computeDataset(): Promise<any[] | undefined> {
-    if (typeof this.datasetAccumlator === 'function') {
-      this.dataset = await this.datasetAccumlator()
+  async #computeDataset(): Promise<any[] | undefined> {
+    if (typeof this.#datasetAccumlator === 'function') {
+      this.dataset = await this.#datasetAccumlator()
     }
 
     return this.dataset
@@ -162,23 +178,20 @@ export class Test<
   /**
    * Get context instance for the test
    */
-  private async computeContext(): Promise<Context> {
-    if (typeof this.contextAccumlator === 'function') {
-      this.context = await this.contextAccumlator(this)
+  async #computeContext(): Promise<Context> {
+    if (typeof this.#contextAccumlator === 'function') {
+      this.context = await this.#contextAccumlator(this)
     }
 
-    return this.context
+    return this.context!
   }
 
   /**
    * Skip the test conditionally
    */
-  public skip(
-    skip: boolean | (() => Promise<boolean> | boolean) = true,
-    skipReason?: string
-  ): this {
+  skip(skip: boolean | (() => Promise<boolean> | boolean) = true, skipReason?: string): this {
     if (typeof skip === 'function') {
-      this.skipAccumulator = skip
+      this.#skipAccumulator = skip
     } else {
       this.options.isSkipped = skip
     }
@@ -191,7 +204,7 @@ export class Test<
    * Expect the test to fail. Helpful in creating test cases
    * to showcase bugs
    */
-  public fails(failReason?: string): this {
+  fails(failReason?: string): this {
     this.options.isFailing = true
     this.options.failReason = failReason
     return this
@@ -200,7 +213,7 @@ export class Test<
   /**
    * Define custom timeout for the test
    */
-  public timeout(timeout: number): this {
+  timeout(timeout: number): this {
     this.options.timeout = timeout
     return this
   }
@@ -208,7 +221,7 @@ export class Test<
   /**
    * Disable test timeout. It is same as calling `test.timeout(0)`
    */
-  public disableTimeout(): this {
+  disableTimeout(): this {
     return this.timeout(0)
   }
 
@@ -216,7 +229,7 @@ export class Test<
    * Assign tags to the test. Later you can use the tags to run
    * specific tests
    */
-  public tags(tags: string[], strategy: 'replace' | 'append' | 'prepend' = 'replace'): this {
+  tags(tags: string[], strategy: 'replace' | 'append' | 'prepend' = 'replace'): this {
     if (strategy === 'replace') {
       this.options.tags = tags
       return this
@@ -235,7 +248,7 @@ export class Test<
    * Configure the number of times this test should be retried
    * when failing.
    */
-  public retry(retries: number): this {
+  retry(retries: number): this {
     this.options.retries = retries
     return this
   }
@@ -243,7 +256,7 @@ export class Test<
   /**
    * Wait for the test executor to call done method
    */
-  public waitForDone(): this {
+  waitForDone(): this {
     this.options.waitsForDone = true
     return this
   }
@@ -252,34 +265,23 @@ export class Test<
    * Pin current test. Pinning a test will only run the
    * pinned tests.
    */
-  public pin(): this {
-    this.refiner.pinTest(this)
+  pin(): this {
+    this.#refiner.pinTest(this)
     return this
-  }
-
-  /**
-   * Define a dispose callback.
-   *
-   * Do note: Async methods are not allowed
-   */
-  public static dispose(
-    callback: (test: Test<any, any>, hasError: boolean, errors: TestEndNode['errors']) => void
-  ): void {
-    this.disposeCallbacks.push(callback)
   }
 
   /**
    * Define the dataset for the test. The test executor will be invoked
    * for all the items inside the dataset array
    */
-  public with<Dataset extends DataSetNode>(dataset: Dataset): Test<Context, Dataset> {
+  with<Dataset extends DataSetNode>(dataset: Dataset): Test<Context, Dataset> {
     if (Array.isArray(dataset)) {
       this.dataset = dataset
       return this as unknown as Test<Context, Dataset>
     }
 
     if (typeof dataset === 'function') {
-      this.datasetAccumlator = dataset
+      this.#datasetAccumlator = dataset
       return this as unknown as Test<Context, Dataset>
     }
 
@@ -289,7 +291,7 @@ export class Test<
   /**
    * Define the test executor function
    */
-  public run(executor: TestExecutor<Context, TestData>): this {
+  run(executor: TestExecutor<Context, TestData>): this {
     this.options.executor = executor
     return this
   }
@@ -297,34 +299,34 @@ export class Test<
   /**
    * Register a test setup function
    */
-  public setup(handler: TestHooksHandler<Context>): this {
+  setup(handler: TestHooksHandler<Context>): this {
     debug('registering "%s" test setup hook %s', this.title, handler)
-    this.hooks.add('setup', handler)
+    this.#hooks.add('setup', handler)
     return this
   }
 
   /**
    * Register a test teardown function
    */
-  public teardown(handler: TestHooksHandler<Context>): this {
+  teardown(handler: TestHooksHandler<Context>): this {
     debug('registering "%s" test teardown hook %s', this.title, handler)
-    this.hooks.add('teardown', handler)
+    this.#hooks.add('teardown', handler)
     return this
   }
 
   /**
    * Register a cleanup hook from within the test
    */
-  public cleanup(handler: TestHooksCleanupHandler<Context>): this {
+  cleanup(handler: TestHooksCleanupHandler<Context>): this {
     debug('registering "%s" test cleanup function %s', this.title, handler)
-    this.hooks.add('cleanup', handler)
+    this.#hooks.add('cleanup', handler)
     return this
   }
 
   /**
    * Execute test
    */
-  public async exec() {
+  async exec() {
     /**
      * Return early, if there are pinned test and the current test is not
      * pinned.
@@ -332,7 +334,7 @@ export class Test<
      * However, the pinned test check is only applied when there
      * is no filter on the test title.
      */
-    if (!this.refiner.allows(this)) {
+    if (!this.#refiner.allows(this)) {
       debug('test "%s" skipped by refiner', this.title)
       return
     }
@@ -340,49 +342,49 @@ export class Test<
     /**
      * Avoid re-running the same test multiple times
      */
-    if (this.executed) {
+    if (this.#executed) {
       return
     }
 
-    this.executed = true
+    this.#executed = true
 
     /**
      * Do not run tests without executor function
      */
-    this.computeisTodo()
+    this.#computeisTodo()
     if (this.options.isTodo) {
       debug('skipping todo test "%s"', this.title)
-      new DummyRunner(this, this.emitter).run()
+      new DummyRunner(this, this.#emitter).run()
       return
     }
 
     /**
      * Do not run test meant to be skipped
      */
-    await this.computeShouldSkip()
+    await this.#computeShouldSkip()
     if (this.options.isSkipped) {
       debug(
         'skipping test "%s", reason (%s)',
         this.title,
         this.options.skipReason || 'Skipped using .skip method'
       )
-      new DummyRunner(this, this.emitter).run()
+      new DummyRunner(this, this.#emitter).run()
       return
     }
 
     /**
      * Run for each row inside dataset
      */
-    await this.computeDataset()
+    await this.#computeDataset()
     if (Array.isArray(this.dataset) && this.dataset.length) {
       let index = 0
       // eslint-disable-next-line @typescript-eslint/naming-convention
       for (let _ of this.dataset) {
-        await this.computeContext()
+        await this.#computeContext()
         await new TestRunner(
           this,
-          this.hooks,
-          this.emitter,
+          this.#hooks,
+          this.#emitter,
           (this.constructor as typeof Test).disposeCallbacks,
           index
         ).run()
@@ -395,11 +397,11 @@ export class Test<
     /**
      * Run when no dataset is used
      */
-    await this.computeContext()
+    await this.#computeContext()
     await new TestRunner(
       this,
-      this.hooks,
-      this.emitter,
+      this.#hooks,
+      this.#emitter,
       (this.constructor as typeof Test).disposeCallbacks
     ).run()
   }
