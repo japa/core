@@ -26,6 +26,14 @@ import type { FilteringOptions } from './types.js'
  */
 export class Refiner {
   /**
+   * Controls if test tags should match all the defined
+   * tags or not.
+   *
+   * Defaults to false
+   */
+  #shouldMatchAllTags: boolean = false
+
+  /**
    * A set of pinned tests
    */
   #pinnedTests: Set<Test<any, any>> = new Set()
@@ -129,6 +137,9 @@ export class Refiner {
     /**
      * Find one or more matching tags
      */
+    if (this.#shouldMatchAllTags) {
+      return this.#filters.tags.every((tag) => test.options.tags.includes(tag))
+    }
     return this.#filters.tags.some((tag) => test.options.tags.includes(tag))
   }
 
@@ -153,6 +164,18 @@ export class Refiner {
     }
 
     return this.#pinnedTests.has(test)
+  }
+
+  /**
+   * Enable/disable matching of all tags when filtering tests.
+   * If "matchAll" is enabled, the test tags should match
+   * all the user defined tags.
+   *
+   * Otherwise, any one match will pass the filter
+   */
+  matchAllTags(state: boolean): this {
+    this.#shouldMatchAllTags = state
+    return this
   }
 
   /**

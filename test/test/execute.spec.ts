@@ -1232,6 +1232,24 @@ test.describe('execute | refiner', () => {
     assert.deepEqual(stack, ['executed'])
   })
 
+  test('do not run test when all tags are not matched', async () => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    refiner.add('tags', ['@slow', '@regression'])
+    refiner.matchAllTags(true)
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance.tags(['@regression'])
+    testInstance.run(async () => {
+      stack.push('executed')
+    })
+
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isNull(event)
+  })
+
   test('do not run test when there are pinned tests and the current one is not pinned', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
