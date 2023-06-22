@@ -4,4 +4,4 @@ on:
   - pull_request
 jobs:
   typecheck:
-    uses: adonisjs/.github/.github/workflows/test.yml@main
+    uses: japa/.github/.github/workflows/typecheck.yml@main

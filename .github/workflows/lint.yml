@@ -4,4 +4,4 @@ on:
   - pull_request
 jobs:
   lint:
-    uses: adonisjs/.github/.github/workflows/test.yml@main
+    uses: japa/.github/.github/workflows/lint.yml@main
