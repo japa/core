@@ -1,7 +1,0 @@
-name: typecheck
-on:
-  - push
-  - pull_request
-jobs:
-  typecheck:
-    uses: japa/.github/.github/workflows/typecheck.yml@main

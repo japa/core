@@ -1,7 +1,0 @@
-name: lint
-on:
-  - push
-  - pull_request
-jobs:
-  lint:
-    uses: japa/.github/.github/workflows/lint.yml@main
