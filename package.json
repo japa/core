@@ -17,6 +17,7 @@
     "pretest": "npm run lint",
     "test": "node --test --loader=ts-node/esm test/**/*.spec.ts",
     "clean": "del build",
+    "typecheck": "tsc --noEmit",
     "compile": "npm run lint && npm run clean && tsc",
     "build": "npm run compile",
     "release": "np",
