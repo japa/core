@@ -7,7 +7,6 @@
  * file that was distributed with this source code.
  */
 
-export * from './src/types.js'
 export { Runner } from './src/runner.js'
 export { Test } from './src/test/main.js'
 export { Emitter } from './src/emitter.js'
