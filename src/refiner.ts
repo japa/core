@@ -33,11 +33,11 @@ export class Refiner {
   /**
    * Available filters
    */
-  #filters: Required<FilteringOptions> & { negateTags: string[] } = {
+  #filters: Required<FilteringOptions> & { negatedTags: string[] } = {
     tags: [],
     tests: [],
     groups: [],
-    negateTags: [],
+    negatedTags: [],
   }
 
   constructor(filters: FilteringOptions = {}) {
@@ -108,14 +108,14 @@ export class Refiner {
    * Find if test is allowed by the negated tags filter
    */
   #allowedByNegatedTags(test: Test<any, any>): boolean {
-    if (!this.#filters.negateTags.length) {
+    if (!this.#filters.negatedTags.length) {
       return true
     }
 
     /**
      * There should be zero matching negated tags
      */
-    return this.#filters.negateTags.every((tag) => !test.options.tags.includes(tag))
+    return this.#filters.negatedTags.every((tag) => !test.options.tags.includes(tag))
   }
 
   /**
@@ -176,7 +176,7 @@ export class Refiner {
     if (layer === 'tags') {
       values.forEach((tag) => {
         if (tag.startsWith('!')) {
-          this.#filters.negateTags.push(tag.slice(1))
+          this.#filters.negatedTags.push(tag.slice(1))
         } else {
           this.#filters.tags.push(tag)
         }
