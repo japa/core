@@ -9,6 +9,9 @@
     "build/index.d.ts",
     "build/index.js"
   ],
+  "engines": {
+    "node": ">=18.16.0"
+  },
   "exports": {
     ".": "./build/index.js",
     "./types": "./build/src/types.js"
