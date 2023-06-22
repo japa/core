@@ -1,7 +1,7 @@
-name: test
+name: lint
 on:
   - push
   - pull_request
 jobs:
-  test:
+  lint:
     uses: adonisjs/.github/.github/workflows/test.yml@main

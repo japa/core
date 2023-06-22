@@ -1,7 +1,7 @@
-name: test
+name: typecheck
 on:
   - push
   - pull_request
 jobs:
-  test:
+  typecheck:
     uses: adonisjs/.github/.github/workflows/test.yml@main
