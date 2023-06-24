@@ -180,7 +180,7 @@ test.describe('configure', () => {
     })
   })
 
-  test('do not mix hooks when a test is extended', async () => {
+  test('do not mix callbacks when a test is extended', async () => {
     class Test1 extends Test<any, any> {
       static disposeCallbacks = []
     }
@@ -189,27 +189,31 @@ test.describe('configure', () => {
     }
 
     function disposeCallback() {}
-    Test1.dispose(disposeCallback)
+    function setupCallback() {}
+    Test1.executed(disposeCallback)
+    Test1.executing(setupCallback)
 
-    assert.deepEqual(Test1.disposeCallbacks, [disposeCallback])
-    assert.deepEqual(Test2.disposeCallbacks, [])
+    assert.deepEqual(Test1.executedCallbacks, [disposeCallback])
+    assert.deepEqual(Test1.executingCallbacks, [setupCallback])
+    assert.deepEqual(Test2.executedCallbacks, [])
+    assert.deepEqual(Test2.executingCallbacks, [])
   })
 
-  test('inherit parent dispose calls', async () => {
+  test('inherit parent callbacks', async () => {
     function disposeCallback() {}
     function disposeCallback1() {}
-    Test.dispose(disposeCallback)
+    Test.executed(disposeCallback)
 
     class Test1 extends Test<any, any> {
-      static disposeCallbacks = [...Test.disposeCallbacks]
+      static executedCallbacks = [...Test.executedCallbacks]
     }
     class Test2 extends Test<any, any> {
-      static disposeCallbacks = [...Test.disposeCallbacks]
+      static executedCallbacks = [...Test.executedCallbacks]
     }
 
-    Test2.dispose(disposeCallback1)
+    Test2.executed(disposeCallback1)
 
-    assert.deepEqual(Test1.disposeCallbacks, [disposeCallback])
-    assert.deepEqual(Test2.disposeCallbacks, [disposeCallback, disposeCallback1])
+    assert.deepEqual(Test1.executedCallbacks, [disposeCallback])
+    assert.deepEqual(Test2.executedCallbacks, [disposeCallback, disposeCallback1])
   })
 })
