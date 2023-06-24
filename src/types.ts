@@ -243,7 +243,6 @@ export interface RunnerEvents {
   'suite:end': SuiteEndNode
   'runner:start': RunnerStartNode
   'runner:end': RunnerEndNode
-  'uncaught:exception': Error
 }
 
 /**

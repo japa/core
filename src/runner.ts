@@ -42,11 +42,6 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
   #tracker?: Tracker
 
   /**
-   * Handler to listen for uncaughtException
-   */
-  #uncaughtExceptionHandler?: NodeJS.UncaughtExceptionListener
-
-  /**
    * A collection of suites
    */
   suites: Suite<Context>[] = []
@@ -81,9 +76,6 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
   #boot() {
     this.#tracker = new Tracker()
 
-    this.#emitter.on('uncaught:exception', (payload) =>
-      this.#tracker?.processEvent('uncaught:exception', payload)
-    )
     this.#emitter.on('runner:start', (payload) =>
       this.#tracker?.processEvent('runner:start', payload)
     )
@@ -123,18 +115,6 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
    */
   registerReporter(reporter: ReporterContract): this {
     this.reporters.add(reporter)
-    return this
-  }
-
-  /**
-   * Manage unhandled exceptions occurred during tests
-   */
-  manageUnHandledExceptions(): this {
-    if (!this.#uncaughtExceptionHandler) {
-      this.#uncaughtExceptionHandler = (error) => this.#emitter.emit('uncaught:exception', error)
-      process.on('uncaughtException', this.#uncaughtExceptionHandler)
-    }
-
     return this
   }
 

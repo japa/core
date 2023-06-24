@@ -235,14 +235,6 @@ export class Tracker {
   }
 
   /**
-   * Increment the count of uncaught exceptions
-   */
-  #onUncaughtException() {
-    this.#aggregates.uncaughtExceptions++
-    this.#hasError = true
-  }
-
-  /**
    * Process the tests events
    */
   processEvent<Event extends keyof RunnerEvents>(
@@ -250,9 +242,6 @@ export class Tracker {
     payload: RunnerEvents[Event]
   ) {
     switch (event) {
-      case 'uncaught:exception':
-        this.#onUncaughtException()
-        break
       case 'suite:start':
         this.#onSuiteStart(payload as SuiteStartNode)
         break
