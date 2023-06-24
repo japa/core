@@ -182,10 +182,12 @@ test.describe('configure', () => {
 
   test('do not mix callbacks when a test is extended', async () => {
     class Test1 extends Test<any, any> {
-      static disposeCallbacks = []
+      static executedCallbacks = []
+      static executingCallbacks = []
     }
     class Test2 extends Test<any, any> {
-      static disposeCallbacks = []
+      static executedCallbacks = []
+      static executingCallbacks = []
     }
 
     function disposeCallback() {}
