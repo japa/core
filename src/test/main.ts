@@ -41,23 +41,39 @@ export class Test<
   TestData extends DataSetNode = undefined
 > extends Macroable {
   /**
-   * Methods to call before disposing the test
+   * Methods to call before the test callback is executed
    */
-  static disposeCallbacks: ((
+  static executingCallbacks: ((test: Test<any, any>) => void)[] = []
+
+  /**
+   * Methods to call after the test callback is executed
+   */
+  static executedCallbacks: ((
     test: Test<any, any>,
     hasError: boolean,
     errors: TestEndNode['errors']
   ) => void)[] = []
 
   /**
-   * Define a dispose callback.
+   * Define a synchronous function to call before running
+   * the test executor callback
    *
    * Do note: Async methods are not allowed
    */
-  static dispose(
+  static executing(callback: (test: Test<any, any>) => void): void {
+    this.executingCallbacks.push(callback)
+  }
+
+  /**
+   * Define a synchronous function to call after running
+   * the test executor callback
+   *
+   * Do note: Async methods are not allowed
+   */
+  static executed(
     callback: (test: Test<any, any>, hasError: boolean, errors: TestEndNode['errors']) => void
   ): void {
-    this.disposeCallbacks.push(callback)
+    this.executedCallbacks.push(callback)
   }
 
   #refiner: Refiner
@@ -131,11 +147,17 @@ export class Test<
     }
 
     /**
-     * Make sure the instantiated class has its own property "disposeCalls"
+     * Make sure the instantiated class has its own property "executingCallbacks"
+     * and "executedCallbacks"
      */
-    if (!this.constructor.hasOwnProperty('disposeCallbacks')) {
+    if (!this.constructor.hasOwnProperty('executingCallbacks')) {
       throw new Error(
-        `Define static property "disposeCallbacks = []" on ${this.constructor.name} class`
+        `Define static property "executingCallbacks = []" on ${this.constructor.name} class`
+      )
+    }
+    if (!this.constructor.hasOwnProperty('executedCallbacks')) {
+      throw new Error(
+        `Define static property "executedCallbacks = []" on ${this.constructor.name} class`
       )
     }
 
@@ -327,6 +349,8 @@ export class Test<
    * Execute test
    */
   async exec() {
+    const self = this.constructor as typeof Test
+
     /**
      * Return early, if there are pinned test and the current test is not
      * pinned.
@@ -385,7 +409,10 @@ export class Test<
           this,
           this.#hooks,
           this.#emitter,
-          (this.constructor as typeof Test).disposeCallbacks,
+          {
+            executing: self.executingCallbacks,
+            executed: self.executedCallbacks,
+          },
           index
         ).run()
 
@@ -398,11 +425,9 @@ export class Test<
      * Run when no dataset is used
      */
     await this.#computeContext()
-    await new TestRunner(
-      this,
-      this.#hooks,
-      this.#emitter,
-      (this.constructor as typeof Test).disposeCallbacks
-    ).run()
+    await new TestRunner(this, this.#hooks, this.#emitter, {
+      executing: self.executingCallbacks,
+      executed: self.executedCallbacks,
+    }).run()
   }
 }

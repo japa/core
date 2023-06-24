@@ -9,6 +9,7 @@
 
 import retry from 'async-retry'
 import Hooks from '@poppinss/hooks'
+import type { Runner } from '@poppinss/hooks/types'
 import timeSpan, { TimeEndFunction } from 'time-span'
 
 import debug from '../debug.js'
@@ -16,7 +17,6 @@ import { Test } from './main.js'
 import { Emitter } from '../emitter.js'
 import { interpolate } from '../interpolate.js'
 import type { TestEndNode, TestHooks, TestHooksData, TestStartNode } from '../types.js'
-import { Runner } from '@poppinss/hooks/types'
 
 /**
  * Dummy test runner that just emits the required events
@@ -122,14 +122,12 @@ export class TestRunner {
   #datasetCurrentIndex: number | undefined
 
   /**
-   * Synchronous methods to execute to dispose the test. These methods
-   * can change the status of a test from passing to failing
+   * Callbacks to execute around the test executor
    */
-  #disposeCalls: ((
-    test: Test<any, any>,
-    hasError: boolean,
-    errors: TestEndNode['errors']
-  ) => void)[]
+  #callbacks: {
+    executing: ((test: Test<any, any>) => void)[]
+    executed: ((test: Test<any, any>, hasError: boolean, errors: TestEndNode['errors']) => void)[]
+  }
 
   /**
    * Reference to parent test
@@ -149,17 +147,16 @@ export class TestRunner {
     test: Test<any, any>,
     hooks: Hooks<TestHooks<Record<any, any>>>,
     emitter: Emitter,
-    disposeCalls: ((
-      test: Test<any, any>,
-      hasError: boolean,
-      errors: TestEndNode['errors']
-    ) => void)[],
+    callbacks: {
+      executing: ((test: Test<any, any>) => void)[]
+      executed: ((test: Test<any, any>, hasError: boolean, errors: TestEndNode['errors']) => void)[]
+    },
     datasetCurrentIndex?: number
   ) {
     this.#test = test
     this.#hooks = hooks
     this.#emitter = emitter
-    this.#disposeCalls = disposeCalls
+    this.#callbacks = callbacks
     this.#datasetCurrentIndex = datasetCurrentIndex
     this.#setupRunner = hooks.runner('setup')
     this.#teardownRunner = hooks.runner('teardown')
@@ -419,6 +416,7 @@ export class TestRunner {
      * Run the test executor
      */
     try {
+      this.#callbacks.executing.forEach((callback) => callback(this.#test))
       await this.#wrapTestInRetries()
     } catch (error) {
       this.#hasError = true
@@ -432,12 +430,14 @@ export class TestRunner {
     /**
      * Run dispose callbacks
      */
-    try {
-      this.#disposeCalls.forEach((callback) => callback(this.#test, this.#hasError, this.#errors))
-    } catch (error) {
-      this.#hasError = true
-      this.#errors.push({ phase: 'test', error })
-    }
+    this.#callbacks.executed.forEach((callback) => {
+      try {
+        callback(this.#test, this.#hasError, this.#errors)
+      } catch (error) {
+        this.#hasError = true
+        this.#errors.push({ phase: 'test', error })
+      }
+    })
 
     /**
      * Run test cleanup hooks

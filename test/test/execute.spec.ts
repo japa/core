@@ -705,17 +705,105 @@ test.describe('execute | hooks', () => {
   })
 })
 
-test.describe('execute | dispose', () => {
+test.describe('execute | executing', () => {
   test.afterEach(() => {
-    Test.disposeCallbacks = []
+    Test.executingCallbacks = []
   })
 
-  test('define dispose callbacks for the test', async () => {
+  test('define executing callbacks for the test', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    Test.dispose(() => {
+    Test.executing(() => {
+      stack.push('executing hook')
+    })
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance.run(async () => {
+      stack.push('executed')
+    })
+
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executing hook', 'executed'])
+  })
+
+  test('fail test when executing hook fails', async () => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    Test.executing(() => {
+      throw new Error('blowup')
+    })
+
+    const testInstance = new Test(
+      '2 + 2 = 4',
+      async () => {
+        return new TestContext()
+      },
+      emitter,
+      refiner
+    )
+    testInstance.run(async () => {
+      stack.push('executed')
+    })
+
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.equal(event!.errors[0].error.message, 'blowup')
+    assert.deepEqual(stack, [])
+  })
+
+  test('do not call executing hooks when setup hook fails', async () => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    Test.executing(() => {
+      stack.push('dispose callback')
+    })
+
+    const testInstance = new Test(
+      '2 + 2 = 4',
+      async () => {
+        return new TestContext()
+      },
+      emitter,
+      refiner
+    )
+    testInstance
+      .setup(async () => {
+        throw new Error('blowup')
+      })
+      .run(() => {
+        stack.push('executed')
+      })
+
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'setup')
+    assert.equal(event!.errors[0].error.message, 'blowup')
+    assert.deepEqual(stack, [])
+  })
+})
+
+test.describe('execute | executed', () => {
+  test.afterEach(() => {
+    Test.executedCallbacks = []
+  })
+
+  test('define executed callbacks for the test', async () => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    Test.executed(() => {
       stack.push('dispose hook')
     })
 
@@ -730,12 +818,12 @@ test.describe('execute | dispose', () => {
     assert.deepEqual(stack, ['executed', 'dispose hook'])
   })
 
-  test('fail test when dispose hook fails', async () => {
+  test('fail test when executed hook fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    Test.dispose(() => {
+    Test.executed(() => {
       throw new Error('blowup')
     })
 
@@ -759,12 +847,12 @@ test.describe('execute | dispose', () => {
     assert.deepEqual(stack, ['executed'])
   })
 
-  test('call dispose hook when test fails', async () => {
+  test('call executed hook when test fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    Test.dispose(() => {
+    Test.executed(() => {
       stack.push('dispose callback')
     })
 
@@ -788,12 +876,12 @@ test.describe('execute | dispose', () => {
     assert.deepEqual(stack, ['dispose callback'])
   })
 
-  test('do not call dispose hooks when setup hook fails', async () => {
+  test('do not call executed hooks when setup hook fails', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
     const refiner = new Refiner({})
 
-    Test.dispose(() => {
+    Test.executed(() => {
       stack.push('dispose callback')
     })
 
