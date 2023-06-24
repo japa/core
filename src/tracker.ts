@@ -56,22 +56,13 @@ export class Tracker {
   #currentSuiteHasError = false
   #currentGroupHasError = false
 
-  #aggregates: {
-    total: number
-    failed: number
-    passed: number
-    regression: number
-    skipped: number
-    todo: number
-    uncaughtExceptions: number
-  } = {
+  #aggregates: RunnerSummary['aggregates'] = {
     total: 0,
     failed: 0,
     passed: 0,
     regression: 0,
     skipped: 0,
     todo: 0,
-    uncaughtExceptions: 0,
   }
 
   #duration: number = 0

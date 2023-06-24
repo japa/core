@@ -315,7 +315,6 @@ export type RunnerSummary = {
     regression: number
     skipped: number
     todo: number
-    uncaughtExceptions: number
   }
   duration: number
   hasError: boolean
