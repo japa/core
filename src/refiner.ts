@@ -198,7 +198,7 @@ export class Refiner {
   add(layer: 'tests' | 'tags' | 'groups', values: string[]): void {
     if (layer === 'tags') {
       values.forEach((tag) => {
-        if (tag.startsWith('!')) {
+        if (tag.startsWith('!') || tag.startsWith('~')) {
           this.#filters.negatedTags.push(tag.slice(1))
         } else {
           this.#filters.tags.push(tag)
