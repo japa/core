@@ -16,6 +16,12 @@ import type { Group } from './group/main.js'
 import type { Suite } from './suite/main.js'
 
 /**
+ * Summary reporters are registered with the SummaryBuilder to
+ * add information to the tests summary output
+ */
+export type SummaryReporter = () => { key: string; value: string | string[] }[]
+
+/**
  * Shape of test data set. Should be an array of a function that
  * returns an array
  */

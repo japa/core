@@ -14,6 +14,7 @@ import { Suite } from './suite/main.js'
 import { Emitter } from './emitter.js'
 import { Tracker } from './tracker.js'
 import { ReporterContract, RunnerSummary } from './types.js'
+import { SummaryBuilder } from './summary_builder.js'
 
 /**
  * The Runner class exposes the API to register test suites and execute
@@ -40,6 +41,12 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
    * Reference to tests tracker
    */
   #tracker?: Tracker
+
+  /**
+   * Summary builder is used to create the tests summary reported by
+   * multiple reporters. Each report contains a key-value pair
+   */
+  summaryBuilder = new SummaryBuilder()
 
   /**
    * A collection of suites
