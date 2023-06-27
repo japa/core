@@ -111,12 +111,6 @@ export class TestRunner {
   #hasError: boolean = false
 
   /**
-   * Handler to capture uncaught exception while in the scope of the
-   * test
-   */
-  #uncaughtExceptionHandler?: NodeJS.UncaughtExceptionListener
-
-  /**
    * Current dataset index for which executing the test
    */
   #datasetCurrentIndex: number | undefined
@@ -328,18 +322,6 @@ export class TestRunner {
         }
       }
 
-      /**
-       * Done style tests the primary source of uncaught exceptions. Hence
-       * we make an extra efforts to catch uncaught exceptions with
-       * them
-       */
-      if (!this.#uncaughtExceptionHandler) {
-        this.#uncaughtExceptionHandler = (error) => {
-          reject(error)
-        }
-        process.on('uncaughtException', this.#uncaughtExceptionHandler)
-      }
-
       debug('running test "%s" and waiting for done method call', this.#test.title)
       this.#runTest(done).catch(reject)
     })
@@ -421,10 +403,6 @@ export class TestRunner {
     } catch (error) {
       this.#hasError = true
       this.#errors.push({ phase: 'test', error })
-    } finally {
-      if (this.#uncaughtExceptionHandler) {
-        process.removeListener('uncaughtException', this.#uncaughtExceptionHandler)
-      }
     }
 
     /**
