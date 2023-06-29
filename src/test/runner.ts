@@ -217,7 +217,7 @@ export class TestRunner {
       hasError: this.#hasError,
       errors: this.#errors,
       retryAttempt: this.#test.options.retryAttempt,
-      duration: this.#timeTracker?.rounded() ?? 0,
+      duration: this.#timeTracker?.() ?? 0,
     }
 
     this.#emitter.emit('test:end', endOptions)
