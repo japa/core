@@ -119,7 +119,7 @@ export class Test<
    * Reference to the test context. Available at the time
    * of running the test
    */
-  context?: Context
+  context!: Context
 
   /**
    * Find if the test is pinned
