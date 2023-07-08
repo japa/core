@@ -185,6 +185,24 @@ test.describe('execute | async', () => {
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed'])
   })
+
+  test('increase test timeout from within the callback', async () => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance.run(async () => {
+      testInstance.resetTimeout(5000)
+      stack.push('executed')
+      await sleep(4000)
+    })
+
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 6000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed'])
+  })
 })
 
 test.describe('execute | waitForDone', () => {
@@ -349,6 +367,28 @@ test.describe('execute | waitForDone', () => {
       })
       .waitForDone()
       .timeout(5000)
+
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed'])
+  })
+
+  test('increase test timeout from within the test callback', async () => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance
+      .run(async (_, d) => {
+        testInstance.resetTimeout(5000)
+        stack.push('executed')
+        setTimeout(() => {
+          d()
+        }, 4000)
+      })
+      .waitForDone()
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
@@ -1151,6 +1191,36 @@ test.describe('execute | dataset', () => {
     assert.notStrictEqual(contexts[0], contexts[1])
 
     assert.lengthOf(events, 2)
+    assert.deepEqual(events[0].dataset, { size: 2, row: 'foo', index: 0 })
+    assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
+  })
+
+  test('reset timeout within test callback for each dataset row', async () => {
+    const stack: string[] = []
+    const contexts: TestContext[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const testInstance = new Test('2 + 2 = 4', () => new TestContext(), emitter, refiner)
+    testInstance.with(['foo', 'bar']).run(async (ctx, value) => {
+      testInstance.resetTimeout()
+      contexts.push(ctx)
+      stack.push(value)
+      await sleep(3000)
+    })
+
+    const [, events] = await Promise.all([
+      testInstance.exec(),
+      pEventTimes(emitter, 'test:end', 2, 8000),
+    ])
+
+    assert.deepEqual(stack, ['foo', 'bar'])
+    assert.lengthOf(contexts, 2)
+    assert.notStrictEqual(contexts[0], contexts[1])
+
+    assert.lengthOf(events, 2)
+    assert.equal(events[0].hasError, false)
+    assert.equal(events[1].hasError, false)
     assert.deepEqual(events[0].dataset, { size: 2, row: 'foo', index: 0 })
     assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
   })

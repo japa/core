@@ -80,7 +80,13 @@ export class Test<
   #emitter: Emitter
 
   /**
-   * Find if the test has already been executed
+   * Reference to the active runner running the
+   * test
+   */
+  #activeRunner?: TestRunner
+
+  /**
+   * Check if the test has been executed
    */
   #executed: boolean = false
 
@@ -248,6 +254,23 @@ export class Test<
   }
 
   /**
+   * Reset the timeout from within the test callback.
+   */
+  resetTimeout(duration?: number): this {
+    if (this.#activeRunner) {
+      this.#activeRunner.resetTimeout(duration)
+    } else {
+      if (duration) {
+        this.timeout(duration)
+      } else {
+        this.disableTimeout()
+      }
+    }
+
+    return this
+  }
+
+  /**
    * Assign tags to the test. Later you can use the tags to run
    * specific tests
    */
@@ -397,15 +420,20 @@ export class Test<
     }
 
     /**
-     * Run for each row inside dataset
+     * Compute dataset by calling the with method
      */
     await this.#computeDataset()
+
+    /**
+     * Run for each row inside dataset
+     */
     if (Array.isArray(this.dataset) && this.dataset.length) {
       let index = 0
       // eslint-disable-next-line @typescript-eslint/naming-convention
       for (let _ of this.dataset) {
         await this.#computeContext()
-        await new TestRunner(
+
+        this.#activeRunner = new TestRunner(
           this,
           this.#hooks,
           this.#emitter,
@@ -414,10 +442,14 @@ export class Test<
             executed: self.executedCallbacks,
           },
           index
-        ).run()
+        )
+
+        await this.#activeRunner.run()
 
         index++
       }
+
+      this.#activeRunner = undefined
       return
     }
 
@@ -425,9 +457,13 @@ export class Test<
      * Run when no dataset is used
      */
     await this.#computeContext()
-    await new TestRunner(this, this.#hooks, this.#emitter, {
+
+    this.#activeRunner = new TestRunner(this, this.#hooks, this.#emitter, {
       executing: self.executingCallbacks,
       executed: self.executedCallbacks,
-    }).run()
+    })
+
+    await this.#activeRunner.run()
+    this.#activeRunner = undefined
   }
 }

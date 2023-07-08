@@ -356,7 +356,7 @@ export class TestRunner {
    */
   #resetTimer(duration: number) {
     if (this.#timeout) {
-      debug('resetting timmer')
+      debug('resetting timer')
       clearTimeout(this.#timeout.timer)
       this.#timeout.timer = setTimeout(
         () => this.#timeout!.reject(new Error('Test timeout')),
@@ -370,7 +370,7 @@ export class TestRunner {
    */
   #clearTimer() {
     if (this.#timeout) {
-      debug('clearing timmer')
+      debug('clearing timer')
       clearTimeout(this.#timeout.timer)
       this.#timeout = undefined
     }
@@ -387,8 +387,8 @@ export class TestRunner {
 
     try {
       await Promise.race([
-        this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest(),
         this.#createTimeoutTimer(this.#test.options.timeout),
+        this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest(),
       ])
     } finally {
       this.#clearTimer()
@@ -410,6 +410,18 @@ export class TestRunner {
       },
       { retries: this.#test.options.retries, factor: 1 }
     )
+  }
+
+  /**
+   * Reset test timeout. The timeout will be removed, if
+   * no duration value is provided
+   */
+  resetTimeout(duration?: number) {
+    if (!duration) {
+      this.#clearTimer()
+    } else {
+      this.#resetTimer(duration)
+    }
   }
 
   /**
