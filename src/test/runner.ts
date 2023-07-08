@@ -86,6 +86,16 @@ export class TestRunner {
   #emitter: Emitter
 
   /**
+   * Timeout timer and promise reject method references to
+   * fail the test after timeout. We keep global reference
+   * to allow timeout reset within the test.
+   */
+  #timeout?: {
+    timer: NodeJS.Timeout
+    reject: (error: Error) => void
+  }
+
+  /**
    * Time tracker to find test duration
    */
   #timeTracker?: TimeEndFunction
@@ -328,6 +338,45 @@ export class TestRunner {
   }
 
   /**
+   * Creates a timeout promise with global timer to reject
+   * the promise after given duration.
+   */
+  #createTimeoutTimer(duration: number) {
+    return new Promise((_, reject) => {
+      debug('wrapping test in timeout timer')
+      this.#timeout = {
+        reject,
+        timer: setTimeout(() => this.#timeout!.reject(new Error('Test timeout')), duration),
+      }
+    })
+  }
+
+  /**
+   * Resets the timeout timer
+   */
+  #resetTimer(duration: number) {
+    if (this.#timeout) {
+      debug('resetting timmer')
+      clearTimeout(this.#timeout.timer)
+      this.#timeout.timer = setTimeout(
+        () => this.#timeout!.reject(new Error('Test timeout')),
+        duration
+      )
+    }
+  }
+
+  /**
+   * Clears the timer
+   */
+  #clearTimer() {
+    if (this.#timeout) {
+      debug('clearing timmer')
+      clearTimeout(this.#timeout.timer)
+      this.#timeout = undefined
+    }
+  }
+
+  /**
    * Run the test executor and make sure it times out after the configured
    * timeout.
    */
@@ -336,26 +385,13 @@ export class TestRunner {
       return this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest()
     }
 
-    let timeoutTimer: null | NodeJS.Timeout = null
-
-    const timeout = () => {
-      return new Promise((_, reject) => {
-        timeoutTimer = setTimeout(
-          () => reject(new Error('Test timeout')),
-          this.#test.options.timeout
-        )
-      })
-    }
-
     try {
       await Promise.race([
         this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest(),
-        timeout(),
+        this.#createTimeoutTimer(this.#test.options.timeout),
       ])
     } finally {
-      if (timeoutTimer) {
-        clearTimeout(timeoutTimer)
-      }
+      this.#clearTimer()
     }
   }
 
