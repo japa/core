@@ -38,7 +38,7 @@ import type {
  */
 export class Test<
   Context extends Record<any, any>,
-  TestData extends DataSetNode = undefined
+  TestData extends DataSetNode = undefined,
 > extends Macroable {
   /**
    * Methods to call before the test callback is executed

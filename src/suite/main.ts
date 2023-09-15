@@ -58,7 +58,11 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
    */
   stack: (Test<Context, any> | Group<Context>)[] = []
 
-  constructor(public name: string, emitter: Emitter, refiner: Refiner) {
+  constructor(
+    public name: string,
+    emitter: Emitter,
+    refiner: Refiner
+  ) {
     super()
     this.#emitter = emitter
     this.#refiner = refiner

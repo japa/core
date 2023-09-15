@@ -105,7 +105,11 @@ export class Group<Context extends Record<any, any>> extends Macroable {
     },
   }
 
-  constructor(public title: string, emitter: Emitter, refiner: Refiner) {
+  constructor(
+    public title: string,
+    emitter: Emitter,
+    refiner: Refiner
+  ) {
     super()
     this.#emitter = emitter
     this.#refiner = refiner

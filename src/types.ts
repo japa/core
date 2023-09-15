@@ -33,7 +33,7 @@ export type DataSetNode = undefined | any[] | (() => any[] | Promise<any[]>)
  */
 export type TestHooksData<Context extends Record<any, any>> = [
   [test: Test<Context, any>],
-  [hasError: boolean, test: Test<Context, any>]
+  [hasError: boolean, test: Test<Context, any>],
 ]
 
 /**
@@ -66,7 +66,7 @@ export type TestHooks<Context extends Record<any, any>> = {
  */
 export type GroupHooksData<Context extends Record<any, any>> = [
   [group: Group<Context>],
-  [hasError: boolean, group: Group<Context>]
+  [hasError: boolean, group: Group<Context>],
 ]
 
 /**
@@ -92,7 +92,7 @@ export type GroupHooks<Context extends Record<any, any>> = {
  */
 export type SuiteHooksData<Context extends Record<any, any>> = [
   [suite: Suite<Context>],
-  [hasError: boolean, suite: Suite<Context>]
+  [hasError: boolean, suite: Suite<Context>],
 ]
 
 /**
