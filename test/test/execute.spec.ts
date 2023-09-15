@@ -743,6 +743,30 @@ test.describe('execute | hooks', () => {
     assert.equal(event!.errors[0].phase, 'test:cleanup')
     assert.deepEqual(stack, ['executed'])
   })
+
+  test('execute test cleanup hooks inside dataset', async () => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance.with(['foo', 'bar'])
+
+    testInstance.run(async () => {
+      testInstance.cleanup(async (hasError, t) => {
+        assert.isFalse(hasError)
+        assert.deepEqual(t, testInstance)
+        stack.push('test:cleanup')
+      })
+
+      stack.push('executed')
+    })
+
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, ['executed', 'test:cleanup', 'executed', 'test:cleanup'])
+  })
 })
 
 test.describe('execute | executing', () => {

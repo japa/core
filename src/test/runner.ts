@@ -265,9 +265,11 @@ export class TestRunner {
    * Running test cleanup functions
    */
   async #runTestCleanupFunctions() {
+    const cleanupRunner = this.#hooks.runner('cleanup')
+    this.#hooks.clear('cleanup')
     try {
       debug('running "%s" test cleanup functions', this.#test.title)
-      await this.#hooks.runner('cleanup').run(this.#hasError, this.#test)
+      await cleanupRunner.run(this.#hasError, this.#test)
     } catch (error) {
       debug('test cleanup functions failed, test: %s, error: %O', this.#test.title, error)
       this.#hasError = true
