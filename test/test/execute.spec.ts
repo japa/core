@@ -767,6 +767,42 @@ test.describe('execute | hooks', () => {
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed', 'test:cleanup', 'executed', 'test:cleanup'])
   })
+
+  test('run test cleanup hooks in reverse order', async () => {
+    const stack: string[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance.with(['foo', 'bar'])
+
+    testInstance.run(async () => {
+      testInstance.cleanup(async (hasError, t) => {
+        assert.isFalse(hasError)
+        assert.deepEqual(t, testInstance)
+        stack.push('test:cleanup')
+      })
+      testInstance.cleanup(async (hasError, t) => {
+        assert.isFalse(hasError)
+        assert.deepEqual(t, testInstance)
+        stack.push('test:cleanup 1')
+      })
+
+      stack.push('executed')
+    })
+
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
+    assert.isFalse(event!.hasError)
+    assert.lengthOf(event!.errors, 0)
+    assert.deepEqual(stack, [
+      'executed',
+      'test:cleanup 1',
+      'test:cleanup',
+      'executed',
+      'test:cleanup 1',
+      'test:cleanup',
+    ])
+  })
 })
 
 test.describe('execute | executing', () => {

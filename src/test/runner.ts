@@ -269,7 +269,7 @@ export class TestRunner {
     this.#hooks.clear('cleanup')
     try {
       debug('running "%s" test cleanup functions', this.#test.title)
-      await cleanupRunner.run(this.#hasError, this.#test)
+      await cleanupRunner.runReverse(this.#hasError, this.#test)
     } catch (error) {
       debug('test cleanup functions failed, test: %s, error: %O', this.#test.title, error)
       this.#hasError = true
