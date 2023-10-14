@@ -1,6 +1,6 @@
 {
   "name": "@japa/core",
-  "version": "8.0.1",
+  "version": "8.0.2",
   "description": "Implementation of core APIs for the Japa tests runner",
   "main": "build/index.js",
   "type": "module",
