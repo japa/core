@@ -50,6 +50,7 @@
     "cross-env": "^7.0.3",
     "del-cli": "^5.1.0",
     "eslint": "^8.51.0",
+    "github-label-sync": "^2.3.1",
     "glob": "^10.3.10",
     "husky": "^8.0.3",
     "np": "^8.0.4",
