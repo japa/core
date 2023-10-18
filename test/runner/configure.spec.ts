@@ -72,4 +72,32 @@ test.describe('configure | runner', () => {
     runner.registerReporter(listReporter)
     assert.deepEqual(runner.reporters, new Set([listReporter]))
   })
+
+  test('tap into suites after they have been registered', async () => {
+    const emitter = new Emitter()
+
+    const runner = new Runner(emitter)
+    const refiner = new Refiner()
+
+    /**
+     * First add a suite to the runner
+     */
+    const unitSuite = new Suite('unit', emitter, refiner)
+    runner.add(unitSuite)
+
+    /**
+     * Next define the hook
+     */
+    runner.onSuite((suite) => (suite.name = `configured:${suite.name}`))
+
+    /**
+     * Add another suite to the runner
+     */
+    const functionalSuite = new Suite('functional', emitter, refiner)
+    runner.add(functionalSuite)
+
+    assert.deepEqual(runner.suites, [unitSuite, functionalSuite])
+    assert.equal(unitSuite.name, 'configured:unit')
+    assert.equal(functionalSuite.name, 'configured:functional')
+  })
 })

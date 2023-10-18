@@ -77,4 +77,63 @@ test.describe('configure', () => {
 
     assert.equal(testInstance.options.timeout, 0)
   })
+
+  test('tap into tests after they have been registered', async () => {
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const suite = new Suite<TestContext>('sample suite', new Emitter(), refiner)
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    const test1Instance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+
+    /**
+     * First add test to suite
+     */
+    suite.add(testInstance)
+
+    /**
+     * Define the hook afterwards
+     */
+    suite.onTest((t) => t.tags(['@hooked'], 'append'))
+
+    /**
+     * Add another test
+     */
+    suite.add(test1Instance)
+
+    assert.deepEqual(testInstance.options.tags, ['@hooked'])
+    assert.deepEqual(test1Instance.options.tags, ['@hooked'])
+  })
+
+  test('tap into groups after they have been registered', async () => {
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const suite = new Suite<TestContext>('sample suite', new Emitter(), refiner)
+    const group = new Group<TestContext>('sample group', emitter, refiner)
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+
+    const group1 = new Group<TestContext>('sample group', emitter, refiner)
+    const test1Instance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+
+    /**
+     * First add test to group and group to suite
+     */
+    group.add(testInstance)
+    suite.add(group)
+
+    /**
+     * Define hook
+     */
+    suite.onGroup((g) => g.tap((t) => t.tags(['@hooked'], 'append')))
+
+    /**
+     * Add another group to suite and test to the group
+     */
+    suite.add(group1)
+    group1.add(test1Instance)
+
+    assert.deepEqual(testInstance.options.tags, ['@hooked'])
+    assert.deepEqual(test1Instance.options.tags, ['@hooked'])
+  })
 })

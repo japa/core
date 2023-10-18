@@ -116,6 +116,7 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
    * Tap into each suite and configure it
    */
   onSuite(callback: (suite: Suite<Context>) => void): this {
+    this.suites.forEach((suite) => callback(suite))
     this.#configureSuiteCallbacks.push(callback)
     return this
   }

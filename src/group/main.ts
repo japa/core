@@ -155,6 +155,7 @@ export class Group<Context extends Record<any, any>> extends Macroable {
    * Tap into each test and configure it
    */
   tap(callback: (test: Test<Context, any>) => void): this {
+    this.tests.forEach((test) => callback(test))
     this.#tapsCallbacks.push(callback)
     return this
   }

@@ -88,6 +88,12 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
    * Tap into each test and configure it
    */
   onTest(callback: (test: Test<Context, any>) => void): this {
+    this.stack.forEach((testOrGroup) => {
+      if (testOrGroup instanceof Test) {
+        callback(testOrGroup)
+      }
+    })
+
     this.#configureTestCallbacks.push(callback)
     return this
   }
@@ -96,6 +102,12 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
    * Tap into each group and configure it
    */
   onGroup(callback: (group: Group<Context>) => void): this {
+    this.stack.forEach((testOrGroup) => {
+      if (testOrGroup instanceof Group) {
+        callback(testOrGroup)
+      }
+    })
+
     this.#configureGroupCallbacks.push(callback)
     return this
   }
