@@ -14,7 +14,7 @@ import { Test } from '../../src/test/main.js'
 import { Refiner } from '../../src/refiner.js'
 import { Emitter } from '../../src/emitter.js'
 import { TestContext } from '../../src/test_context.js'
-import { sleep, pEvent, pEventTimes } from '../../test_helpers/index.js'
+import { sleep, pEvent, pEventTimes } from '../../tests_helpers/index.js'
 
 test.describe('execute | async', () => {
   test('execute test executor', async () => {

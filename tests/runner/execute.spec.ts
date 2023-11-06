@@ -15,7 +15,7 @@ import { Test } from '../../src/test/main.js'
 import { Emitter } from '../../src/emitter.js'
 import { Refiner } from '../../src/refiner.js'
 import { Suite } from '../../src/suite/main.js'
-import { pEvent } from '../../test_helpers/index.js'
+import { pEvent } from '../../tests_helpers/index.js'
 import { TestContext } from '../../src/test_context.js'
 import { SuiteEndNode, TestEndNode } from '../../src/types.js'
 

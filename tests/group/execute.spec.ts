@@ -15,7 +15,7 @@ import { Refiner } from '../../src/refiner.js'
 import { Emitter } from '../../src/emitter.js'
 import { Group } from '../../src/group/main.js'
 import { TestEndNode } from '../../src/types.js'
-import { pEvent } from '../../test_helpers/index.js'
+import { pEvent } from '../../tests_helpers/index.js'
 import { TestContext } from '../../src/test_context.js'
 
 test.describe('execute | test', () => {

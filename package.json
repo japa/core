@@ -18,7 +18,7 @@
   },
   "scripts": {
     "pretest": "npm run lint",
-    "test": "c8 glob -c \"node --loader=ts-node/esm --test\" \"test/**/*.spec.ts\"",
+    "test": "c8 glob -c \"node --loader=ts-node/esm --test\" \"tests/**/*.spec.ts\"",
     "clean": "del build",
     "typecheck": "tsc --noEmit",
     "precompile": "npm run lint && npm run clean",
