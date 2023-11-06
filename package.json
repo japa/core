@@ -5,7 +5,9 @@
   "main": "build/index.js",
   "type": "module",
   "files": [
-    "build"
+    "build",
+    "!build/test",
+    "!build/test_helpers"
   ],
   "engines": {
     "node": ">=18.16.0"
@@ -19,7 +21,8 @@
     "test": "c8 glob -c \"node --loader=ts-node/esm --test\" \"test/**/*.spec.ts\"",
     "clean": "del build",
     "typecheck": "tsc --noEmit",
-    "compile": "npm run lint && npm run clean && tsup-node",
+    "precompile": "npm run lint && npm run clean",
+    "compile": "tsup-node && tsc --emitDeclarationOnly --declaration",
     "build": "npm run compile",
     "release": "np",
     "version": "npm run build",
@@ -112,7 +115,8 @@
     "outDir": "./build",
     "clean": true,
     "format": "esm",
-    "dts": true,
+    "dts": false,
+    "sourcemap": true,
     "target": "esnext"
   }
 }
