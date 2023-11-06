@@ -6,8 +6,8 @@
   "type": "module",
   "files": [
     "build",
-    "!build/test",
-    "!build/test_helpers"
+    "!build/tests",
+    "!build/tests_helpers"
   ],
   "engines": {
     "node": ">=18.16.0"
