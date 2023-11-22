@@ -26,6 +26,17 @@ test.describe('Refiner', () => {
     assert.isTrue(refiner.allows(testInstance))
   })
 
+  test('filter test title when it contains special characters', () => {
+    const refiner = new Refiner({
+      tests: [`A title with "quotes'" and comma ,`],
+    })
+
+    const emitter = new Emitter()
+    const testInstance = new Test(`A title with "quotes'" and comma ,`, {}, emitter, refiner)
+
+    assert.isTrue(refiner.allows(testInstance))
+  })
+
   test('add filter for test tags', () => {
     const refiner = new Refiner({})
 
