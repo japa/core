@@ -117,12 +117,12 @@ export type SuiteHooks<Context extends Record<any, any>> = {
 export type TestExecutor<Context, DataSet> = DataSet extends any[]
   ? (context: Context, value: DataSet[number], done: (error?: any) => void) => void | Promise<void>
   : DataSet extends () => infer A
-  ? (
-      context: Context,
-      value: Awaited<A> extends any[] ? Awaited<A>[number] : Awaited<A>,
-      done?: (error?: any) => void
-    ) => void | Promise<void>
-  : (context: Context, done: (error?: any) => void) => void | Promise<void>
+    ? (
+        context: Context,
+        value: Awaited<A> extends any[] ? Awaited<A>[number] : Awaited<A>,
+        done?: (error?: any) => void
+      ) => void | Promise<void>
+    : (context: Context, done: (error?: any) => void) => void | Promise<void>
 
 /**
  * Test configuration options.
