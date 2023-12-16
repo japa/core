@@ -39,9 +39,6 @@ export class DummyRunner {
       title: {
         original: this.#test.options.title,
         expanded: this.#test.options.title,
-        toString() {
-          return this.original
-        },
       },
       isPinned: this.#test.isPinned,
     }
@@ -57,9 +54,6 @@ export class DummyRunner {
       title: {
         original: this.#test.options.title,
         expanded: this.#test.options.title,
-        toString() {
-          return this.original
-        },
       },
       isPinned: this.#test.isPinned,
       hasError: false,
@@ -190,9 +184,6 @@ export class TestRunner {
     return {
       original: title,
       expanded: dataset ? interpolate(title, dataset.row, dataset.index + 1) : title,
-      toString() {
-        return this.original
-      },
     }
   }
 

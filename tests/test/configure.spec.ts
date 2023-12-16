@@ -51,6 +51,30 @@ test.describe('configure', () => {
     })
   })
 
+  test('define timeout using the resetTimeout method', async () => {
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
+    testInstance.resetTimeout(6000)
+
+    assert.deepEqual(testInstance.options, {
+      tags: [],
+      title: '2 + 2 = 4',
+      timeout: 6000,
+      meta: {},
+    })
+  })
+
+  test('disable timeout using the resetTimeout method', async () => {
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
+    testInstance.resetTimeout()
+
+    assert.deepEqual(testInstance.options, {
+      tags: [],
+      title: '2 + 2 = 4',
+      timeout: 0,
+      meta: {},
+    })
+  })
+
   test('define test retries', async () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({}))
     testInstance.retry(4)
@@ -199,6 +223,24 @@ test.describe('configure', () => {
     assert.deepEqual(Test1.executingCallbacks, [setupCallback])
     assert.deepEqual(Test2.executedCallbacks, [])
     assert.deepEqual(Test2.executingCallbacks, [])
+  })
+
+  test('throw error when child class does not initialize callbacks properties', async () => {
+    class Test1 extends Test<any, any> {
+      static executedCallbacks = []
+    }
+    class Test2 extends Test<any, any> {
+      static executingCallbacks = []
+    }
+
+    assert.throws(
+      () => new Test1('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({})),
+      'Define static property "executingCallbacks = []" on Test1 class'
+    )
+    assert.throws(
+      () => new Test2('2 + 2 = 4', new TestContext(), new Emitter(), new Refiner({})),
+      'Define static property "executedCallbacks = []" on Test2 class'
+    )
   })
 
   test('inherit parent callbacks', async () => {

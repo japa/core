@@ -150,7 +150,6 @@ export type TestStartNode = Omit<TestOptions, 'title'> & {
   title: {
     original: string
     expanded: string
-    toString(): string
   }
   isPinned: boolean
   dataset?: {
@@ -167,7 +166,6 @@ export type TestEndNode = Omit<TestOptions, 'title'> & {
   title: {
     original: string
     expanded: string
-    toString(): string
   }
   isPinned: boolean
   duration: number

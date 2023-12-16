@@ -124,4 +124,37 @@ test.describe('Refiner', () => {
     refiner.add('groups', [groupInstance.title])
     assert.isFalse(refiner.allows(loneTestInstance))
   })
+
+  test('add filters via constructor', () => {
+    const refiner = new Refiner({
+      groups: ['Maths'],
+      tags: ['@slow'],
+      tests: ['add two numbers'],
+    })
+
+    const emitter = new Emitter()
+
+    const group = new Group('Maths', emitter, refiner)
+
+    /**
+     * All filters pass
+     */
+    const testInstance1 = new Test('add two numbers', {}, emitter, refiner, group)
+    testInstance1.tags(['@slow'])
+    assert.isTrue(refiner.allows(testInstance1))
+
+    /**
+     * Title filter fails
+     */
+    const testInstance = new Test('2 + 2 = 4', {}, emitter, refiner, group)
+    testInstance.tags(['@slow'])
+    assert.isFalse(refiner.allows(testInstance))
+
+    /**
+     * Title + tag filter fails
+     */
+    const testInstance2 = new Test('subtract two number', {}, emitter, refiner, group)
+    group.add(testInstance2)
+    assert.isFalse(refiner.allows(testInstance2))
+  })
 })
