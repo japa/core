@@ -83,19 +83,16 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
   #boot() {
     this.#tracker = new Tracker()
 
-    this.#emitter.on(
-      'runner:start',
-      (payload) => this.#tracker?.processEvent('runner:start', payload)
+    this.#emitter.on('runner:start', (payload) =>
+      this.#tracker?.processEvent('runner:start', payload)
     )
     this.#emitter.on('runner:end', (payload) => this.#tracker?.processEvent('runner:end', payload))
-    this.#emitter.on(
-      'suite:start',
-      (payload) => this.#tracker?.processEvent('suite:start', payload)
+    this.#emitter.on('suite:start', (payload) =>
+      this.#tracker?.processEvent('suite:start', payload)
     )
     this.#emitter.on('suite:end', (payload) => this.#tracker?.processEvent('suite:end', payload))
-    this.#emitter.on(
-      'group:start',
-      (payload) => this.#tracker?.processEvent('group:start', payload)
+    this.#emitter.on('group:start', (payload) =>
+      this.#tracker?.processEvent('group:start', payload)
     )
     this.#emitter.on('group:end', (payload) => this.#tracker?.processEvent('group:end', payload))
     this.#emitter.on('test:start', (payload) => this.#tracker?.processEvent('test:start', payload))
