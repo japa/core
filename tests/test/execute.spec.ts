@@ -30,6 +30,7 @@ test.describe('execute | async', () => {
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
     assert.isDefined(event)
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed'])
   })
@@ -54,6 +55,7 @@ test.describe('execute | async', () => {
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
     assert.isDefined(event)
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed'])
   })
@@ -72,6 +74,7 @@ test.describe('execute | async', () => {
     assert.isFalse(endEvent!.hasError)
     assert.lengthOf(endEvent!.errors, 0)
     assert.deepEqual(stack, ['executed'])
+    assert.isFalse(testInstance.failed)
 
     const [endEvent1] = await Promise.all([pEvent(emitter, 'test:end'), testInstance.exec()])
     assert.isNull(endEvent1)
@@ -90,7 +93,9 @@ test.describe('execute | async', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
     assert.isDefined(event)
+
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -116,6 +121,7 @@ test.describe('execute | async', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.equal(event!.retryAttempt, 2)
     assert.deepEqual(stack, ['executed', 'executed'])
@@ -138,6 +144,7 @@ test.describe('execute | async', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -182,6 +189,7 @@ test.describe('execute | async', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 6000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed'])
   })
@@ -200,6 +208,7 @@ test.describe('execute | async', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 6000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed'])
   })
@@ -221,6 +230,7 @@ test.describe('execute | waitForDone', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed'])
   })
@@ -240,6 +250,7 @@ test.describe('execute | waitForDone', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -263,6 +274,7 @@ test.describe('execute | waitForDone', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -294,6 +306,7 @@ test.describe('execute | waitForDone', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.equal(event!.retryAttempt, 2)
     assert.deepEqual(stack, ['executed', 'executed'])
@@ -319,6 +332,7 @@ test.describe('execute | waitForDone', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -345,6 +359,7 @@ test.describe('execute | waitForDone', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -370,6 +385,7 @@ test.describe('execute | waitForDone', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed'])
   })
@@ -392,6 +408,7 @@ test.describe('execute | waitForDone', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed'])
   })
@@ -415,6 +432,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['setup', 'executed'])
   })
@@ -447,6 +465,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['setup', 'setup 2', 'executed', 'setup cleanup 2', 'setup cleanup'])
   })
@@ -469,6 +488,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'setup')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -502,6 +522,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'setup')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -531,6 +552,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['setup', 'executed', 'teardown'])
   })
@@ -560,6 +582,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['setup', 'executed', 'teardown', 'teardown cleanup'])
   })
@@ -587,6 +610,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'teardown')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -617,6 +641,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -643,6 +668,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'setup:cleanup')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -669,6 +695,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'teardown:cleanup')
     assert.instanceOf(event!.errors[0].error, Error)
@@ -694,6 +721,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed', 'test:cleanup'])
   })
@@ -716,6 +744,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test')
     assert.deepEqual(stack, ['test:cleanup'])
@@ -739,6 +768,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test:cleanup')
     assert.deepEqual(stack, ['executed'])
@@ -764,6 +794,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed', 'test:cleanup', 'executed', 'test:cleanup'])
   })
@@ -793,6 +824,7 @@ test.describe('execute | hooks', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, [
       'executed',
@@ -826,6 +858,7 @@ test.describe('execute | executing', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executing hook', 'executed'])
   })
@@ -853,6 +886,7 @@ test.describe('execute | executing', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test')
     assert.equal(event!.errors[0].error.message, 'blowup')
@@ -886,6 +920,7 @@ test.describe('execute | executing', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'setup')
     assert.equal(event!.errors[0].error.message, 'blowup')
@@ -914,6 +949,7 @@ test.describe('execute | executed', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isFalse(event!.hasError)
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed', 'dispose hook'])
   })
@@ -970,6 +1006,7 @@ test.describe('execute | executed', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'test')
     assert.equal(event!.errors[0].error.message, 'blowup')
@@ -1003,6 +1040,7 @@ test.describe('execute | executed', () => {
 
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 8000)])
     assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
     assert.equal(event!.errors[0].phase, 'setup')
     assert.equal(event!.errors[0].error.message, 'blowup')
@@ -1027,6 +1065,7 @@ test.describe('execute | dataset', () => {
     ])
 
     assert.deepEqual(stack, ['foo', 'bar'])
+    assert.isFalse(testInstance.failed)
     assert.lengthOf(events, 2)
     assert.deepEqual(events[0].dataset, { size: 2, row: 'foo', index: 0 })
     assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
@@ -1058,6 +1097,7 @@ test.describe('execute | dataset', () => {
 
     assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
     assert.isFalse(events[1].hasError)
+    assert.isTrue(testInstance.failed)
   })
 
   test('run hooks for each row inside dataset', async () => {
@@ -1100,6 +1140,8 @@ test.describe('execute | dataset', () => {
 
     assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
     assert.isFalse(events[1].hasError)
+
+    assert.isFalse(testInstance.failed)
   })
 
   test('compute dataset lazily', async () => {
@@ -1125,6 +1167,8 @@ test.describe('execute | dataset', () => {
     assert.lengthOf(events, 2)
     assert.deepEqual(events[0].dataset, { size: 2, row: 'foo', index: 0 })
     assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
+
+    assert.isFalse(testInstance.failed)
   })
 
   test('fail when dataset is not an array or a function', async () => {
@@ -1283,6 +1327,8 @@ test.describe('execute | dataset', () => {
     assert.equal(events[1].hasError, false)
     assert.deepEqual(events[0].dataset, { size: 2, row: 'foo', index: 0 })
     assert.deepEqual(events[1].dataset, { size: 2, row: 'bar', index: 1 })
+
+    assert.isFalse(testInstance.failed)
   })
 })
 
@@ -1295,6 +1341,7 @@ test.describe('execute | todo', () => {
     const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 1000)])
 
     assert.isNull(event!)
+    assert.isTrue(testInstance.executed)
   })
 })
 
@@ -1316,6 +1363,7 @@ test.describe('execute | skip', () => {
     assert.isFalse(event!.hasError)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, [])
+    assert.isTrue(testInstance.executed)
   })
 
   test('skip by default', async () => {
@@ -1335,6 +1383,7 @@ test.describe('execute | skip', () => {
     assert.isFalse(event!.hasError)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, [])
+    assert.isTrue(testInstance.executed)
   })
 
   test('compute skip status lazily', async () => {
@@ -1354,6 +1403,7 @@ test.describe('execute | skip', () => {
     assert.isFalse(event!.hasError)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, [])
+    assert.isTrue(testInstance.executed)
   })
 
   test('specify skip reason', async () => {
@@ -1374,6 +1424,7 @@ test.describe('execute | skip', () => {
     assert.isFalse(event!.hasError)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, [])
+    assert.isTrue(testInstance.executed)
   })
 })
 
@@ -1393,6 +1444,7 @@ test.describe('execute | refiner', () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(() => {})
     await testInstance.exec()
+    assert.isFalse(testInstance.executed)
   })
 
   test('do not run test when refiner does not allows for test tags', async () => {
@@ -1411,6 +1463,7 @@ test.describe('execute | refiner', () => {
     const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
     testInstance.run(() => {})
     await testInstance.exec()
+    assert.isFalse(testInstance.executed)
   })
 
   test('run test when its title is allowed by the refiner', async () => {

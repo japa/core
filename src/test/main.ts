@@ -89,6 +89,7 @@ export class Test<
    * Check if the test has been executed
    */
   #executed: boolean = false
+  #failed: boolean = false
 
   /**
    * Reference to registered hooks
@@ -110,6 +111,21 @@ export class Test<
    * The function that returns the test data set
    */
   #datasetAccumlator?: () => Promise<any[]> | any[]
+
+  /**
+   * Know if the test has been executed. Skipped and
+   * todo tests are also considered executed.
+   */
+  get executed(): boolean {
+    return this.#executed
+  }
+
+  /**
+   * Know if the test has failed.
+   */
+  get failed(): boolean {
+    return this.#failed
+  }
 
   /**
    * Test options
@@ -446,6 +462,15 @@ export class Test<
 
         await this.#activeRunner.run()
 
+        /**
+         * Mark test as failed when it is not already been
+         * marked as failed and the current iteration
+         * fails.
+         */
+        if (!this.#failed && this.#activeRunner.failed) {
+          this.#failed = true
+        }
+
         index++
       }
 
@@ -464,6 +489,7 @@ export class Test<
     })
 
     await this.#activeRunner.run()
+    this.#failed = this.#activeRunner.failed
     this.#activeRunner = undefined
   }
 }

@@ -25,6 +25,13 @@ export class DummyRunner {
   #test: Test<any, any>
   #emitter: Emitter
 
+  /**
+   * Know if the test has failed
+   */
+  get failed(): boolean {
+    return false
+  }
+
   constructor(test: Test<any, any>, emitter: Emitter) {
     this.#test = test
     this.#emitter = emitter
@@ -140,6 +147,13 @@ export class TestRunner {
    * since that callback can push hooks to the cleanup event.
    */
   #hooks: Hooks<TestHooks<Record<any, any>>>
+
+  /**
+   * Know if the test has failed
+   */
+  get failed(): boolean {
+    return !!this.#hasError
+  }
 
   constructor(
     test: Test<any, any>,
