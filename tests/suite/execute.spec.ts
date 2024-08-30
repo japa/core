@@ -44,6 +44,7 @@ test.describe('execute | test', () => {
     suite.add(testInstance).add(testInstance1)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isFalse(suite.failed)
     assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
@@ -81,6 +82,7 @@ test.describe('execute | test', () => {
     group.add(testInstance).add(testInstance1)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isFalse(suite.failed)
     assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
@@ -122,6 +124,7 @@ test.describe('execute | test', () => {
     group.add(testInstance)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isFalse(suite.failed)
     assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
@@ -166,6 +169,7 @@ test.describe('execute | hooks', () => {
     suite.add(testInstance).add(testInstance1)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isFalse(suite.failed)
     assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
@@ -214,6 +218,7 @@ test.describe('execute | hooks', () => {
     suite.add(testInstance).add(testInstance1)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isFalse(suite.failed)
     assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
@@ -261,6 +266,7 @@ test.describe('execute | hooks', () => {
     suite.add(testInstance).add(testInstance1)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isTrue(suite.failed)
     assert.lengthOf(events, 0)
     assert.equal(suiteEndEvent!.name, 'sample suite')
     assert.isTrue(suiteEndEvent!.hasError)
@@ -305,6 +311,7 @@ test.describe('execute | hooks', () => {
     suite.add(testInstance).add(testInstance1)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isTrue(suite.failed)
     assert.lengthOf(events, 0)
     assert.equal(suiteEndEvent!.name, 'sample suite')
     assert.isTrue(suiteEndEvent!.hasError)
@@ -349,6 +356,7 @@ test.describe('execute | hooks', () => {
     suite.add(testInstance).add(testInstance1)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isTrue(suite.failed)
     assert.lengthOf(events, 2)
     assert.equal(suiteEndEvent!.name, 'sample suite')
     assert.isTrue(suiteEndEvent!.hasError)
@@ -399,6 +407,7 @@ test.describe('execute | hooks', () => {
     suite.add(testInstance).add(testInstance1)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isTrue(suite.failed)
     assert.lengthOf(events, 2)
     assert.equal(suiteEndEvent!.name, 'sample suite')
     assert.isTrue(suiteEndEvent!.hasError)
@@ -446,6 +455,7 @@ test.describe('execute | hooks', () => {
     suite.add(testInstance).add(testInstance1)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isTrue(suite.failed)
     assert.lengthOf(events, 2)
     assert.equal(suiteEndEvent!.name, 'sample suite')
     assert.isTrue(suiteEndEvent!.hasError)
@@ -487,6 +497,7 @@ test.describe('execute | hooks', () => {
     suite.add(testInstance).add(testInstance1)
     const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
+    assert.isTrue(suite.failed)
     assert.lengthOf(events, 2)
     assert.equal(suiteEndEvent!.name, 'sample suite')
     assert.isTrue(suiteEndEvent!.hasError)

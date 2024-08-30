@@ -152,7 +152,7 @@ export class TestRunner {
    * Know if the test has failed
    */
   get failed(): boolean {
-    return !!this.#hasError
+    return this.#hasError
   }
 
   constructor(
@@ -384,18 +384,38 @@ export class TestRunner {
   }
 
   /**
+   * Reverts the failing/passing behavior of the test
+   * if it is meant to be a regression test
+   */
+  #wrapRegressionTest() {
+    if (!this.#test.options.isFailing) {
+      return this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest()
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      ;(this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest())
+        .then(() => {
+          reject(
+            new Error('Expected regression test to fail, instead it finished without any errors')
+          )
+        })
+        .catch(() => resolve())
+    })
+  }
+
+  /**
    * Run the test executor and make sure it times out after the configured
    * timeout.
    */
   async #wrapTestInTimeout() {
     if (!this.#test.options.timeout) {
-      return this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest()
+      return this.#wrapRegressionTest()
     }
 
     try {
       await Promise.race([
         this.#createTimeoutTimer(this.#test.options.timeout),
-        this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest(),
+        this.#wrapRegressionTest(),
       ])
     } finally {
       this.#clearTimer()

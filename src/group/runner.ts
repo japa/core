@@ -48,9 +48,16 @@ export class GroupRunner {
   }[] = []
 
   /**
-   * Track if test has any errors
+   * Track if execution stack has any errors
    */
   #hasError: boolean = false
+
+  /**
+   * Know if any of the tests/hooks have failed
+   */
+  get failed(): boolean {
+    return this.#hasError
+  }
 
   constructor(group: Group<any>, hooks: Hooks<GroupHooks<Record<any, any>>>, emitter: Emitter) {
     this.#group = group
@@ -164,6 +171,9 @@ export class GroupRunner {
      */
     for (let test of this.#group.tests) {
       await test.exec()
+      if (!this.#hasError && test.failed) {
+        this.#hasError = true
+      }
     }
 
     /**

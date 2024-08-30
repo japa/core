@@ -13,6 +13,7 @@ import type {
   GroupEndNode,
   SuiteEndNode,
   RunnerEvents,
+  RunnerEndNode,
   RunnerSummary,
   GroupStartNode,
   SuiteStartNode,
@@ -45,17 +46,6 @@ export class Tracker {
    */
   #hasError: boolean = false
 
-  /**
-   * Storing state if current suite and group has errors. These
-   * errors are not directly from the suite and groups, but
-   * instead from their children.
-   *
-   * For example: If a test fails, it marks both current group
-   * and suite has errors.
-   */
-  #currentSuiteHasError = false
-  #currentGroupHasError = false
-
   #aggregates: RunnerSummary['aggregates'] = {
     total: 0,
     failed: 0,
@@ -79,7 +69,6 @@ export class Tracker {
    * Set reference for the current suite
    */
   #onSuiteStart(payload: SuiteStartNode) {
-    this.#currentSuiteHasError = false
     this.#currentSuite = {
       name: payload.name,
       type: 'suite',
@@ -94,12 +83,7 @@ export class Tracker {
    */
   #onSuiteEnd(payload: SuiteEndNode) {
     if (payload.hasError) {
-      this.#hasError = true
-      this.#currentSuiteHasError = true
       this.#currentSuite!.errors = payload.errors
-    }
-
-    if (this.#currentSuiteHasError) {
       this.#failureTree.push(this.#currentSuite!)
     }
   }
@@ -108,7 +92,6 @@ export class Tracker {
    * Set reference for the current group
    */
   #onGroupStart(payload: GroupStartNode) {
-    this.#currentGroupHasError = false
     this.#currentGroup = {
       name: payload.title,
       type: 'group',
@@ -123,13 +106,7 @@ export class Tracker {
    */
   #onGroupEnd(payload: GroupEndNode) {
     if (payload.hasError) {
-      this.#hasError = true
-      this.#currentGroupHasError = true
       this.#currentGroup!.errors = payload.errors
-    }
-
-    if (this.#currentGroupHasError) {
-      this.#currentSuiteHasError = true
       this.#currentSuite!.children.push(this.#currentGroup!)
     }
   }
@@ -161,28 +138,14 @@ export class Tracker {
     }
 
     /**
-     * Regression test. Mark test as failed, when there is no error
-     * Because, we expect regression tests to have errors.
-     *
-     * However, there is no need to move anything to the failure
-     * tree, since there is no real error
-     */
-    if (payload.isFailing) {
-      if (!payload.hasError) {
-        this.#aggregates.failed++
-        this.#hasError = true
-      } else {
-        this.#aggregates.regression++
-      }
-
-      return
-    }
-
-    /**
      * Test completed successfully
      */
     if (!payload.hasError) {
-      this.#aggregates.passed++
+      if (payload.isFailing) {
+        this.#aggregates.regression++
+      } else {
+        this.#aggregates.passed++
+      }
       return
     }
 
@@ -197,7 +160,6 @@ export class Tracker {
      * Bump failed count
      */
     this.#aggregates.failed++
-    this.#hasError = true
 
     /**
      * Test payload
@@ -212,10 +174,8 @@ export class Tracker {
      * Track test inside the current group or suite
      */
     if (this.#currentGroup) {
-      this.#currentGroupHasError = true
       this.#currentGroup.children.push(testPayload)
     } else if (this.#currentSuite) {
-      this.#currentSuiteHasError = true
       this.#currentSuite.children.push(testPayload)
     }
 
@@ -252,6 +212,7 @@ export class Tracker {
         this.#timeTracker = timeSpan()
         break
       case 'runner:end':
+        this.#hasError = (payload as RunnerEndNode).hasError
         this.#duration = this.#timeTracker?.rounded() ?? 0
         break
     }

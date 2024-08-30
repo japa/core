@@ -31,6 +31,7 @@ import { SummaryBuilder } from './summary_builder.js'
  */
 export class Runner<Context extends Record<any, any>> extends Macroable {
   #emitter: Emitter
+  #failed: boolean = false
 
   /**
    * Callbacks to invoke on every suite
@@ -74,7 +75,9 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
    * Notify the reporter about the runner end
    */
   #notifyEnd() {
-    return this.#emitter.emit('runner:end', {})
+    return this.#emitter.emit('runner:end', {
+      hasError: this.#failed,
+    })
   }
 
   /**
@@ -97,6 +100,13 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
     this.#emitter.on('group:end', (payload) => this.#tracker?.processEvent('group:end', payload))
     this.#emitter.on('test:start', (payload) => this.#tracker?.processEvent('test:start', payload))
     this.#emitter.on('test:end', (payload) => this.#tracker?.processEvent('test:end', payload))
+  }
+
+  /**
+   * Know if one or more suites have failed
+   */
+  get failed(): boolean {
+    return this.#failed
   }
 
   /**
@@ -158,6 +168,9 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
   async exec() {
     for (let suite of this.suites) {
       await suite.exec()
+      if (!this.#failed && suite.failed) {
+        this.#failed = true
+      }
     }
   }
 

@@ -33,6 +33,7 @@ import type { GroupHooksHandler, TestHooksHandler, GroupOptions, GroupHooks } fr
 export class Group<Context extends Record<any, any>> extends Macroable {
   #emitter: Emitter
   #refiner: Refiner
+  #failed: boolean = false
 
   /**
    * Reference to registered hooks
@@ -51,6 +52,14 @@ export class Group<Context extends Record<any, any>> extends Macroable {
   #testsRetries?: number
   #testSetupHooks: TestHooksHandler<Context>[] = []
   #testTeardownHooks: TestHooksHandler<Context>[] = []
+
+  /**
+   * Know if one or more tests/hooks within this group
+   * has failed.
+   */
+  get failed(): boolean {
+    return this.#failed
+  }
 
   options: GroupOptions
 
@@ -187,6 +196,8 @@ export class Group<Context extends Record<any, any>> extends Macroable {
       return
     }
 
-    await new GroupRunner(this, this.#hooks, this.#emitter).run()
+    const runner = new GroupRunner(this, this.#hooks, this.#emitter)
+    await runner.run()
+    this.#failed = runner.failed
   }
 }

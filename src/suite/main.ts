@@ -41,6 +41,7 @@ import type { SuiteHooks, SuiteHooksHandler } from '../types.js'
 export class Suite<Context extends Record<any, any>> extends Macroable {
   #refiner: Refiner
   #emitter: Emitter
+  #failed: boolean = false
 
   /**
    * Reference to registered hooks
@@ -57,6 +58,14 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
    * A collection of tests and groups both
    */
   stack: (Test<Context, any> | Group<Context>)[] = []
+
+  /**
+   * Know if one or more groups or tests within this suite
+   * has failed.
+   */
+  get failed(): boolean {
+    return this.#failed
+  }
 
   constructor(
     public name: string,
@@ -156,6 +165,8 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
       return
     }
 
-    await new SuiteRunner(this, this.#hooks, this.#emitter).run()
+    const runner = new SuiteRunner(this, this.#hooks, this.#emitter)
+    await runner.run()
+    this.#failed = runner.failed
   }
 }

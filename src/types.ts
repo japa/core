@@ -233,7 +233,9 @@ export type RunnerStartNode = {}
 /**
  * Data shared with "runner:end" event
  */
-export type RunnerEndNode = {}
+export type RunnerEndNode = {
+  hasError: boolean
+}
 
 /**
  * Events emitted by the runner emitter. These can be extended as well

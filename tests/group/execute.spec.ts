@@ -43,6 +43,7 @@ test.describe('execute | test', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isFalse(group.failed)
     assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
@@ -79,6 +80,7 @@ test.describe('execute | test', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isTrue(group.failed)
     assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isTrue(events[0].hasError)
@@ -125,6 +127,7 @@ test.describe('execute | hooks', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isFalse(group.failed)
     assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
@@ -173,6 +176,7 @@ test.describe('execute | hooks', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isFalse(group.failed)
     assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)
@@ -220,6 +224,7 @@ test.describe('execute | hooks', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isTrue(group.failed)
     assert.lengthOf(events, 0)
     assert.equal(groupEndEvent!.title, 'sample group')
     assert.isTrue(groupEndEvent!.hasError)
@@ -264,6 +269,7 @@ test.describe('execute | hooks', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isTrue(group.failed)
     assert.lengthOf(events, 0)
     assert.equal(groupEndEvent!.title, 'sample group')
     assert.isTrue(groupEndEvent!.hasError)
@@ -308,6 +314,7 @@ test.describe('execute | hooks', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isTrue(group.failed)
     assert.lengthOf(events, 2)
     assert.equal(groupEndEvent!.title, 'sample group')
     assert.isTrue(groupEndEvent!.hasError)
@@ -323,7 +330,7 @@ test.describe('execute | hooks', () => {
     ])
   })
 
-  test('call teardown cleanup functions when teardown hook files', async () => {
+  test('call teardown cleanup functions when teardown hook fails', async () => {
     const stack: string[] = []
     const events: TestEndNode[] = []
     const emitter = new Emitter()
@@ -358,6 +365,7 @@ test.describe('execute | hooks', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isTrue(group.failed)
     assert.lengthOf(events, 2)
     assert.equal(groupEndEvent!.title, 'sample group')
     assert.isTrue(groupEndEvent!.hasError)
@@ -405,6 +413,7 @@ test.describe('execute | hooks', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isTrue(group.failed)
     assert.lengthOf(events, 2)
     assert.equal(groupEndEvent!.title, 'sample group')
     assert.isTrue(groupEndEvent!.hasError)
@@ -446,6 +455,7 @@ test.describe('execute | hooks', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isTrue(group.failed)
     assert.lengthOf(events, 2)
     assert.equal(groupEndEvent!.title, 'sample group')
     assert.isTrue(groupEndEvent!.hasError)
@@ -590,6 +600,7 @@ test.describe('execute | refiner', () => {
     group.add(testInstance).add(testInstance1)
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
+    assert.isFalse(group.failed)
     assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isFalse(events[0].hasError)

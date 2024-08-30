@@ -49,6 +49,13 @@ export class SuiteRunner {
    */
   #hasError: boolean = false
 
+  /**
+   * Know if any of the tests/hooks have failed
+   */
+  get failed(): boolean {
+    return this.#hasError
+  }
+
   constructor(suite: Suite<any>, hooks: Hooks<SuiteHooks<Record<any, any>>>, emitter: Emitter) {
     this.#suite = suite
     this.#emitter = emitter
@@ -161,6 +168,9 @@ export class SuiteRunner {
      */
     for (let groupOrTest of this.#suite.stack) {
       await groupOrTest.exec()
+      if (!this.#hasError && groupOrTest.failed) {
+        this.#hasError = true
+      }
     }
 
     /**

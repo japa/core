@@ -49,8 +49,17 @@ test.describe('Tracker', () => {
     emitter.on('test:start', (payload) => tracker.processEvent('test:start', payload))
     emitter.on('test:end', (payload) => tracker.processEvent('test:end', payload))
 
-    await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
+    await Promise.all([
+      pEvent(emitter, 'runner:end'),
+      (async () => {
+        await runner.exec()
+        await runner.end()
+      })(),
+    ])
+
     const summary = tracker.getSummary()
+
+    assert.isFalse(runner.failed)
     assert.isFalse(summary.hasError)
     assert.equal(summary.aggregates.total, 2)
     assert.equal(summary.aggregates.passed, 2)
@@ -93,8 +102,16 @@ test.describe('Tracker', () => {
     emitter.on('test:start', (payload) => tracker.processEvent('test:start', payload))
     emitter.on('test:end', (payload) => tracker.processEvent('test:end', payload))
 
-    await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
+    await Promise.all([
+      pEvent(emitter, 'runner:end'),
+      (async () => {
+        await runner.exec()
+        await runner.end()
+      })(),
+    ])
     const summary = tracker.getSummary()
+
+    assert.isTrue(runner.failed)
     assert.isTrue(summary.hasError)
     assert.equal(summary.aggregates.total, 2)
     assert.equal(summary.aggregates.passed, 1)
@@ -153,8 +170,17 @@ test.describe('Tracker', () => {
     emitter.on('test:start', (payload) => tracker.processEvent('test:start', payload))
     emitter.on('test:end', (payload) => tracker.processEvent('test:end', payload))
 
-    await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
+    await Promise.all([
+      pEvent(emitter, 'runner:end'),
+      (async () => {
+        await runner.exec()
+        await runner.end()
+      })(),
+    ])
+
     const summary = tracker.getSummary()
+
+    assert.isTrue(runner.failed)
     assert.isTrue(summary.hasError)
     assert.equal(summary.aggregates.total, 2)
     assert.equal(summary.aggregates.passed, 1)
@@ -222,8 +248,17 @@ test.describe('Tracker', () => {
     emitter.on('test:start', (payload) => tracker.processEvent('test:start', payload))
     emitter.on('test:end', (payload) => tracker.processEvent('test:end', payload))
 
-    await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
+    await Promise.all([
+      pEvent(emitter, 'runner:end'),
+      (async () => {
+        await runner.exec()
+        await runner.end()
+      })(),
+    ])
+
     const summary = tracker.getSummary()
+
+    assert.isFalse(runner.failed)
     assert.isFalse(summary.hasError)
     assert.equal(summary.aggregates.total, 2)
     assert.equal(summary.aggregates.passed, 1)
@@ -270,8 +305,17 @@ test.describe('Tracker', () => {
     emitter.on('test:start', (payload) => tracker.processEvent('test:start', payload))
     emitter.on('test:end', (payload) => tracker.processEvent('test:end', payload))
 
-    await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
+    await Promise.all([
+      pEvent(emitter, 'runner:end'),
+      (async () => {
+        await runner.exec()
+        await runner.end()
+      })(),
+    ])
+
     const summary = tracker.getSummary()
+
+    assert.isTrue(runner.failed)
     assert.isTrue(summary.hasError)
     assert.equal(summary.aggregates.total, 1)
     assert.equal(summary.aggregates.passed, 1)
@@ -333,8 +377,17 @@ test.describe('Tracker', () => {
     emitter.on('test:start', (payload) => tracker.processEvent('test:start', payload))
     emitter.on('test:end', (payload) => tracker.processEvent('test:end', payload))
 
-    await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
+    await Promise.all([
+      pEvent(emitter, 'runner:end'),
+      (async () => {
+        await runner.exec()
+        await runner.end()
+      })(),
+    ])
+
     const summary = tracker.getSummary()
+
+    assert.isTrue(runner.failed)
     assert.isTrue(summary.hasError)
     assert.equal(summary.aggregates.total, 1)
     assert.equal(summary.aggregates.passed, 1)
@@ -384,8 +437,17 @@ test.describe('Tracker', () => {
     emitter.on('test:start', (payload) => tracker.processEvent('test:start', payload))
     emitter.on('test:end', (payload) => tracker.processEvent('test:end', payload))
 
-    await Promise.all([pEvent(emitter, 'runner:end'), runner.exec()])
+    await Promise.all([
+      pEvent(emitter, 'runner:end'),
+      (async () => {
+        await runner.exec()
+        await runner.end()
+      })(),
+    ])
+
     const summary = tracker.getSummary()
+
+    assert.isTrue(runner.failed)
     assert.isTrue(summary.hasError)
     assert.equal(summary.aggregates.total, 2)
     assert.equal(summary.aggregates.passed, 1)
@@ -393,7 +455,15 @@ test.describe('Tracker', () => {
     assert.equal(summary.aggregates.todo, 0)
     assert.equal(summary.aggregates.failed, 1)
     assert.equal(summary.aggregates.regression, 0)
-    assert.deepEqual(summary.failureTree, [])
-    assert.deepEqual(summary.failedTestsTitles, [])
+
+    assert.deepEqual(summary.failedTestsTitles, ['test 1'])
+
+    assert.lengthOf(summary.failureTree, 1)
+    assert.lengthOf(summary.failureTree[0].children, 1)
+    assert.equal(summary.failureTree[0].children[0].type, 'group')
+
+    if (summary.failureTree[0].children[0].type === 'group') {
+      assert.lengthOf(summary.failureTree[0].children[0].children[0].errors, 1)
+    }
   })
 })
