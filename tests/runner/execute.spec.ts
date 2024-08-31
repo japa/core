@@ -138,6 +138,61 @@ test.describe('execute | runner', () => {
     assert.isNotNull(runnerEndEvent)
     assert.deepEqual(stack, ['test', 'test 1'])
   })
+
+  test('bail upcoming suites when a test fails', async () => {
+    const stack: string[] = []
+    const events: (TestEndNode | SuiteEndNode)[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      events.push(event)
+    })
+
+    emitter.on('suite:end', (event) => {
+      events.push(event)
+    })
+
+    const runner = new Runner<TestContext>(emitter)
+    const unit = new Suite<TestContext>('unit', emitter, refiner)
+    const functional = new Suite<TestContext>('functional', emitter, refiner)
+
+    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    testInstance.run(() => {
+      stack.push('test')
+      throw new Error('blow up')
+    })
+
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    testInstance1.run(() => {
+      stack.push('test 1')
+    })
+
+    runner.add(unit).add(functional)
+    unit.add(testInstance)
+    runner.bail()
+    functional.add(testInstance1)
+
+    const [runnerEndEvent] = await Promise.all([
+      pEvent(emitter, 'runner:end'),
+      (async () => {
+        await runner.start()
+        await runner.exec()
+        await runner.end()
+      })(),
+    ])
+
+    assert.isTrue(runner.failed)
+    assert.lengthOf(events, 2)
+    assert.equal((events[0] as TestEndNode).title.expanded, 'test')
+    assert.isTrue(events[0].hasError)
+
+    assert.equal((events[1] as SuiteEndNode).name, 'unit')
+    assert.isTrue(events[1].hasError)
+
+    assert.isNotNull(runnerEndEvent)
+    assert.deepEqual(stack, ['test'])
+  })
 })
 
 test.describe('execute | reporters', () => {

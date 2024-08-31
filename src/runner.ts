@@ -32,6 +32,7 @@ import { SummaryBuilder } from './summary_builder.js'
 export class Runner<Context extends Record<any, any>> extends Macroable {
   #emitter: Emitter
   #failed: boolean = false
+  #bail: boolean = false
 
   /**
    * Callbacks to invoke on every suite
@@ -129,6 +130,17 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
   }
 
   /**
+   * Enable/disable the bail mode. In bail mode, all
+   * upcoming suites/groups/tests will be skipped
+   * when the current test fails
+   */
+  bail(toggle: boolean = true) {
+    this.#bail = toggle
+    this.onSuite((suite) => suite.bail(toggle))
+    return this
+  }
+
+  /**
    * Register a tests reporter
    */
   registerReporter(reporter: ReporterContract): this {
@@ -170,6 +182,10 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
       await suite.exec()
       if (!this.#failed && suite.failed) {
         this.#failed = true
+      }
+
+      if (this.#bail && this.#failed) {
+        break
       }
     }
   }

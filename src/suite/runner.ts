@@ -20,6 +20,9 @@ import type { SuiteEndNode, SuiteHooks, SuiteHooksData, SuiteStartNode } from '.
  */
 export class SuiteRunner {
   #emitter: Emitter
+  #options: {
+    bail: boolean
+  }
 
   /**
    * Parent suite reference
@@ -56,9 +59,17 @@ export class SuiteRunner {
     return this.#hasError
   }
 
-  constructor(suite: Suite<any>, hooks: Hooks<SuiteHooks<Record<any, any>>>, emitter: Emitter) {
+  constructor(
+    suite: Suite<any>,
+    hooks: Hooks<SuiteHooks<Record<any, any>>>,
+    emitter: Emitter,
+    options: {
+      bail: boolean
+    }
+  ) {
     this.#suite = suite
     this.#emitter = emitter
+    this.#options = options
 
     this.#setupRunner = hooks.runner('setup')
     this.#teardownRunner = hooks.runner('teardown')
@@ -170,6 +181,10 @@ export class SuiteRunner {
       await groupOrTest.exec()
       if (!this.#hasError && groupOrTest.failed) {
         this.#hasError = true
+      }
+
+      if (this.#options.bail && this.#hasError) {
+        break
       }
     }
 

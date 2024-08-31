@@ -34,6 +34,7 @@ export class Group<Context extends Record<any, any>> extends Macroable {
   #emitter: Emitter
   #refiner: Refiner
   #failed: boolean = false
+  #bail: boolean = false
 
   /**
    * Reference to registered hooks
@@ -129,6 +130,16 @@ export class Group<Context extends Record<any, any>> extends Macroable {
   }
 
   /**
+   * Enable/disable the bail mode. In bail mode, all
+   * upcoming tests will be skipped when the current
+   * test fails
+   */
+  bail(toggle: boolean = true) {
+    this.#bail = toggle
+    return this
+  }
+
+  /**
    * Add a test to the group. Adding a test to the group
    * mutates the test properties
    */
@@ -196,7 +207,10 @@ export class Group<Context extends Record<any, any>> extends Macroable {
       return
     }
 
-    const runner = new GroupRunner(this, this.#hooks, this.#emitter)
+    const runner = new GroupRunner(this, this.#hooks, this.#emitter, {
+      bail: this.#bail,
+    })
+
     await runner.run()
     this.#failed = runner.failed
   }

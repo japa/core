@@ -15,7 +15,7 @@ import { Suite } from '../../src/suite/main.js'
 import { Group } from '../../src/group/main.js'
 import { Refiner } from '../../src/refiner.js'
 import { Emitter } from '../../src/emitter.js'
-import { TestEndNode } from '../../src/types.js'
+import { GroupEndNode, TestEndNode } from '../../src/types.js'
 import { pEvent } from '../../tests_helpers/index.js'
 import { TestContext } from '../../src/test_context.js'
 
@@ -134,6 +134,54 @@ test.describe('execute | test', () => {
 
     assert.equal(suiteEndEvent!.name, 'sample suite')
     assert.deepEqual(stack, ['group test setup', 'test', 'test 1'])
+  })
+
+  test('bail groups and groups execution on failure', async () => {
+    const stack: string[] = []
+    const events: (TestEndNode | GroupEndNode)[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      events.push(event)
+    })
+    emitter.on('group:end', (event) => {
+      events.push(event)
+    })
+
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
+    const group1 = new Group<TestContext>('group', emitter, refiner)
+    const group2 = new Group<TestContext>('group 2', emitter, refiner)
+
+    suite.add(group1).add(group2)
+
+    const testInstance = new Test('test', new TestContext(), emitter, refiner)
+    testInstance.run(() => {
+      stack.push('test')
+      throw new Error('blow up')
+    })
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner)
+    testInstance1.run(() => {
+      stack.push('test 1')
+    })
+
+    group1.add(testInstance).add(testInstance1)
+    suite.bail()
+    group2.add(testInstance).add(testInstance1)
+
+    const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
+
+    assert.isTrue(suite.failed)
+    assert.lengthOf(events, 2)
+
+    assert.equal((events[0].title as { expanded: string }).expanded, 'test')
+    assert.isTrue(events[0].hasError)
+
+    assert.equal(String(events[1].title), 'group')
+    assert.isTrue(events[1].hasError)
+
+    assert.equal(suiteEndEvent!.name, 'sample suite')
+    assert.deepEqual(stack, ['test'])
   })
 })
 

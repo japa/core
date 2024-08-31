@@ -19,6 +19,10 @@ import type { GroupEndNode, GroupHooks, GroupHooksData, GroupStartNode } from '.
  * Run all tests for a given group
  */
 export class GroupRunner {
+  #options: {
+    bail: boolean
+  }
+
   /**
    * Parent group
    */
@@ -59,9 +63,17 @@ export class GroupRunner {
     return this.#hasError
   }
 
-  constructor(group: Group<any>, hooks: Hooks<GroupHooks<Record<any, any>>>, emitter: Emitter) {
+  constructor(
+    group: Group<any>,
+    hooks: Hooks<GroupHooks<Record<any, any>>>,
+    emitter: Emitter,
+    options: {
+      bail: boolean
+    }
+  ) {
     this.#group = group
     this.#emitter = emitter
+    this.#options = options
     this.#setupRunner = hooks.runner('setup')
     this.#teardownRunner = hooks.runner('teardown')
   }
@@ -173,6 +185,10 @@ export class GroupRunner {
       await test.exec()
       if (!this.#hasError && test.failed) {
         this.#hasError = true
+      }
+
+      if (this.#options.bail && this.#hasError) {
+        break
       }
     }
 

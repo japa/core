@@ -42,6 +42,7 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
   #refiner: Refiner
   #emitter: Emitter
   #failed: boolean = false
+  #bail: boolean = false
 
   /**
    * Reference to registered hooks
@@ -122,6 +123,17 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
   }
 
   /**
+   * Enable/disable the bail mode. In bail mode, all
+   * upcoming tests/group will be skipped when the current
+   * test fails
+   */
+  bail(toggle: boolean = true) {
+    this.#bail = toggle
+    this.onGroup((group) => group.bail(toggle))
+    return this
+  }
+
+  /**
    * Register a test setup function
    */
   setup(handler: SuiteHooksHandler<Context>): this {
@@ -165,7 +177,9 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
       return
     }
 
-    const runner = new SuiteRunner(this, this.#hooks, this.#emitter)
+    const runner = new SuiteRunner(this, this.#hooks, this.#emitter, {
+      bail: this.#bail,
+    })
     await runner.run()
     this.#failed = runner.failed
   }
