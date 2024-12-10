@@ -28,6 +28,7 @@ function parseProp(data: any, key: string) {
  * @example
  * interpolate('hello { username }', { username: 'virk' })
  */
+
 export function interpolate(input: string, data: any, index: number) {
   return input.replace(/(\\)?{(.*?)}/g, (_, escapeChar, key) => {
     if (escapeChar) {
@@ -40,7 +41,7 @@ export function interpolate(input: string, data: any, index: number) {
     }
 
     if (key === '$self') {
-      return data
+      return typeof data === 'string' ? data : JSON.stringify(data)
     }
 
     return parseProp(data, key)

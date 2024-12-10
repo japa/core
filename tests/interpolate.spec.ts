@@ -25,7 +25,10 @@ test.describe('Interpolate', () => {
   })
 
   test('interpolate when literval value is not a string', () => {
-    assert.equal(interpolate('hello {$self}', { foo: 'bar' }, 0), 'hello [object Object]')
+    assert.equal(
+      interpolate('hello {$self}', { foo: 'bar' }, 0),
+      `hello ${JSON.stringify({ foo: 'bar' })}`
+    )
   })
 
   test('interpolate key value is not a string', () => {
