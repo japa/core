@@ -2,7 +2,6 @@
   "name": "@japa/core",
   "version": "9.0.1",
   "description": "Implementation of core APIs for the Japa tests runner",
-  "main": "build/index.js",
   "type": "module",
   "files": [
     "build",
@@ -19,58 +18,45 @@
   "scripts": {
     "pretest": "npm run lint",
     "test": "c8 glob -c \"node --import=ts-node-maintained/register/esm --enable-source-maps --test\" \"tests/**/*.spec.ts\"",
+    "lint": "eslint .",
+    "format": "prettier --write .",
     "clean": "del build",
     "typecheck": "tsc --noEmit",
     "precompile": "npm run lint && npm run clean",
     "compile": "tsup-node && tsc --emitDeclarationOnly --declaration",
     "build": "npm run compile",
-    "release": "np",
-    "version": "npm run build",
     "prepublishOnly": "npm run build",
-    "lint": "eslint .",
-    "format": "prettier --write .",
-    "sync-labels": "github-label-sync --labels .github/labels.json japa/core"
+    "version": "npm run build",
+    "release": "release-it"
   },
-  "keywords": [
-    "japa",
-    "testing",
-    "tests"
-  ],
-  "author": "virk,japa",
-  "license": "MIT",
   "devDependencies": {
     "@adonisjs/eslint-config": "^2.0.0-beta.1",
-    "@adonisjs/prettier-config": "^1.3.0",
-    "@adonisjs/tsconfig": "^1.3.0",
-    "@commitlint/cli": "^19.4.1",
-    "@commitlint/config-conventional": "^19.4.1",
-    "@swc/core": "^1.7.22",
-    "@types/async-retry": "^1.4.8",
-    "@types/chai": "^4.3.19",
-    "@types/node": "^22.5.1",
-    "c8": "^10.1.2",
-    "chai": "^5.1.1",
-    "cross-env": "^7.0.3",
-    "del-cli": "^5.1.0",
-    "eslint": "^9.9.1",
-    "github-label-sync": "^2.3.1",
+    "@adonisjs/prettier-config": "^1.4.0",
+    "@adonisjs/tsconfig": "^1.4.0",
+    "@swc/core": "^1.10.1",
+    "@types/async-retry": "^1.4.9",
+    "@types/chai": "^5.0.1",
+    "@types/node": "^22.10.2",
+    "c8": "^10.1.3",
+    "chai": "^5.1.2",
+    "del-cli": "^6.0.0",
+    "eslint": "^9.17.0",
     "glob": "^11.0.0",
-    "husky": "^9.1.5",
-    "np": "^10.0.7",
-    "prettier": "^3.3.3",
-    "ts-node-maintained": "^10.9.3",
-    "tsup": "^8.2.4",
-    "typescript": "^5.5.4"
+    "prettier": "^3.4.2",
+    "ts-node-maintained": "^10.9.4",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@poppinss/cliui": "^6.4.1",
-    "@poppinss/hooks": "^7.2.3",
-    "@poppinss/macroable": "^1.0.2",
+    "@poppinss/cliui": "^6.4.2",
+    "@poppinss/hooks": "^7.2.4",
+    "@poppinss/macroable": "^1.0.3",
     "async-retry": "^1.3.3",
     "emittery": "^1.0.3",
     "string-width": "^7.2.0",
     "time-span": "^5.1.0"
   },
+  "homepage": "https://github.com/japa/core#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/japa/core.git"
@@ -78,32 +64,17 @@
   "bugs": {
     "url": "https://github.com/japa/core/issues"
   },
-  "homepage": "https://github.com/japa/core#readme",
-  "c8": {
-    "reporter": [
-      "text",
-      "html"
-    ],
-    "exclude": [
-      "tests/**"
-    ]
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
+  "keywords": [
+    "japa",
+    "testing",
+    "tests"
+  ],
+  "author": "virk",
+  "license": "MIT",
   "publishConfig": {
     "access": "public",
-    "tag": "latest"
+    "provenance": true
   },
-  "np": {
-    "message": "chore(release): %s",
-    "tag": "latest",
-    "branch": "main",
-    "anyBranch": false
-  },
-  "prettier": "@adonisjs/prettier-config",
   "tsup": {
     "entry": [
       "./index.ts",
@@ -115,5 +86,39 @@
     "dts": false,
     "sourcemap": true,
     "target": "esnext"
-  }
+  },
+  "release-it": {
+    "git": {
+      "requireCleanWorkingDir": true,
+      "requireUpstream": true,
+      "commitMessage": "chore(release): ${version}",
+      "tagAnnotation": "v${version}",
+      "push": true,
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": true
+    },
+    "npm": {
+      "publish": true,
+      "skipChecks": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": {
+          "name": "angular"
+        }
+      }
+    }
+  },
+  "c8": {
+    "reporter": [
+      "text",
+      "html"
+    ],
+    "exclude": [
+      "tests/**"
+    ]
+  },
+  "prettier": "@adonisjs/prettier-config"
 }
