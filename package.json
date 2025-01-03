@@ -30,7 +30,7 @@
     "release": "release-it"
   },
   "devDependencies": {
-    "@adonisjs/eslint-config": "^2.0.0-beta.1",
+    "@adonisjs/eslint-config": "^2.0.0-beta.7",
     "@adonisjs/prettier-config": "^1.4.0",
     "@adonisjs/tsconfig": "^1.4.0",
     "@release-it/conventional-changelog": "^9.0.4",
@@ -86,7 +86,7 @@
     "clean": true,
     "format": "esm",
     "dts": false,
-    "sourcemap": true,
+    "sourcemap": false,
     "target": "esnext"
   },
   "release-it": {
