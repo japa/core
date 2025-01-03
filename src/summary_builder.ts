@@ -7,8 +7,8 @@
  * file that was distributed with this source code.
  */
 
+import string from '@poppinss/string'
 import stringWidth from 'string-width'
-import { justify } from '@poppinss/cliui/helpers'
 
 /**
  * Summary builder is used to create the tests summary reported by
@@ -43,7 +43,12 @@ export class SummaryBuilder {
     })
 
     const largestKey = Math.max(...keysLengths)
-    const keysRows = justify(keys, { maxWidth: largestKey, align: 'right', paddingChar: ' ' })
+    const keysRows = string.justify(keys, {
+      width: largestKey,
+      align: 'right',
+      indent: ' ',
+      getLength: (chunk) => stringWidth(chunk),
+    })
 
     return keysRows.map((key, index) => {
       return `${key}${values[index]
