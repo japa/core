@@ -33,6 +33,7 @@
     "@adonisjs/eslint-config": "^2.0.0-beta.1",
     "@adonisjs/prettier-config": "^1.4.0",
     "@adonisjs/tsconfig": "^1.4.0",
+    "@release-it/conventional-changelog": "^9.0.4",
     "@swc/core": "^1.10.4",
     "@types/async-retry": "^1.4.9",
     "@types/chai": "^5.0.1",
@@ -43,6 +44,7 @@
     "eslint": "^9.17.0",
     "glob": "^11.0.0",
     "prettier": "^3.4.2",
+    "release-it": "^17.11.0",
     "ts-node-maintained": "^10.9.4",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2"
@@ -69,7 +71,7 @@
     "testing",
     "tests"
   ],
-  "author": "virk",
+  "author": "Harminder Virk <virk@adonisjs.com>",
   "license": "MIT",
   "publishConfig": {
     "access": "public",
