@@ -42,7 +42,7 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
   #refiner: Refiner
   #emitter: Emitter
   #failed: boolean = false
-  #bail: boolean = false
+  #bail?: boolean
 
   /**
    * Reference to registered hooks
@@ -128,8 +128,10 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
    * test fails
    */
   bail(toggle: boolean = true) {
-    this.#bail = toggle
-    this.onGroup((group) => group.bail(toggle))
+    if (this.#bail === undefined) {
+      this.#bail = toggle
+      this.onGroup((group) => group.bail(toggle))
+    }
     return this
   }
 
@@ -178,7 +180,7 @@ export class Suite<Context extends Record<any, any>> extends Macroable {
     }
 
     const runner = new SuiteRunner(this, this.#hooks, this.#emitter, {
-      bail: this.#bail,
+      bail: this.#bail ?? false,
     })
     await runner.run()
     this.#failed = runner.failed
