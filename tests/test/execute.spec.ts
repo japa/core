@@ -194,6 +194,29 @@ test.describe('execute | async', () => {
     assert.deepEqual(stack, ['executed'])
   })
 
+  test('report timeout error with a predefined error instance', async () => {
+    const stack: string[] = []
+    const timeoutError = new Error()
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance.run(async () => {
+      stack.push('executed')
+      await sleep(4000)
+    }, timeoutError)
+
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end', 5000)])
+
+    assert.isTrue(event!.hasError)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.instanceOf(event!.errors[0].error, Error)
+    assert.match(event!.errors[0].error.stack?.split('\n')[1]!, /execute\.spec\.ts\:199/)
+    assert.equal(event!.errors[0].error.message, 'Test timeout')
+    assert.deepEqual(stack, ['executed'])
+  })
+
   test('increase test timeout from within the callback', async () => {
     const stack: string[] = []
     const emitter = new Emitter()
@@ -231,6 +254,7 @@ test.describe('execute | async', () => {
 
     assert.isFalse(event!.hasError)
     assert.isFalse(testInstance.failed)
+    assert.isTrue(event!.isFailing)
     assert.lengthOf(event!.errors, 0)
     assert.deepEqual(stack, ['executed'])
   })
@@ -253,11 +277,41 @@ test.describe('execute | async', () => {
     assert.isTrue(event!.hasError)
     assert.isTrue(testInstance.failed)
     assert.lengthOf(event!.errors, 1)
+    assert.isTrue(event!.isFailing)
     assert.equal(event!.errors[0].phase, 'test')
     assert.equal(
       event!.errors[0].error.message,
       'Expected regression test to fail, instead it finished without any errors'
     )
+    assert.deepEqual(stack, ['executed'])
+  })
+
+  test('report regression test error with a predefined error instance', async () => {
+    const stack: string[] = []
+    const regressionError = new Error()
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+    testInstance
+      .run(async () => {
+        stack.push('executed')
+      }, regressionError)
+      .fails()
+
+    const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
+    assert.isDefined(event)
+
+    assert.isTrue(event!.hasError)
+    assert.isTrue(testInstance.failed)
+    assert.isTrue(event!.isFailing)
+    assert.lengthOf(event!.errors, 1)
+    assert.equal(event!.errors[0].phase, 'test')
+    assert.equal(
+      event!.errors[0].error.message,
+      'Expected regression test to fail, instead it finished without any errors'
+    )
+    assert.match(event!.errors[0].error.stack?.split('\n')[1]!, /execute\.spec\.ts\:291/)
     assert.deepEqual(stack, ['executed'])
   })
 

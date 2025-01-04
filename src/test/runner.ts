@@ -85,6 +85,7 @@ export class DummyRunner {
  */
 export class TestRunner {
   #emitter: Emitter
+  #debuggingError: Error | null
 
   /**
    * Timeout timer and promise reject method references to
@@ -163,12 +164,14 @@ export class TestRunner {
       executing: ((test: Test<any, any>) => void)[]
       executed: ((test: Test<any, any>, hasError: boolean, errors: TestEndNode['errors']) => void)[]
     },
+    debuggingError: Error | null,
     datasetCurrentIndex?: number
   ) {
     this.#test = test
     this.#hooks = hooks
     this.#emitter = emitter
     this.#callbacks = callbacks
+    this.#debuggingError = debuggingError
     this.#datasetCurrentIndex = datasetCurrentIndex
     this.#setupRunner = hooks.runner('setup')
     this.#teardownRunner = hooks.runner('teardown')
@@ -216,6 +219,21 @@ export class TestRunner {
     }
 
     this.#emitter.emit('test:start', startOptions)
+  }
+
+  /**
+   * Creates an error to be used for reporting errors with the
+   * execution of the test.
+   *
+   * First, the `debuggingError` property is used (if exists), otherwise
+   * an inline Error instance is created
+   */
+  #createError(message: string): Error {
+    if (this.#debuggingError) {
+      this.#debuggingError.message = message
+      return this.#debuggingError
+    }
+    return new Error(message)
   }
 
   /**
@@ -353,7 +371,7 @@ export class TestRunner {
       debug('wrapping test in timeout timer')
       this.#timeout = {
         reject,
-        timer: setTimeout(() => this.#timeout!.reject(new Error('Test timeout')), duration),
+        timer: setTimeout(() => this.#timeout!.reject(this.#createError('Test timeout')), duration),
       }
     })
   }
@@ -366,7 +384,7 @@ export class TestRunner {
       debug('resetting timer')
       clearTimeout(this.#timeout.timer)
       this.#timeout.timer = setTimeout(
-        () => this.#timeout!.reject(new Error('Test timeout')),
+        () => this.#timeout!.reject(this.#createError('Test timeout')),
         duration
       )
     }
@@ -396,7 +414,9 @@ export class TestRunner {
       ;(this.#test.options.waitsForDone ? this.#runTestWithDone() : this.#runTest())
         .then(() => {
           reject(
-            new Error('Expected regression test to fail, instead it finished without any errors')
+            this.#createError(
+              'Expected regression test to fail, instead it finished without any errors'
+            )
           )
         })
         .catch(() => resolve())

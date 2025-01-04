@@ -92,6 +92,17 @@ export class Test<
   #failed: boolean = false
 
   /**
+   * Debugging Error is used to point the errors to the source of
+   * the test.
+   *
+   * Since tests are executed after they are created, the errors thrown
+   * by the internals of Japa will never point to the original test.
+   * Therefore, this debuggingError property is used to retain
+   * the source of the test callback.
+   */
+  #debuggingError: Error | null = null
+
+  /**
    * Reference to registered hooks
    */
   #hooks = new Hooks<TestHooks<Context>>()
@@ -352,7 +363,8 @@ export class Test<
   /**
    * Define the test executor function
    */
-  run(executor: TestExecutor<Context, TestData>): this {
+  run(executor: TestExecutor<Context, TestData>, debuggingError?: Error): this {
+    this.#debuggingError = debuggingError || new Error()
     this.options.executor = executor
     return this
   }
@@ -457,6 +469,7 @@ export class Test<
             executing: self.executingCallbacks,
             executed: self.executedCallbacks,
           },
+          this.#debuggingError,
           index
         )
 
@@ -483,10 +496,16 @@ export class Test<
      */
     await this.#computeContext()
 
-    this.#activeRunner = new TestRunner(this, this.#hooks, this.#emitter, {
-      executing: self.executingCallbacks,
-      executed: self.executedCallbacks,
-    })
+    this.#activeRunner = new TestRunner(
+      this,
+      this.#hooks,
+      this.#emitter,
+      {
+        executing: self.executingCallbacks,
+        executed: self.executedCallbacks,
+      },
+      this.#debuggingError
+    )
 
     await this.#activeRunner.run()
     this.#failed = this.#activeRunner.failed
