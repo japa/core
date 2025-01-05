@@ -72,4 +72,17 @@ test.describe('configure', () => {
 
     assert.equal(testInstance.options.timeout, 0)
   })
+
+  test('skip all tests inside the group', async () => {
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const group = new Group<TestContext>('sample group', emitter, refiner)
+    const testInstance = new Test('2 + 2 = 4', new TestContext(), emitter, refiner)
+
+    group.each.skip()
+    group.add(testInstance)
+
+    assert.equal(testInstance.options.isSkipped, true)
+  })
 })

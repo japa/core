@@ -122,11 +122,13 @@ test.describe('execute | test', () => {
     const [groupEndEvent] = await Promise.all([pEvent(emitter, 'group:end'), group.exec()])
 
     assert.isTrue(group.failed)
-    assert.lengthOf(events, 1)
+    assert.lengthOf(events, 2)
     assert.equal(events[0].title.expanded, 'test')
     assert.isTrue(events[0].hasError)
     assert.equal(events[0].errors[0].phase, 'test')
     assert.equal(events[0].errors[0].error.message, 'blow up')
+
+    assert.isTrue(events[1].isSkipped)
 
     assert.equal(groupEndEvent!.title, 'sample group')
     assert.deepEqual(stack, ['test'])

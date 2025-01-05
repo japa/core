@@ -182,13 +182,16 @@ export class GroupRunner {
      * Run the test executor
      */
     for (let test of this.#group.tests) {
+      /**
+       * Skip tests in bail mode when there is an error
+       */
+      if (this.#options.bail && this.#hasError) {
+        test.skip(true, 'Skipped due to bail mode')
+      }
+
       await test.exec()
       if (!this.#hasError && test.failed) {
         this.#hasError = true
-      }
-
-      if (this.#options.bail && this.#hasError) {
-        break
       }
     }
 

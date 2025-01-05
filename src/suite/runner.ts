@@ -14,6 +14,7 @@ import debug from '../debug.js'
 import { Suite } from './main.js'
 import { Emitter } from '../emitter.js'
 import type { SuiteEndNode, SuiteHooks, SuiteHooksData, SuiteStartNode } from '../types.js'
+import { Group } from '../group/main.js'
 
 /**
  * Run all groups or tests inside the suite stack
@@ -178,13 +179,20 @@ export class SuiteRunner {
      * Run the test executor
      */
     for (let groupOrTest of this.#suite.stack) {
+      /**
+       * Skip tests in bail mode when there is an error
+       */
+      if (this.#options.bail && this.#hasError) {
+        if (groupOrTest instanceof Group) {
+          groupOrTest.each.skip(true, 'Skipped due to bail mode')
+        } else {
+          groupOrTest.skip(true, 'Skipped due to bail mode')
+        }
+      }
+
       await groupOrTest.exec()
       if (!this.#hasError && groupOrTest.failed) {
         this.#hasError = true
-      }
-
-      if (this.#options.bail && this.#hasError) {
-        break
       }
     }
 

@@ -166,22 +166,34 @@ test.describe('execute | test', () => {
     })
 
     group1.add(testInstance).add(testInstance1)
-    suite.bail()
-    group2.add(testInstance).add(testInstance1)
 
-    const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
+    const testInstance3 = new Test('test 3', new TestContext(), emitter, refiner)
+    testInstance3.run(() => {
+      stack.push('test 3')
+      throw new Error('blow up')
+    })
+    const testInstance4 = new Test('test 4', new TestContext(), emitter, refiner)
+    testInstance4.run(() => {
+      stack.push('test 1')
+    })
+
+    suite.bail()
+    group2.add(testInstance3).add(testInstance4)
+
+    await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
 
     assert.isTrue(suite.failed)
-    assert.lengthOf(events, 2)
+    assert.lengthOf(events, 6)
 
     assert.equal((events[0].title as { expanded: string }).expanded, 'test')
     assert.isTrue(events[0].hasError)
+    assert.isTrue((events[1] as TestEndNode).isSkipped)
 
-    assert.equal(String(events[1].title), 'group')
-    assert.isTrue(events[1].hasError)
+    assert.equal((events[3].title as { expanded: string }).expanded, 'test 3')
+    assert.isTrue(events[3].hasError)
+    assert.isTrue((events[4] as TestEndNode).isSkipped)
 
-    assert.equal(suiteEndEvent!.name, 'sample suite')
-    assert.deepEqual(stack, ['test'])
+    assert.deepEqual(stack, ['test', 'test 3'])
   })
 })
 

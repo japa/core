@@ -53,6 +53,10 @@ export class Group<Context extends Record<any, any>> extends Macroable {
   #testsRetries?: number
   #testSetupHooks: TestHooksHandler<Context>[] = []
   #testTeardownHooks: TestHooksHandler<Context>[] = []
+  #testsSkip?: {
+    skip: boolean | (() => Promise<boolean> | boolean)
+    skipReason?: string
+  }
 
   /**
    * Know if one or more tests/hooks within this group
@@ -77,6 +81,7 @@ export class Group<Context extends Record<any, any>> extends Macroable {
     teardown: (handler: TestHooksHandler<Context>) => void
     timeout: (timeout: number) => void
     retry: (retries: number) => void
+    skip: (skip?: boolean | (() => Promise<boolean> | boolean), skipReason?: string) => void
     disableTimeout: () => void
   } = {
     /**
@@ -112,6 +117,13 @@ export class Group<Context extends Record<any, any>> extends Macroable {
      */
     retry: (retries: number) => {
       this.#testsRetries = retries
+    },
+
+    /**
+     * Skip all the tests inside the group
+     */
+    skip: (skip, skipReason) => {
+      this.#testsSkip = { skip: skip ?? true, skipReason }
     },
   }
 
@@ -162,6 +174,9 @@ export class Group<Context extends Record<any, any>> extends Macroable {
     }
     if (this.#testTeardownHooks.length) {
       this.#testTeardownHooks.forEach((handler) => test.teardown(handler))
+    }
+    if (this.#testsSkip) {
+      test.skip(this.#testsSkip.skip, this.#testsSkip.skipReason)
     }
 
     /**
