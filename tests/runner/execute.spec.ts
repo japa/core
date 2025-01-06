@@ -139,7 +139,7 @@ test.describe('execute | runner', () => {
     assert.deepEqual(stack, ['test', 'test 1'])
   })
 
-  test('bail upcoming suites when a test fails', async () => {
+  test('skip upcoming suites when a test fails in bail mode', async () => {
     const stack: string[] = []
     const events: (TestEndNode | SuiteEndNode)[] = []
     const emitter = new Emitter()
@@ -156,6 +156,8 @@ test.describe('execute | runner', () => {
     const runner = new Runner<TestContext>(emitter)
     const unit = new Suite<TestContext>('unit', emitter, refiner)
     const functional = new Suite<TestContext>('functional', emitter, refiner)
+    runner.add(unit).add(functional)
+    runner.bail()
 
     const testInstance = new Test('test', new TestContext(), emitter, refiner)
     testInstance.run(() => {
@@ -168,9 +170,7 @@ test.describe('execute | runner', () => {
       stack.push('test 1')
     })
 
-    runner.add(unit).add(functional)
     unit.add(testInstance)
-    runner.bail()
     functional.add(testInstance1)
 
     const [runnerEndEvent] = await Promise.all([
@@ -183,12 +183,15 @@ test.describe('execute | runner', () => {
     ])
 
     assert.isTrue(runner.failed)
-    assert.lengthOf(events, 2)
+    assert.lengthOf(events, 4)
     assert.equal((events[0] as TestEndNode).title.expanded, 'test')
     assert.isTrue(events[0].hasError)
 
     assert.equal((events[1] as SuiteEndNode).name, 'unit')
     assert.isTrue(events[1].hasError)
+
+    assert.isTrue((events[2] as TestEndNode).isSkipped)
+    assert.equal((events[3] as SuiteEndNode).name, 'functional')
 
     assert.isNotNull(runnerEndEvent)
     assert.deepEqual(stack, ['test'])

@@ -136,7 +136,7 @@ test.describe('execute | test', () => {
     assert.deepEqual(stack, ['group test setup', 'test', 'test 1'])
   })
 
-  test('bail groups and groups execution on failure', async () => {
+  test('skip upcoming groups when a test fails in bail mode', async () => {
     const stack: string[] = []
     const events: (TestEndNode | GroupEndNode)[] = []
     const emitter = new Emitter()
@@ -189,11 +189,10 @@ test.describe('execute | test', () => {
     assert.isTrue(events[0].hasError)
     assert.isTrue((events[1] as TestEndNode).isSkipped)
 
-    assert.equal((events[3].title as { expanded: string }).expanded, 'test 3')
-    assert.isTrue(events[3].hasError)
+    assert.isTrue((events[3] as TestEndNode).isSkipped)
     assert.isTrue((events[4] as TestEndNode).isSkipped)
 
-    assert.deepEqual(stack, ['test', 'test 3'])
+    assert.deepEqual(stack, ['test'])
   })
 })
 
