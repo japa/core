@@ -15,6 +15,7 @@ import { Emitter } from './emitter.js'
 import { Tracker } from './tracker.js'
 import { ReporterContract, RunnerSummary } from './types.js'
 import { SummaryBuilder } from './summary_builder.js'
+import { Group } from './group/main.js'
 
 /**
  * The Runner class exposes the API to register test suites and execute
@@ -179,13 +180,22 @@ export class Runner<Context extends Record<any, any>> extends Macroable {
    */
   async exec() {
     for (let suite of this.suites) {
+      /**
+       * Skip tests in bail mode when there is an error
+       */
+      if (this.#bail && this.#failed) {
+        suite.stack.forEach((groupOrTest) => {
+          if (groupOrTest instanceof Group) {
+            groupOrTest.tap((t) => t.skip(true, 'Skipped due to bail mode'))
+          } else {
+            groupOrTest.skip(true, 'Skipped due to bail mode')
+          }
+        })
+      }
+
       await suite.exec()
       if (!this.#failed && suite.failed) {
         this.#failed = true
-      }
-
-      if (this.#bail && this.#failed) {
-        break
       }
     }
   }
