@@ -184,7 +184,7 @@ export class SuiteRunner {
        */
       if (this.#options.bail && this.#hasError) {
         if (groupOrTest instanceof Group) {
-          groupOrTest.each.skip(true, 'Skipped due to bail mode')
+          groupOrTest.tap((t) => t.skip(true, 'Skipped due to bail mode'))
         } else {
           groupOrTest.skip(true, 'Skipped due to bail mode')
         }
