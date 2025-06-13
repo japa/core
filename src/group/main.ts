@@ -11,11 +11,11 @@ import Hooks from '@poppinss/hooks'
 import Macroable from '@poppinss/macroable'
 
 import debug from '../debug.js'
-import { Test } from '../test/main.js'
-import { Refiner } from '../refiner.js'
 import { Emitter } from '../emitter.js'
+import { Refiner } from '../refiner.js'
+import { Test } from '../test/main.js'
+import type { GroupHooks, GroupHooksHandler, GroupOptions, TestHooksHandler } from '../types.js'
 import { GroupRunner } from './runner.js'
-import type { GroupHooksHandler, TestHooksHandler, GroupOptions, GroupHooks } from '../types.js'
 
 /**
  * Group class exposes an API to group multiple tests together
@@ -194,6 +194,15 @@ export class Group<Context extends Record<any, any>> extends Macroable {
   tap(callback: (test: Test<Context, any>) => void): this {
     this.tests.forEach((test) => callback(test))
     this.#tapsCallbacks.push(callback)
+    return this
+  }
+
+  /**
+   * Pin each test. Pinning a test will only run the
+   * pinned tests.
+   */
+  pin(): this {
+    this.tap((test) => test.pin())
     return this
   }
 

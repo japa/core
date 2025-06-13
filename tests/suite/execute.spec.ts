@@ -7,17 +7,17 @@
  * file that was distributed with this source code.
  */
 
-import test from 'node:test'
 import { assert } from 'chai'
+import test from 'node:test'
 
-import { Test } from '../../src/test/main.js'
-import { Suite } from '../../src/suite/main.js'
+import { Emitter } from '../../src/emitter.js'
 import { Group } from '../../src/group/main.js'
 import { Refiner } from '../../src/refiner.js'
-import { Emitter } from '../../src/emitter.js'
+import { Suite } from '../../src/suite/main.js'
+import { Test } from '../../src/test/main.js'
+import { TestContext } from '../../src/test_context.js'
 import { GroupEndNode, TestEndNode } from '../../src/types.js'
 import { pEvent } from '../../tests_helpers/index.js'
-import { TestContext } from '../../src/test_context.js'
 
 test.describe('execute | test', () => {
   test('run all tests inside a suite', async () => {
@@ -193,6 +193,47 @@ test.describe('execute | test', () => {
     assert.isTrue((events[4] as TestEndNode).isSkipped)
 
     assert.deepEqual(stack, ['test'])
+  })
+
+  test('Skip group when pinned', async () => {
+    const stack: string[] = []
+    const events: TestEndNode[] = []
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    emitter.on('test:end', (event) => {
+      events.push(event)
+    })
+
+    const suite = new Suite<TestContext>('sample suite', emitter, refiner)
+
+    const group = new Group<TestContext>('sample group', emitter, refiner)
+    suite.add(group)
+    const testInstance = new Test('test', new TestContext(), emitter, refiner, group)
+    testInstance.run(() => {
+      stack.push('test')
+    })
+    group.add(testInstance)
+
+    const testInstance1 = new Test('test 1', new TestContext(), emitter, refiner, group)
+    testInstance1.run(() => {
+      stack.push('test 1')
+    })
+    const group1 = new Group<TestContext>('sample group 1', emitter, refiner)
+    suite.add(group1)
+    group1.add(testInstance1)
+
+    group1.pin()
+
+    const [suiteEndEvent] = await Promise.all([pEvent(emitter, 'suite:end'), suite.exec()])
+
+    assert.isFalse(suite.failed)
+    assert.lengthOf(events, 1)
+    assert.equal(events[0].title.expanded, 'test 1')
+    assert.isFalse(events[0].hasError)
+
+    assert.equal(suiteEndEvent!.name, 'sample suite')
+    assert.deepEqual(stack, ['test 1'])
   })
 })
 
