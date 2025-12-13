@@ -1,6 +1,6 @@
 {
   "name": "@japa/core",
-  "version": "10.3.0",
+  "version": "10.4.0",
   "description": "Implementation of core APIs for the Japa tests runner",
   "type": "module",
   "files": [
