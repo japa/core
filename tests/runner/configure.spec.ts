@@ -14,7 +14,7 @@ import { Runner } from '../../src/runner.js'
 import { Emitter } from '../../src/emitter.js'
 import { Refiner } from '../../src/refiner.js'
 import { Suite } from '../../src/suite/main.js'
-import { ReporterContract } from '../../src/types.js'
+import { type ReporterContract } from '../../src/types.js'
 
 test.describe('configure | runner', () => {
   test('create an instance of runner', async () => {

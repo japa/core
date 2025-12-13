@@ -7,12 +7,12 @@
  * file that was distributed with this source code.
  */
 
-import Hooks from '@poppinss/hooks'
-import { Runner } from '@poppinss/hooks/types'
+import type Hooks from '@poppinss/hooks'
+import { type Runner } from '@poppinss/hooks/types'
 
 import debug from '../debug.js'
-import { Suite } from './main.js'
-import { Emitter } from '../emitter.js'
+import { type Suite } from './main.js'
+import { type Emitter } from '../emitter.js'
 import type { SuiteEndNode, SuiteHooks, SuiteHooksData, SuiteStartNode } from '../types.js'
 import { Group } from '../group/main.js'
 

@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import timeSpan, { TimeEndFunction } from 'time-span'
+import timeSpan, { type TimeEndFunction } from 'time-span'
 import type {
   TestEndNode,
   GroupEndNode,

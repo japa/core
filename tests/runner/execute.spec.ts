@@ -17,7 +17,7 @@ import { Refiner } from '../../src/refiner.js'
 import { Suite } from '../../src/suite/main.js'
 import { pEvent } from '../../tests_helpers/index.js'
 import { TestContext } from '../../src/test_context.js'
-import { SuiteEndNode, TestEndNode } from '../../src/types.js'
+import { type SuiteEndNode, type TestEndNode } from '../../src/types.js'
 
 test.describe('execute | runner', () => {
   test('run all suites tests', async () => {

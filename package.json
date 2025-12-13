@@ -17,7 +17,7 @@
   },
   "scripts": {
     "pretest": "npm run lint",
-    "test": "c8 glob -c \"node --import=@poppinss/ts-exec --enable-source-maps --test\" \"tests/**/*.spec.ts\"",
+    "test": "node --import=@poppinss/ts-exec --enable-source-maps --test tests/**/*.spec.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "clean": "del build",
@@ -42,7 +42,6 @@
     "chai": "^6.2.1",
     "del-cli": "^7.0.0",
     "eslint": "^9.39.2",
-    "glob": "^13.0.0",
     "prettier": "^3.7.4",
     "release-it": "^19.1.0",
     "tsup": "^8.5.1",

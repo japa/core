@@ -11,9 +11,9 @@ import Hooks from '@poppinss/hooks'
 import Macroable from '@poppinss/macroable'
 
 import debug from '../debug.js'
-import { Group } from '../group/main.js'
-import { Emitter } from '../emitter.js'
-import { Refiner } from '../refiner.js'
+import { type Group } from '../group/main.js'
+import { type Emitter } from '../emitter.js'
+import { type Refiner } from '../refiner.js'
 import { DummyRunner, TestRunner } from './runner.js'
 import type {
   TestHooks,

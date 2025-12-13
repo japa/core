@@ -10,10 +10,10 @@
 import Macroable from '@poppinss/macroable'
 
 import debug from './debug.js'
-import { Suite } from './suite/main.js'
-import { Emitter } from './emitter.js'
+import { type Suite } from './suite/main.js'
+import { type Emitter } from './emitter.js'
 import { Tracker } from './tracker.js'
-import { ReporterContract, RunnerSummary } from './types.js'
+import { type ReporterContract, type RunnerSummary } from './types.js'
 import { SummaryBuilder } from './summary_builder.js'
 import { Group } from './group/main.js'
 

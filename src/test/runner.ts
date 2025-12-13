@@ -8,13 +8,13 @@
  */
 
 import retry from 'async-retry'
-import Hooks from '@poppinss/hooks'
+import type Hooks from '@poppinss/hooks'
 import type { Runner } from '@poppinss/hooks/types'
-import timeSpan, { TimeEndFunction } from 'time-span'
+import timeSpan, { type TimeEndFunction } from 'time-span'
 
 import debug from '../debug.js'
-import { Test } from './main.js'
-import { Emitter } from '../emitter.js'
+import { type Test } from './main.js'
+import { type Emitter } from '../emitter.js'
 import { interpolate } from '../interpolate.js'
 import type { TestEndNode, TestHooks, TestHooksData, TestStartNode } from '../types.js'
 

@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { Test } from './test/main.js'
+import { type Test } from './test/main.js'
 import { Group } from './group/main.js'
 import type { FilteringOptions } from './types.js'
 
