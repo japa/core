@@ -10,14 +10,14 @@
 import test from 'node:test'
 import { assert } from 'chai'
 
-import { Test } from '../../src/test/main.js'
-import { Suite } from '../../src/suite/main.js'
-import { Group } from '../../src/group/main.js'
-import { Refiner } from '../../src/refiner.js'
-import { Emitter } from '../../src/emitter.js'
-import { type GroupEndNode, type TestEndNode } from '../../src/types.js'
-import { pEvent } from '../../tests_helpers/index.js'
-import { TestContext } from '../../src/test_context.js'
+import { Test } from '../../src/test/main.ts'
+import { Suite } from '../../src/suite/main.ts'
+import { Group } from '../../src/group/main.ts'
+import { Refiner } from '../../src/refiner.ts'
+import { Emitter } from '../../src/emitter.ts'
+import { type GroupEndNode, type TestEndNode } from '../../src/types.ts'
+import { pEvent } from '../../tests_helpers/index.ts'
+import { TestContext } from '../../src/test_context.ts'
 
 test.describe('execute | test', () => {
   test('run all tests inside a suite', async () => {

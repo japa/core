@@ -7,9 +7,9 @@
  * file that was distributed with this source code.
  */
 
-import { type Test } from './test/main.js'
-import { Group } from './group/main.js'
-import type { FilteringOptions } from './types.js'
+import { type Test } from './test/main.ts'
+import { Group } from './group/main.ts'
+import type { FilteringOptions } from './types.ts'
 
 /**
  * Exposes the API to refine unwanted tests based upon applied

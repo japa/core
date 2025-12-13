@@ -10,14 +10,14 @@
 import test from 'node:test'
 import { assert } from 'chai'
 
-import { Runner } from '../../src/runner.js'
-import { Test } from '../../src/test/main.js'
-import { Emitter } from '../../src/emitter.js'
-import { Refiner } from '../../src/refiner.js'
-import { Suite } from '../../src/suite/main.js'
-import { pEvent } from '../../tests_helpers/index.js'
-import { TestContext } from '../../src/test_context.js'
-import { type SuiteEndNode, type TestEndNode } from '../../src/types.js'
+import { Runner } from '../../src/runner.ts'
+import { Test } from '../../src/test/main.ts'
+import { Emitter } from '../../src/emitter.ts'
+import { Refiner } from '../../src/refiner.ts'
+import { Suite } from '../../src/suite/main.ts'
+import { pEvent } from '../../tests_helpers/index.ts'
+import { TestContext } from '../../src/test_context.ts'
+import { type SuiteEndNode, type TestEndNode } from '../../src/types.ts'
 
 test.describe('execute | runner', () => {
   test('run all suites tests', async () => {

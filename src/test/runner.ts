@@ -12,11 +12,11 @@ import type Hooks from '@poppinss/hooks'
 import type { Runner } from '@poppinss/hooks/types'
 import timeSpan, { type TimeEndFunction } from 'time-span'
 
-import debug from '../debug.js'
-import { type Test } from './main.js'
-import { type Emitter } from '../emitter.js'
-import { interpolate } from '../interpolate.js'
-import type { TestEndNode, TestHooks, TestHooksData, TestStartNode } from '../types.js'
+import debug from '../debug.ts'
+import { type Test } from './main.ts'
+import { type Emitter } from '../emitter.ts'
+import { interpolate } from '../interpolate.ts'
+import type { TestEndNode, TestHooks, TestHooksData, TestStartNode } from '../types.ts'
 
 /**
  * Dummy test runner that just emits the required events

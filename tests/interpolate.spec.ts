@@ -9,7 +9,7 @@
 
 import test from 'node:test'
 import { assert } from 'chai'
-import { interpolate } from '../src/interpolate.js'
+import { interpolate } from '../src/interpolate.ts'
 
 test.describe('Interpolate', () => {
   test('interpolate object values inside a string', () => {

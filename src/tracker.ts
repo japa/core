@@ -19,7 +19,7 @@ import type {
   SuiteStartNode,
   FailureTreeGroupNode,
   FailureTreeSuiteNode,
-} from './types.js'
+} from './types.ts'
 
 /**
  * Tracks the tests events to generate a summary report. Failing tests are further tracked

@@ -10,11 +10,11 @@
 import test from 'node:test'
 import { assert } from 'chai'
 
-import { Runner } from '../../src/runner.js'
-import { Emitter } from '../../src/emitter.js'
-import { Refiner } from '../../src/refiner.js'
-import { Suite } from '../../src/suite/main.js'
-import { type ReporterContract } from '../../src/types.js'
+import { Runner } from '../../src/runner.ts'
+import { Emitter } from '../../src/emitter.ts'
+import { Refiner } from '../../src/refiner.ts'
+import { Suite } from '../../src/suite/main.ts'
+import { type ReporterContract } from '../../src/types.ts'
 
 test.describe('configure | runner', () => {
   test('create an instance of runner', async () => {

@@ -9,13 +9,13 @@
 
 import Macroable from '@poppinss/macroable'
 
-import debug from './debug.js'
-import { type Suite } from './suite/main.js'
-import { type Emitter } from './emitter.js'
-import { Tracker } from './tracker.js'
-import { type ReporterContract, type RunnerSummary } from './types.js'
-import { SummaryBuilder } from './summary_builder.js'
-import { Group } from './group/main.js'
+import debug from './debug.ts'
+import { type Suite } from './suite/main.ts'
+import { type Emitter } from './emitter.ts'
+import { Tracker } from './tracker.ts'
+import { type ReporterContract, type RunnerSummary } from './types.ts'
+import { SummaryBuilder } from './summary_builder.ts'
+import { Group } from './group/main.ts'
 
 /**
  * The Runner class exposes the API to register test suites and execute

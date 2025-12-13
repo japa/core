@@ -10,10 +10,10 @@
 import test from 'node:test'
 import { assert } from 'chai'
 
-import { Test } from '../../src/test/main.js'
-import { Group } from '../../src/group/main.js'
-import { Emitter } from '../../src/emitter.js'
-import { Refiner } from '../../src/refiner.js'
+import { Test } from '../../src/test/main.ts'
+import { Group } from '../../src/group/main.ts'
+import { Emitter } from '../../src/emitter.ts'
+import { Refiner } from '../../src/refiner.ts'
 
 test.describe('Refiner', () => {
   test('add filter for test title', () => {

@@ -10,11 +10,11 @@
 import type Hooks from '@poppinss/hooks'
 import { type Runner } from '@poppinss/hooks/types'
 
-import debug from '../debug.js'
-import { type Suite } from './main.js'
-import { type Emitter } from '../emitter.js'
-import type { SuiteEndNode, SuiteHooks, SuiteHooksData, SuiteStartNode } from '../types.js'
-import { Group } from '../group/main.js'
+import debug from '../debug.ts'
+import { type Suite } from './main.ts'
+import { type Emitter } from '../emitter.ts'
+import type { SuiteEndNode, SuiteHooks, SuiteHooksData, SuiteStartNode } from '../types.ts'
+import { Group } from '../group/main.ts'
 
 /**
  * Run all groups or tests inside the suite stack

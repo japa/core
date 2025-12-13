@@ -10,11 +10,11 @@
 import test from 'node:test'
 import { assert } from 'chai'
 
-import { Test } from '../../src/test/main.js'
-import { Group } from '../../src/group/main.js'
-import { Refiner } from '../../src/refiner.js'
-import { Emitter } from '../../src/emitter.js'
-import { TestContext } from '../../src/test_context.js'
+import { Test } from '../../src/test/main.ts'
+import { Group } from '../../src/group/main.ts'
+import { Refiner } from '../../src/refiner.ts'
+import { Emitter } from '../../src/emitter.ts'
+import { TestContext } from '../../src/test_context.ts'
 
 test.describe('configure', () => {
   test('create an instance of group', async () => {

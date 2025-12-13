@@ -10,10 +10,10 @@
 import type Hooks from '@poppinss/hooks'
 import { type Runner } from '@poppinss/hooks/types'
 
-import debug from '../debug.js'
-import { type Group } from './main.js'
-import { type Emitter } from '../emitter.js'
-import type { GroupEndNode, GroupHooks, GroupHooksData, GroupStartNode } from '../types.js'
+import debug from '../debug.ts'
+import { type Group } from './main.ts'
+import { type Emitter } from '../emitter.ts'
+import type { GroupEndNode, GroupHooks, GroupHooksData, GroupStartNode } from '../types.ts'
 
 /**
  * Run all tests for a given group

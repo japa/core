@@ -9,7 +9,7 @@
 
 import { assert } from 'chai'
 import { test } from 'node:test'
-import { SummaryBuilder } from '../src/summary_builder.js'
+import { SummaryBuilder } from '../src/summary_builder.ts'
 
 test.describe('Summary builder', () => {
   test('build summary from registered reporters', () => {

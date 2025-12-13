@@ -9,11 +9,11 @@
 
 import type { CleanupHandler, HookHandler } from '@poppinss/hooks/types'
 
-import type { Runner } from './runner.js'
-import type { Test } from './test/main.js'
-import type { Emitter } from './emitter.js'
-import type { Group } from './group/main.js'
-import type { Suite } from './suite/main.js'
+import type { Runner } from './runner.ts'
+import type { Test } from './test/main.ts'
+import type { Emitter } from './emitter.ts'
+import type { Group } from './group/main.ts'
+import type { Suite } from './suite/main.ts'
 
 /**
  * Summary reporters are registered with the SummaryBuilder to

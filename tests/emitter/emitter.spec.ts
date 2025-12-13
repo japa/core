@@ -9,7 +9,7 @@
 
 import test from 'node:test'
 import { assert } from 'chai'
-import { Emitter } from '../../src/emitter.js'
+import { Emitter } from '../../src/emitter.ts'
 
 test.describe('emitter', () => {
   test('define an error handler to handle listener errors', (_, done) => {
