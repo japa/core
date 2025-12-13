@@ -9,7 +9,7 @@
     "!build/tests_helpers"
   ],
   "engines": {
-    "node": ">=18.16.0"
+    "node": ">=24.0.0"
   },
   "exports": {
     ".": "./build/index.js",
@@ -23,7 +23,7 @@
     "clean": "del build",
     "typecheck": "tsc --noEmit",
     "precompile": "npm run lint && npm run clean",
-    "compile": "tsup-node && tsc --emitDeclarationOnly --declaration",
+    "compile": "tsdown && tsc --emitDeclarationOnly --declaration",
     "build": "npm run compile",
     "prepublishOnly": "npm run build",
     "version": "npm run build",
@@ -44,7 +44,8 @@
     "eslint": "^9.39.2",
     "prettier": "^3.7.4",
     "release-it": "^19.1.0",
-    "tsup": "^8.5.1",
+    "time-span": "^5.1.0",
+    "tsdown": "^0.17.3",
     "typescript": "^5.9.3"
   },
   "dependencies": {
@@ -53,8 +54,7 @@
     "@poppinss/string": "^1.7.1",
     "async-retry": "^1.3.3",
     "emittery": "^1.2.0",
-    "string-width": "^8.1.0",
-    "time-span": "^5.1.0"
+    "string-width": "^8.1.0"
   },
   "homepage": "https://github.com/japa/core#readme",
   "repository": {
@@ -75,7 +75,7 @@
     "access": "public",
     "provenance": true
   },
-  "tsup": {
+  "tsdown": {
     "entry": [
       "./index.ts",
       "./src/types.ts"
@@ -83,8 +83,11 @@
     "outDir": "./build",
     "clean": true,
     "format": "esm",
+    "minify": "dce-only",
+    "fixedExtension": false,
     "dts": false,
-    "sourcemap": false,
+    "treeshake": false,
+    "sourcemaps": false,
     "target": "esnext"
   },
   "release-it": {
