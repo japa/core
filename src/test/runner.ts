@@ -263,7 +263,7 @@ export class TestRunner {
     try {
       debug('running "%s" test setup hooks', this.#test.title)
       await this.#setupRunner.run(this.#test)
-    } catch (error) {
+    } catch (error: any) {
       debug('test setup hooks failed, test: %s, error: %O', this.#test.title, error)
       this.#hasError = true
       this.#errors.push({ phase: 'setup', error })
@@ -277,7 +277,7 @@ export class TestRunner {
     try {
       debug('running "%s" test teardown hooks', this.#test.title)
       await this.#teardownRunner.run(this.#test)
-    } catch (error) {
+    } catch (error: any) {
       debug('test teardown hooks failed, test: %s, error: %O', this.#test.title, error)
       this.#hasError = true
       this.#errors.push({ phase: 'teardown', error })
@@ -293,7 +293,7 @@ export class TestRunner {
     try {
       debug('running "%s" test cleanup functions', this.#test.title)
       await cleanupRunner.runReverse(this.#hasError, this.#test)
-    } catch (error) {
+    } catch (error: any) {
       debug('test cleanup functions failed, test: %s, error: %O', this.#test.title, error)
       this.#hasError = true
       this.#errors.push({ phase: 'test:cleanup', error })
@@ -307,7 +307,7 @@ export class TestRunner {
     try {
       debug('running "%s" test setup cleanup functions', this.#test.title)
       await this.#setupRunner.cleanup(this.#hasError, this.#test)
-    } catch (error) {
+    } catch (error: any) {
       debug('test setup cleanup functions failed, test: %s, error: %O', this.#test.title, error)
       this.#hasError = true
       this.#errors.push({ phase: 'setup:cleanup', error })
@@ -321,7 +321,7 @@ export class TestRunner {
     try {
       debug('running "%s" test teardown cleanup functions', this.#test.title)
       await this.#teardownRunner.cleanup(this.#hasError, this.#test)
-    } catch (error) {
+    } catch (error: any) {
       debug('test teardown cleanup functions failed, test: %s, error: %O', this.#test.title, error)
       this.#hasError = true
       this.#errors.push({ phase: 'teardown:cleanup', error })
@@ -495,7 +495,7 @@ export class TestRunner {
     try {
       this.#callbacks.executing.forEach((callback) => callback(this.#test))
       await this.#wrapTestInRetries()
-    } catch (error) {
+    } catch (error: any) {
       this.#hasError = true
       this.#errors.push({ phase: 'test', error })
     }
@@ -506,7 +506,7 @@ export class TestRunner {
     this.#callbacks.executed.forEach((callback) => {
       try {
         callback(this.#test, this.#hasError, this.#errors)
-      } catch (error) {
+      } catch (error: any) {
         this.#hasError = true
         this.#errors.push({ phase: 'test', error })
       }
