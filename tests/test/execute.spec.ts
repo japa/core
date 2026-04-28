@@ -337,6 +337,38 @@ test.describe('execute | async', () => {
     assert.equal(event!.errors[0].error.message, 'Test timeout')
     assert.deepEqual(stack, [])
   })
+
+  test('queued timeout callback firing after test resolution does not throw (issue #90)', async () => {
+    const emitter = new Emitter()
+    const refiner = new Refiner({})
+
+    const TIMEOUT_MS = 9_999
+    const originalSetTimeout = globalThis.setTimeout
+    const captured: Array<() => void> = []
+
+    globalThis.setTimeout = ((cb: any, ms?: number, ...args: any[]) => {
+      if (ms === TIMEOUT_MS && typeof cb === 'function') {
+        captured.push(cb as () => void)
+        return originalSetTimeout(() => {}, 0)
+      }
+      return originalSetTimeout(cb, ms as number, ...args)
+    }) as typeof setTimeout
+
+    try {
+      const testInstance = new Test('quick', new TestContext(), emitter, refiner)
+      testInstance.run(async () => {}).timeout(TIMEOUT_MS)
+
+      const [, event] = await Promise.all([testInstance.exec(), pEvent(emitter, 'test:end')])
+      assert.isFalse(event!.hasError)
+      assert.lengthOf(captured, 1)
+
+      // Simulate the race: a queued timer callback running after #clearTimer
+      // nulled #timeout. Before the fix this threw an unhandled TypeError.
+      assert.doesNotThrow(() => captured[0]())
+    } finally {
+      globalThis.setTimeout = originalSetTimeout
+    }
+  })
 })
 
 test.describe('execute | waitForDone', () => {

@@ -371,7 +371,7 @@ export class TestRunner {
       debug('wrapping test in timeout timer')
       this.#timeout = {
         reject,
-        timer: setTimeout(() => this.#timeout!.reject(this.#createError('Test timeout')), duration),
+        timer: setTimeout(() => this.#timeout?.reject(this.#createError('Test timeout')), duration),
       }
     })
   }
@@ -384,7 +384,7 @@ export class TestRunner {
       debug('resetting timer')
       clearTimeout(this.#timeout.timer)
       this.#timeout.timer = setTimeout(
-        () => this.#timeout!.reject(this.#createError('Test timeout')),
+        () => this.#timeout?.reject(this.#createError('Test timeout')),
         duration
       )
     }
